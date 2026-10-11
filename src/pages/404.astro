@@ -1,0 +1,18 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Página no encontrada" description="La página que buscas no existe o cambió de dirección." >
+  <Fragment set:html={`<section class="cabecera cabecera--simple">
+  <div class="contenedor">
+    <p class="antetitulo">Error 404</p>
+    <h1>No encontramos esa página</h1>
+    <p class="entrada">Puede que haya cambiado de dirección. Estas secciones te pueden servir:</p>
+    <div class="botones">
+      <a class="boton boton--oscuro" href="/carreras/">Ver carreras</a>
+      <a class="boton boton--contorno" href="/continuidad-academica/">Evaluar mis estudios</a>
+      <a class="boton boton--contorno" href="/">Ir al inicio</a>
+    </div>
+  </div>
+</section>
+`} />
+</Layout>

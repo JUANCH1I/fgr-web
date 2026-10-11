@@ -1,0 +1,21 @@
+---
+import carrerasData from '../datos/carreras.json';
+
+const datosCarrerasNavegador = carrerasData.map((c: any) => ({
+  n: c.nombre,
+  s: c.slug,
+  a: c.area,
+  v: c.nivel,
+  r: (c.requisitos || []).join(' ')
+}));
+---
+<form class="buscador-portada" action="/carreras/" method="get" role="search" data-buscador-portada>
+  <label for="buscar-portada">¿Qué quieres estudiar?</label>
+  <div class="buscador-portada__campo">
+    <input id="buscar-portada" name="q" type="search" role="combobox" placeholder="Ej.: seguridad, diseño, podología" autocomplete="off" aria-autocomplete="list" aria-controls="sugerencias-portada" aria-expanded="false" />
+    <button type="submit" class="boton boton--contorno">Buscar</button>
+  </div>
+  <ul class="sugerencias" id="sugerencias-portada" role="listbox" hidden></ul>
+</form>
+
+<script type="application/json" id="datos-carreras" set:html={JSON.stringify(datosCarrerasNavegador)}></script>

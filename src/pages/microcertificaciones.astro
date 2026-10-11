@@ -1,0 +1,133 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Microcertificaciones académicas" description="Seminarios académicos breves y especializados de las maestrías, que puedes cursar de manera individual como puerta de entrada al posgrado." >
+  <Fragment set:html={`<section class="cabecera cabecera--clara">
+  <div class="contenedor">
+    <p class="antetitulo">Formación continua</p>
+    <h1>Microcertificaciones académicas</h1>
+    <p class="entrada">Seminarios académicos breves y especializados, pensados para fortalecer competencias concretas en áreas de formación avanzada. Pueden cursarse de manera individual, según las necesidades profesionales de cada persona, y son una puerta de entrada hacia trayectos académicos de mayor alcance.</p>
+    <div class="botones">
+      <a class="boton boton--oscuro" href="#maestrias">Explorar las maestrías</a>
+      <a class="boton boton--contorno" href="/contacto/">Hablar ahora con un asesor</a>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="que-son-titulo">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2 id="que-son-titulo">¿Qué son las microcertificaciones académicas?</h2>
+      <p class="entrada-oscura">Son experiencias formativas breves, focalizadas y especializadas, orientadas a desarrollar competencias específicas y aplicables en distintos campos profesionales. Permiten cursar contenidos concretos sin iniciar desde el comienzo un programa extenso.</p>
+    </div>
+    <div>
+      <h2>Una nueva forma de ingresar al ecosistema académico</h2>
+      <p>Las microcertificaciones permiten cursar unidades concretas con valor propio, sin necesidad de iniciar de inmediato una maestría completa. Funcionan como experiencia puntual, actualización profesional y posible puerta de entrada al posgrado.</p>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="funciona-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="funciona-titulo">¿Cómo funciona?</h2>
+      <p>Una ruta formativa breve, clara y especializada que permite desarrollar competencias concretas y continuar avanzando dentro del ecosistema académico.</p>
+    </div>
+    <ol class="momentos">
+      <li><p class="momentos__numero">1</p><h3>Explora</h3><p>Seleccionas una microcertificación vinculada al área que deseas fortalecer, actualizar o profundizar.</p></li>
+      <li><p class="momentos__numero">2</p><h3>Aprende</h3><p>Accedes a contenidos seleccionados y enfocados en habilidades concretas para tu campo profesional.</p></li>
+      <li><p class="momentos__numero">3</p><h3>Aplica</h3><p>Incorporas conocimientos que aportan valor real a tu perfil académico y profesional.</p></li>
+      <li><p class="momentos__numero">4</p><h3>Continúa</h3><p>Si lo deseas, puedes seguir con nuevas microcertificaciones u otros trayectos formativos de mayor alcance, según tu perfil, tus objetivos y la oferta académica disponible.</p></li>
+    </ol>
+    <div class="grilla grilla--3" style="margin-top:32px">
+      <div class="tarjeta">
+        <h3>Especialización puntual</h3>
+        <p>Eliges un tema específico y cursas un tramo académico directamente aplicable a tu perfil profesional.</p>
+      </div>
+      <div class="tarjeta">
+        <h3>Ingreso flexible</h3>
+        <p>Puedes comenzar por seminarios, por módulos o por segmentos organizados dentro de la estructura real de cada maestría.</p>
+      </div>
+      <div class="tarjeta">
+        <h3>Continuidad posible</h3>
+        <p>Estas experiencias pueden servir como antesala para trayectos de maestría o para una profundización académica posterior.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" id="maestrias" aria-labelledby="maestrias-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="maestrias-titulo">Maestrías</h2>
+      <p>Elige una maestría para ver sus áreas de conocimiento y los seminarios que puedes cursar.</p>
+    </div>
+    <div class="grilla grilla--3">
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_0d79c8b5477d4a50b540fc52cc2254f0~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_0d79c8b5477d4a50b540fc52cc2254f0~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/inteligencia-e-investigacion-criminal/">Inteligencia e Investigación Criminal</a></h3>
+      <p>Orientada a profesionales que buscan fortalecer el análisis, la investigación y la toma de decisiones en contextos de seguridad.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_3f17aa757ae04ea1b78faa0d54c2f5db~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_3f17aa757ae04ea1b78faa0d54c2f5db~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/gestion-de-las-instituciones-educativas/">Gestión de las Instituciones Educativas</a></h3>
+      <p>Para profesionales que buscan fortalecer la dirección, planificación y mejora estratégica de organizaciones educativas.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_18c0dc3d99d84c83a198b21063de8f1d~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_18c0dc3d99d84c83a198b21063de8f1d~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/ergonomia-ocupacional/">Ergonomía Ocupacional</a></h3>
+      <p>Para profesionales que desean mejorar condiciones de trabajo, prevenir riesgos y optimizar el bienestar ocupacional.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_36e7154726ee4616bd215043b315fb87~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_36e7154726ee4616bd215043b315fb87~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/politica-y-gestion-de-la-seguridad-ciudadana/">Política y Gestión de la Seguridad Ciudadana</a></h3>
+      <p>Dirigida a profesionales que buscan liderar, planificar y optimizar políticas, programas y acciones en seguridad ciudadana.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_79df2a780ae54b5e809844be0c6db770~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_79df2a780ae54b5e809844be0c6db770~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/kinesiologia-y-fisioterapia-cardiorrespiratoria/">Kinesiología y Fisioterapia Cardiorrespiratoria</a></h3>
+      <p>Formación avanzada para profesionales que desean profundizar en la evaluación e intervención en salud cardiorrespiratoria.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_51254f3e2d2d48e4993737c046112b85~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_51254f3e2d2d48e4993737c046112b85~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/politica-y-gestion-de-la-discapacidad-e-inclusion-social/">Política y Gestión de la Discapacidad e Inclusión Social</a></h3>
+      <p>Formación para profesionales interesados en diseñar, gestionar y evaluar políticas y estrategias de inclusión social.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+  <article class="tarjeta-imagen">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_bd7f1ef26b3d4b199422ae4e1cbb8eaa~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_bd7f1ef26b3d4b199422ae4e1cbb8eaa~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Maestría</p>
+      <h3><a href="/microcertificaciones/reentrenamiento-deportivo-y-prevencion-de-lesiones/">Reentrenamiento Deportivo y Prevención de Lesiones</a></h3>
+      <p>Maestría enfocada en profesionales que buscan optimizar el rendimiento físico y reducir riesgos de lesión en contextos deportivos.</p>
+      <span class="enlace-flecha" aria-hidden="true">Ver seminarios <span>→</span></span>
+    </div>
+  </article>
+</div>
+  </div>
+</section>
+`} />
+</Layout>

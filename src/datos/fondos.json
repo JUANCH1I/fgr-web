@@ -1,0 +1,246 @@
+{
+  "_nota": "Los seis fondos del Programa de Cooperación y Excelencia Académica (PCEA). Cada fondo genera su propia página en /fondos/<slug>/. En la oferta, \"carrera\" es el slug de la ficha (ver carreras.json); si queda vacío, la tarjeta se muestra sin enlace a ficha y lleva al asesor. Si \"texto\" queda vacío, se toma la primera oración del perfil del egresado de la ficha.",
+  "fondos": [
+    {
+      "slug": "seguridad-inteligencia-y-estrategia",
+      "rutaAnterior": "/copia-de-programa-de-excelencia-acadé-1",
+      "antetitulo": "Fortalecimiento Académico en",
+      "titulo": "Seguridad, Inteligencia y Estrategia",
+      "resumen": "Formación orientada a perfiles vinculados con análisis, prevención, control y protección institucional.",
+      "imagenTarjeta": "64d480_288d40c157924911a96160382b902016~mv2.jpg",
+      "imagenCabecera": "64d480_e767f9bec45745dd9fa916eb3944d859~mv2.jpg",
+      "entrada": "Este fondo está diseñado para ser el motor de profesionalización de instituciones encargadas del orden, la justicia y la seguridad integral. Su estructura permite cubrir desde la formación operativa hasta la alta dirección estratégica.",
+      "finalidad": "Este espacio académico reúne trayectos orientados a fortalecer capacidades institucionales, analíticas y estratégicas en materia de seguridad, defensa y gestión del orden público.",
+      "objetivos": [
+        { "titulo": "Profesionalización de cuadros", "texto": "Elevar el nivel académico de los funcionarios en ejercicio, dotándolos de herramientas analíticas y legales modernas." },
+        { "titulo": "Gestión basada en evidencia", "texto": "Capacitar en el uso de inteligencia criminal para la prevención del delito, superando el modelo reactivo tradicional." },
+        { "titulo": "Seguridad vial y civil", "texto": "Reducir la siniestralidad vial y mejorar la respuesta ante accidentes mediante formación especializada." },
+        { "titulo": "Ciberestrategia", "texto": "Preparar a la institución para las amenazas del espacio digital, integrando la ciberseguridad como un eje de la seguridad nacional." }
+      ],
+      "usoEstrategico": "Este fondo es ideal para convenios con el Ministerio del Interior, Policía Nacional, Fuerzas Armadas, Secretarías de Tránsito y empresas de seguridad privada que buscan licitar contratos públicos exigentes.",
+      "oferta": [
+        {
+          "grupo": "Tecnicaturas", "nivel": "Pregrado",
+          "carreras": [
+            { "nombre": "Seguridad Pública y Ciudadana", "texto": "Trayecto enfocado en prevención, control del delito y fortalecimiento de la seguridad urbana.", "imagen": "64d480_2008be750cc74c52884a61ba2e90aefb~mv2.png", "carrera": "tecnicatura-universitaria-en-seguridad-publica-y-ciudadana" }
+          ]
+        },
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Seguridad Vial y Accidentología", "texto": "Formación orientada al análisis de siniestros, prevención vial e investigación técnica del accidente.", "imagen": "64d480_77992d03a84e42e99b30922563aed582~mv2.png", "carrera": "ciclo-de-licenciatura-en-seguridad-vial-y-accidentologia" },
+            { "nombre": "Higiene y Seguridad Laboral", "texto": "Propuesta orientada a prevención de riesgos, salud ocupacional y control de condiciones de trabajo.", "imagen": "64d480_ccd236535cf14c26a30b3b42f0af1635~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-higiene-y-seguridad-laboral" },
+            { "nombre": "Seguridad Pública y Ciudadana", "texto": "Trayecto para fortalecer la gestión de políticas públicas, la seguridad territorial y la toma de decisiones.", "imagen": "64d480_625b397a26374a589dc973dfb783adb5~mv2.png", "carrera": "ciclo-de-licenciatura-en-seguridad-publica-y-ciudadana" },
+            { "nombre": "Gestión de la Calidad", "texto": "", "imagen": "64d480_6167ce41b333420db7efdce4baa4dfce~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-gestion-de-la-calidad", "_pendiente": "En el sitio anterior tenía copiado el texto de Higiene y Seguridad Laboral. Se toma el texto de la ficha." }
+          ]
+        },
+        {
+          "grupo": "Maestrías", "nivel": "Posgrado",
+          "carreras": [
+            { "nombre": "Inteligencia e Investigación Criminal", "texto": "Posgrado enfocado en evidencia, análisis avanzado, inteligencia aplicada y técnicas de investigación.", "imagen": "64d480_c9da17aedf6d40c1a8215631c30dabac~mv2.png", "carrera": "maestria-en-inteligencia-e-investigacion-criminal" },
+            { "nombre": "Política y Gestión de la Seguridad Ciudadana", "texto": "Trayecto de alta dirección para el diseño, liderazgo y evaluación de estrategias de seguridad ciudadana.", "imagen": "64d480_56db8dbf4a344b499c4e619536b65719~mv2.png", "carrera": "maestria-en-politica-y-gestion-de-la-seguridad-ciudadana" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para fortalecer tu futuro en Seguridad y Defensa?", "texto": "Únete a una comunidad de profesionales comprometidos con la excelencia, la protección y el servicio a la sociedad." }
+    },
+    {
+      "slug": "industrias-creativas",
+      "rutaAnterior": "/copia-de-desarrollo-y-transformación",
+      "antetitulo": "Innovación y Profesionalización en",
+      "titulo": "Industrias Creativas",
+      "resumen": "Espacios de crecimiento para diseño, creatividad, producción visual e innovación aplicada.",
+      "imagenTarjeta": "64d480_92d353eb7d4c46e8b6802264ff5a0479~mv2.jpg",
+      "imagenCabecera": "64d480_b56e3168758d40dd84a8ec48e20af57b~mv2.png",
+      "entrada": "Formación académica integral que estimula la creatividad, la innovación y el desarrollo de capacidades para diseñar y comunicar en un mundo más visual y en constante cambio.",
+      "finalidad": "Este espacio reúne trayectos orientados a fortalecer diseño, comunicación, estética aplicada y construcción de identidad visual, con impacto en industrias creativas y mercados culturales.",
+      "objetivos": [
+        { "titulo": "Competitividad industrial", "texto": "Aplicar el diseño para mejorar la identidad y el posicionamiento de empresas y productos en mercados locales e internacionales." },
+        { "titulo": "Innovación sostenible", "texto": "Fomentar nuevas formas de producción en moda e interiores que respondan a las demandas del mercado actual." },
+        { "titulo": "Identidad y comunicación", "texto": "Crear estrategias visuales sólidas que permitan a las organizaciones comunicar sus valores de forma efectiva." },
+        { "titulo": "Gestión de espacios", "texto": "Profesionalizar la intervención en hábitats humanos, mejorando la funcionalidad y estética de los entornos corporativos y privados." }
+      ],
+      "usoEstrategico": "Ideal para Cámaras de la Producción, clústeres textiles, agencias de publicidad y estudios de arquitectura o interiorismo.",
+      "oferta": [
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Diseño e Innovación en Moda", "texto": "Programa orientado al desarrollo de identidad, tendencias e innovación para crear valor dentro del ecosistema textil y de moda.", "imagen": "64d480_0d48120bb0194351acefb494d87910e3~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-diseno-e-innovacion-en-moda" },
+            { "nombre": "Diseño de Comunicación Visual", "texto": "Especialización con orientación a entornos visuales y construcción de mensaje para un mundo digital y multiplataforma.", "imagen": "64d480_bf639534383f4168b0656cce2affca0b~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-diseno-de-comunicacion-visual" },
+            { "nombre": "Diseño de Espacios Interiores", "texto": "Carrera para desarrollar y diseñar espacios funcionales y estéticamente atractivos con enfoque profesional.", "imagen": "64d480_5316ebdeaefa4e24bd19bc750bed58c9~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-diseno-de-espacios-interiores" }
+          ]
+        },
+        {
+          "grupo": "Licenciaturas", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Diseño Gráfico", "texto": "Carrera orientada al diseño gráfico y la comunicación visual para diversos medios, soportes y ecosistemas de marca.", "imagen": "64d480_733333ba808944969ec62adab9abf86a~mv2.jpg", "carrera": "licenciatura-en-diseno-grafico" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para fortalecer tu futuro?", "texto": "Únete a una comunidad de creadores innovadores que buscan inspirar y transformar visualmente el mundo." }
+    },
+    {
+      "slug": "desarrollo-tecnologico-y-transformacion-digital",
+      "rutaAnterior": "/copia-de-seguridad-inteligencia-y-es",
+      "antetitulo": "Desarrollo Tecnológico y",
+      "titulo": "Transformación Digital",
+      "resumen": "Programas dirigidos a innovación, tecnología, analítica y herramientas para la economía del conocimiento.",
+      "imagenTarjeta": "64d480_327d388e5e7747a7a3f63f3b9d1be332~mv2.jpg",
+      "imagenCabecera": "64d480_a13524d799064861a75cc0f0f7cf1d68~mv2.png",
+      "entrada": "Este fondo se posiciona como una respuesta estratégica a la demanda de talento altamente calificado en áreas críticas de la industria 4.0. Su enfoque no es solo técnico, sino que busca formar líderes capaces de gestionar infraestructuras digitales y analizar grandes volúmenes de información para la toma de decisiones.",
+      "finalidad": "Este espacio reúne trayectos orientados a datos, programación, ciberseguridad y liderazgo digital, con una mirada aplicada a la transformación de organizaciones públicas y privadas.",
+      "objetivos": [
+        { "titulo": "Soberanía tecnológica", "texto": "Capacitar profesionales que puedan desarrollar y mantener sistemas propios, reduciendo la dependencia de proveedores externos." },
+        { "titulo": "Cultura de datos", "texto": "Fomentar el uso de la IA y el Big Data para transformar datos brutos en inteligencia de negocio o estrategia gubernamental." },
+        { "titulo": "Resiliencia digital", "texto": "Defender infraestructuras críticas ante ataques cibernéticos con una visión estratégica." },
+        { "titulo": "Innovación en procesos", "texto": "Transformar tareas y optimizar flujos de trabajo mediante la incorporación gradual y eficiente de herramientas tecnológicas." }
+      ],
+      "usoEstrategico": "Este fondo es ideal para convenios con Cámaras de Software, Ministerios de Telecomunicaciones, bancos y empresas que se encuentran en procesos de migración digital o implementación de IA.",
+      "oferta": [
+        {
+          "grupo": "Tecnicaturas", "nivel": "Pregrado",
+          "carreras": [
+            { "nombre": "Ciencia de Datos e Inteligencia Artificial", "texto": "Formación orientada al análisis, modelado, minería y visualización de datos con aplicaciones actuales.", "imagen": "64d480_3c2b879f0af64e129e9ecbf3dadc7a99~mv2.jpg", "carrera": "", "_pendiente": "No está entre las 46 carreras cargadas. Falta su ficha." },
+            { "nombre": "Ciberseguridad", "texto": "Trayecto centrado en monitoreo, redes, protección de sistemas y análisis de amenazas cibernéticas.", "imagen": "64d480_3c16a577cb3a479f9c1054528ccd22d4~mv2.jpg", "carrera": "tecnicatura-universitaria-en-ciberseguridad" },
+            { "nombre": "Programación", "texto": "Capacitación en principios de desarrollo, lógica, estructuras y pensamiento computacional aplicado.", "imagen": "64d480_cc11e20f0bdd41b1a8c5c933d9758f9a~mv2.jpg", "carrera": "", "_pendiente": "No está entre las 46 carreras cargadas. Falta su ficha." }
+          ]
+        },
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Ciencia de Datos", "texto": "Programa enfocado en fundamentos de analítica, interpretación avanzada y toma de decisiones basada en datos.", "imagen": "64d480_7e7d8f9362ec49a1b80256fb6f3f94e5~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-ciencia-de-datos" },
+            { "nombre": "Ciberseguridad", "texto": "Formación orientada al control de riesgos, seguridad defensiva y continuidad operativa en entornos críticos.", "imagen": "64d480_ccde6fbca484495f997a6550c119b0c5~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-ciberseguridad" }
+          ]
+        },
+        {
+          "grupo": "Licenciaturas", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Agrotecnología", "texto": "Integra ciencias agrarias y tecnología para gestionar agricultura de precisión, datos e inteligencia artificial.", "imagen": "64d480_6c832f4c1d0a4d19824389fd113eda85~mv2.png", "carrera": "licenciatura-en-agrotecnologia" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para fortalecer el futuro de los datos y la IA?", "texto": "Únete a una comunidad de profesionales que están liderando la innovación tecnológica y transformando el mundo a través del análisis de datos, la programación y la inteligencia artificial." }
+    },
+    {
+      "slug": "inclusion-social-y-sistema-educativo",
+      "rutaAnterior": "/copia-de-salud-rehabilitación-y-deporte",
+      "antetitulo": "Impulso a la Inclusión Social y",
+      "titulo": "Gestión del Sistema Educativo",
+      "resumen": "Propuestas dirigidas a educación, acompañamiento, inclusión y liderazgo institucional.",
+      "imagenTarjeta": "64d480_b1d3cfc7e21f4db1b31b0e3496efa701~mv2.jpg",
+      "imagenCabecera": "64d480_acfbb7f18bec4d80ad1a992920a9fe9d~mv2.png",
+      "entrada": "Este fondo está diseñado para fortalecer las instituciones que sostienen el tejido social y educativo. Su enfoque es la profesionalización de la gestión y la intervención técnica en áreas de alta sensibilidad humana.",
+      "finalidad": "La finalidad de este espacio es modernizar la gestión educativa y social, asegurando que la inclusión sea técnica y profesional, no solo discursiva.",
+      "objetivos": [
+        { "titulo": "Liderazgo educativo", "texto": "Formar directivos capaces de transformar instituciones escolares mediante modelos de gestión eficientes y adaptados a la realidad actual." },
+        { "titulo": "Abordaje integral de la discapacidad", "texto": "Especializar a profesionales en el diseño de políticas y prácticas que garanticen la autonomía y el derecho de las personas con discapacidad." },
+        { "titulo": "Soporte terapéutico", "texto": "Profesionalizar la figura del acompañante y el psicopedagogo como piezas clave en la salud mental y el aprendizaje." },
+        { "titulo": "Actualización docente", "texto": "Brindar herramientas pedagógicas de nivel universitario a quienes ya ejercen la enseñanza en niveles superiores." }
+      ],
+      "usoEstrategico": "Ideal para convenios con el Ministerio de Educación, gobiernos locales (secretarías de desarrollo social), ONG internacionales y redes de colegios privados.",
+      "oferta": [
+        {
+          "grupo": "Tecnicaturas", "nivel": "Pregrado",
+          "carreras": [
+            { "nombre": "Acompañamiento Terapéutico en Salud Mental y Adicciones", "texto": "Formación para acompañar procesos vinculados a salud mental y adicciones con enfoque integral.", "imagen": "64d480_f615ad2fef914debb6383cfae0be6d72~mv2.jpg", "carrera": "", "_pendiente": "No está entre las 46 carreras cargadas. Falta su ficha." }
+          ]
+        },
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Acompañamiento Terapéutico", "texto": "Prepara profesionales para brindar apoyo, contención y acompañamiento en distintos contextos.", "imagen": "64d480_bd9f34457c354e06a4a9d23e14de21f3~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-acompanamiento-terapeutico" },
+            { "nombre": "Gestión de la Educación", "texto": "Desarrolla habilidades para liderar, planificar y mejorar procesos educativos.", "imagen": "64d480_a146fefff2004fb8a8ad034f81ea729e~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-gestion-de-la-educacion" },
+            { "nombre": "Discapacidad y Deporte", "texto": "Enfocada en inclusión, movimiento y prácticas deportivas adaptadas para personas con discapacidad.", "imagen": "64d480_7dfb8b1121a8413bbc80562b059ad331~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-discapacidad-y-deporte" }
+          ]
+        },
+        {
+          "grupo": "Licenciaturas", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Psicopedagogía", "texto": "Aborda el aprendizaje, sus dificultades y el acompañamiento educativo integral.", "imagen": "64d480_8294e47f221c4f428bc6131e8e9034b4~mv2.jpg", "carrera": "licenciatura-en-psicopedagogia" }
+          ]
+        },
+        {
+          "grupo": "Maestrías", "nivel": "Posgrado",
+          "carreras": [
+            { "nombre": "Gestión de las Instituciones Educativas", "texto": "Maestría para fortalecer la conducción y mejora estratégica de instituciones educativas.", "imagen": "64d480_07447718fab04be1860b62a1e8134def~mv2.jpg", "carrera": "maestria-en-gestion-de-las-instituciones-educativas" },
+            { "nombre": "Política y Gestión de la Discapacidad e Inclusión Social", "texto": "Maestría orientada al diseño y gestión de políticas de inclusión y discapacidad.", "imagen": "64d480_fdbdef86ca884c2b9cf2faab314f7abb~mv2.jpg", "carrera": "maestria-en-politica-y-gestion-de-la-discapacidad-e-inclusion-social" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para impulsar un cambio positivo en la inclusión social?", "texto": "Únete a una comunidad de profesionales comprometidos con la equidad y el bienestar de las personas con discapacidad." }
+    },
+    {
+      "slug": "salud-rehabilitacion-y-deporte",
+      "rutaAnterior": "/copia-de-seguridad-inteligencia-y-es-1",
+      "antetitulo": "Alta Especialización en",
+      "titulo": "Salud, Rehabilitación y Deporte",
+      "resumen": "Trayectos académicos pensados para bienestar integral, recuperación funcional y desarrollo profesional.",
+      "imagenTarjeta": "64d480_13d49312202a43ec80cfa1be0b2f1627~mv2.jpg",
+      "imagenCabecera": "64d480_d1f1d4c3474b4916b884b9a212012e4e~mv2.png",
+      "entrada": "Se centra en la excelencia clínica y la recuperación de la funcionalidad humana. No se limita a la atención básica, sino que busca formar expertos en áreas de alta complejidad y rendimiento físico.",
+      "finalidad": "Este espacio reúne trayectos orientados a fortalecer la práctica clínica, la recuperación funcional y la capacidad de intervención especializada en salud humana, deporte y bienestar.",
+      "objetivos": [
+        { "titulo": "Especialización clínica", "texto": "Proveer al sistema de salud profesionales con posgrados específicos en áreas críticas: respiratoria, neurológica y músculo-esquelética." },
+        { "titulo": "Alto rendimiento y prevención", "texto": "Capacitar en la gestión del deportista de élite, minimizando riesgos de lesión y optimizando el retorno al campo." },
+        { "titulo": "Tecnología en salud", "texto": "Fomentar la bioética y el uso de dispositivos de asistencia, prótesis y órtesis para mejorar la calidad de vida de personas con discapacidad." },
+        { "titulo": "Enfoque holístico de la salud", "texto": "Integrar la salud física con la psicomotricidad y la terapia ocupacional para una rehabilitación integral." }
+      ],
+      "usoEstrategico": "Este fondo es ideal para federaciones deportivas, clínicas de rehabilitación, hospitales de alta complejidad y compañías de seguros de salud.",
+      "oferta": [
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Podología", "texto": "Trayecto enfocado en cuidado, prevención y abordaje clínico de la salud del pie.", "imagen": "64d480_4d39d643247d41c4b6ad24521487b88b~mv2.png", "carrera": "ciclo-de-licenciatura-en-podologia" },
+            { "nombre": "Actividad Física", "texto": "Programa vinculado al desarrollo y la promoción de la actividad física, el movimiento y el rendimiento saludable.", "imagen": "64d480_6d8f749e1b354d40a9b2221a3e58f6a0~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-actividad-fisica" }
+          ]
+        },
+        {
+          "grupo": "Licenciaturas", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Podología", "texto": "Programa universitario orientado al abordaje clínico, preventivo y terapéutico de la salud del pie.", "imagen": "64d480_b8da6c91c5d248759c2d28c2dc3ef876~mv2.png", "carrera": "licenciatura-en-podologia" },
+            { "nombre": "Órtesis y Prótesis", "texto": "", "imagen": "64d480_b913db3f7ecd4d44b43c7bc25eeb1ef4~mv2.jpg", "carrera": "licenciatura-en-ortesis-y-protesis", "_pendiente": "En el sitio anterior tenía copiado el texto de Programación. Se toma el texto de la ficha." }
+          ]
+        },
+        {
+          "grupo": "Maestrías", "nivel": "Posgrado",
+          "carreras": [
+            { "nombre": "Kinesiología y Fisioterapia Cardiorrespiratoria", "texto": "Posgrado orientado al abordaje avanzado del paciente con alteraciones cardiorrespiratorias.", "imagen": "64d480_a07b242e41514a008f1989fb8b895d54~mv2.png", "carrera": "maestria-en-kinesiologia-y-fisioterapia-cardiorrespiratoria" },
+            { "nombre": "Reentrenamiento Deportivo y Prevención de Lesiones", "texto": "Programa especializado en optimización del rendimiento físico y recuperación deportiva.", "imagen": "64d480_f166d4ad3f274522b07190e3dd45fbfb~mv2.png", "carrera": "maestria-en-reentrenamiento-deportivo-y-prevencion-de-lesiones" },
+            { "nombre": "Ergonomía Ocupacional", "texto": "Trayecto enfocado en prevención de riesgos, biomecánica y optimización del entorno de trabajo.", "imagen": "64d480_24b9fe9251e34457b722f7b7f57546df~mv2.jpg", "carrera": "maestria-en-ergonomia-ocupacional" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para transformar vidas a través de la salud y el bienestar?", "texto": "Únete a una comunidad de profesionales comprometidos con el cuidado integral, la rehabilitación y la mejora de la calidad de vida de las personas." }
+    },
+    {
+      "slug": "salud-estetica-e-integral",
+      "rutaAnterior": "/copia-de-desarrollo-y-transformación-1",
+      "antetitulo": "Certificación y Bienestar en",
+      "titulo": "Salud Estética e Integral",
+      "resumen": "Opciones de formación con orientación profesional, actualización y especialización aplicada.",
+      "imagenTarjeta": "64d480_60628e4f72094e639e49d41f786ae7e0~mv2.jpg",
+      "imagenCabecera": "64d480_b5eae2ff995046848d3207123fc19d87~mv2.png",
+      "entrada": "Este fondo responde a una necesidad de mercado: la jerarquización de oficios con alta demanda que suelen carecer de respaldo académico formal. Busca convertir el bienestar en una disciplina de salud científica y responsable.",
+      "finalidad": "",
+      "objetivos": [],
+      "usoEstrategico": "",
+      "_pendiente": "En el sitio anterior, la finalidad, los objetivos y el uso estratégico de este fondo estaban copiados del fondo de Desarrollo Tecnológico. Faltan los textos propios; mientras tanto la sección no se muestra.",
+      "oferta": [
+        {
+          "grupo": "Tecnicaturas", "nivel": "Pregrado",
+          "carreras": [
+            { "nombre": "Yoga y Salud Integral", "texto": "Formación enfocada en bienestar, movimiento consciente y salud integral.", "imagen": "nsplsh_21c8a738c46343ca8ceeebd897f99a4b~mv2.jpg", "carrera": "tecnicatura-universitaria-en-yoga-y-salud-integral" },
+            { "nombre": "Cosmetología Facial y Corporal", "texto": "Prepara profesionales en cuidado estético, bienestar y atención integral de la piel.", "imagen": "64d480_c1c9ab16a32f4bb7b7ceb2d32ea420d2~mv2.jpg", "carrera": "", "_pendiente": "La tecnicatura no está entre las 46 carreras cargadas (sí la licenciatura). Falta su ficha." }
+          ]
+        },
+        {
+          "grupo": "Ciclos de Licenciatura", "nivel": "Grado",
+          "carreras": [
+            { "nombre": "Cosmetología Facial y Corporal", "texto": "Profundiza en técnicas estéticas orientadas al cuidado facial y corporal profesional.", "imagen": "64d480_5cba4ef54212406b8ef48f34085b02f4~mv2.jpg", "carrera": "ciclo-de-licenciatura-en-cosmetologia" }
+          ]
+        }
+      ],
+      "cierre": { "titulo": "¿Listo para dar el siguiente paso?", "texto": "Un asesor revisa tu caso y te dice qué opciones tienes en este fondo." }
+    }
+  ]
+}

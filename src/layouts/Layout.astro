@@ -1,0 +1,365 @@
+---
+import sitio from '../datos/sitio.json';
+import { resolverImagen } from '../lib/imagen';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  class?: string;
+  cierre?: boolean | { titulo?: string; texto?: string };
+  schema?: Record<string, any> | Array<Record<string, any>>;
+  type?: 'website' | 'article' | 'course';
+}
+
+const {
+  title,
+  description = sitio.descripcion,
+  image = sitio.imagenCompartir,
+  class: className,
+  cierre = true,
+  schema,
+  type = 'website'
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const ruta = pathname === '' ? '/' : pathname;
+
+const tituloCompleto = ruta === '/'
+  ? `${sitio.nombre} | Carreras universitarias a distancia`
+  : `${title} | ${sitio.nombre}`;
+
+const canonicalURL = new URL(ruta, Astro.site || 'https://www.fgrec.org');
+const imagenURL = resolverImagen(image, 1200);
+const logoURL = resolverImagen(sitio.logo, 600);
+
+function rutaActiva(url: string, current: string) {
+  if (url === '/') return current === '/';
+  return current === url || current.startsWith(url);
+}
+
+const c = sitio.contacto;
+
+// Schema JSON-LD base (EducationalOrganization / NGO)
+const organizacionSchema = {
+  '@type': 'EducationalOrganization',
+  '@id': 'https://www.fgrec.org/#organization',
+  'name': sitio.nombre,
+  'alternateName': sitio.nombreCorto,
+  'url': 'https://www.fgrec.org',
+  'logo': {
+    '@type': 'ImageObject',
+    'url': logoURL
+  },
+  'description': sitio.descripcion,
+  'address': {
+    '@type': 'PostalAddress',
+    'streetAddress': c.direccion,
+    'addressLocality': 'Quito',
+    'addressCountry': 'EC'
+  },
+  'telephone': c.telefono,
+  'email': c.correo,
+  'sameAs': sitio.redes.map((r: any) => r.url)
+};
+
+const webSiteSchema = {
+  '@type': 'WebSite',
+  '@id': 'https://www.fgrec.org/#website',
+  'url': 'https://www.fgrec.org',
+  'name': sitio.nombre,
+  'publisher': {
+    '@id': 'https://www.fgrec.org/#organization'
+  },
+  'inLanguage': sitio.idioma || 'es'
+};
+
+const grafos = [organizacionSchema, webSiteSchema];
+if (schema) {
+  if (Array.isArray(schema)) {
+    grafos.push(...schema);
+  } else {
+    grafos.push(schema);
+  }
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': grafos
+};
+---
+<!doctype html>
+<html lang={sitio.idioma || 'es'}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{tituloCompleto}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content={type === 'course' ? 'website' : type} />
+  <meta property="og:locale" content="es_EC" />
+  <meta property="og:site_name" content={sitio.nombre} />
+  <meta property="og:title" content={title || sitio.nombre} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:image" content={imagenURL} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title || sitio.nombre} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={imagenURL} />
+  <meta name="theme-color" content="#0B1B2E" />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <!-- Favicon e iconos de pestaña con el isotipo oficial del logo -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="preload" href="/assets/fuentes/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fuentes/newsreader-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preconnect" href="https://static.wixstatic.com" />
+  <link rel="stylesheet" href="/assets/css/sitio.css" />
+  <ClientRouter fallback="swap" />
+  <style is:global>
+    /* View Transitions optimizadas para contenido central */
+    main#contenido {
+      view-transition-name: main-content;
+    }
+
+    ::view-transition-old(main-content) {
+      animation: 220ms cubic-bezier(0.4, 0, 1, 1) both astroPageOut;
+    }
+
+    ::view-transition-new(main-content) {
+      animation: 260ms cubic-bezier(0, 0, 0.2, 1) 40ms both astroPageIn;
+    }
+
+    @keyframes astroPageOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+
+    @keyframes astroPageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Comportamiento instantáneo para usuarios con prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*) {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+  <slot name="extraHead" />
+</head>
+<body class={className}>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <!-- Cabecera persistente: no salta ni parpadea -->
+  <header class="cabecera-sitio" transition:persist="header-sitio">
+    <div class="contenedor cabecera-sitio__fila">
+      <a class="marca" href="/">
+        <img class="marca__logo" src={logoURL} alt={`${sitio.nombre} — inicio`} width="204" height="60" />
+      </a>
+      <div class="cabecera-sitio__acciones">
+        <a class="cabecera-sitio__dato" href={`mailto:${c.correo}`}>{c.correo}</a>
+        <a class="boton boton--acento" href={sitio.enlaces.asesor}>Hablar ahora con un asesor</a>
+      </div>
+      <button type="button" class="boton-menu" aria-expanded="false" aria-controls="menu-principal">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+        <span>Menú</span>
+      </button>
+    </div>
+    <nav class="menu" id="menu-principal" aria-label="Principal">
+      <div class="contenedor">
+        <ul class="menu__lista">
+          {sitio.menu.map((item, i) => {
+            const activo = rutaActiva(item.url, ruta) || (item.submenu || []).some((s) => rutaActiva(s.url, ruta));
+            if (!item.submenu) {
+              return (
+                <li>
+                  <a class="menu__enlace" href={item.url} aria-current={activo ? 'page' : undefined}>
+                    {item.texto}
+                  </a>
+                </li>
+              );
+            }
+            const id = `submenu-${i}`;
+            return (
+              <li class="menu__grupo">
+                <button type="button" class="menu__enlace menu__desplegar" aria-expanded="false" aria-controls={id} data-activo={activo ? '' : undefined}>
+                  {item.texto}{' '}
+                  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                    <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  </svg>
+                </button>
+                <ul class="submenu" id={id}>
+                  {item.submenu.map((s) => (
+                    <li>
+                      <a href={s.url} aria-current={rutaActiva(s.url, ruta) && s.url === ruta ? 'page' : undefined}>
+                        {s.texto}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <slot />
+  </main>
+
+  <!-- Cierre Asesor -->
+  {cierre && (
+    <section class="cierre" aria-labelledby="cierre-titulo">
+      <div class="contenedor cierre__fila">
+        <div>
+          <h2 id="cierre-titulo">
+            {typeof cierre === 'object' && cierre.titulo ? cierre.titulo : '¿Prefieres que lo veamos juntos?'}
+          </h2>
+          <p>
+            {typeof cierre === 'object' && cierre.texto ? cierre.texto : 'Un asesor revisa tu caso y te dice qué opciones tienes. Sin compromiso.'}
+          </p>
+        </div>
+        <div class="botones">
+          <a class="boton boton--acento" href={sitio.enlaces.asesor}>Hablar ahora con un asesor</a>
+          {sitio.enlaces.agenda && <a class="boton boton--claro" href={sitio.enlaces.agenda} target="_blank" rel="noopener">Agendar entrevista</a>}
+          {!sitio.enlaces.agenda && <a class="boton boton--claro" href="/continuidad-academica/">Evaluar mis estudios</a>}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Pie persistente -->
+  <footer class="pie" transition:persist="footer-sitio">
+    <div class="contenedor pie__columnas">
+      <div class="pie__datos">
+        <p class="pie__nombre">{sitio.nombre}</p>
+        <p>{c.direccion}. {c.ciudad}. Sede y hub internacional.</p>
+        <p>{sitio.pie.oficinas}</p>
+        <p>
+          <a href={`tel:${c.telefono.replace(/[^+\d]/g, '')}`}>{c.telefono}</a> · <a href={`mailto:${c.correo}`}>{c.correo}</a>
+        </p>
+      </div>
+      <nav class="pie__enlaces" aria-label="Sitio">
+        <p class="pie__titulo">Sitio</p>
+        <ul>
+          {sitio.pie.enlaces.map((e) => (
+            <li><a href={e.url}>{e.texto}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <nav class="pie__enlaces" aria-label="Información legal">
+        <p class="pie__titulo">Información legal</p>
+        <ul>
+          {sitio.pie.legales.map((e) => (
+            <li><a href={e.url}>{e.texto}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <nav class="pie__enlaces" aria-label="Redes sociales">
+        <p class="pie__titulo">Redes</p>
+        <ul>
+          {sitio.redes.map((r) => (
+            <li><a href={r.url} target="_blank" rel="noopener">{r.nombre}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+    <div class="pie__legal">
+      <div class="contenedor">
+        <p>
+          {sitio.pie.resolucion}
+          {sitio.enlaces.resolucion && (
+            <> <a href={sitio.enlaces.resolucion} target="_blank" rel="noopener">Ver resolución</a></>
+          )}
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Barra móvil persistente -->
+  <nav class="barra-movil" aria-label="Accesos rápidos" transition:persist="barra-movil">
+    <a class="boton boton--oscuro" href="/continuidad-academica/#evaluar">Evaluar mis estudios</a>
+    <a class="boton boton--contorno" href={sitio.enlaces.asesor} target={/^https?:/.test(sitio.enlaces.asesor) ? '_blank' : undefined} rel="noopener">Hablar con un asesor</a>
+  </nav>
+
+  <script is:inline src="/assets/js/sitio.js"></script>
+  <script is:inline>
+    // Actualizar estado activo del menú en la cabecera persistente
+    function actualizarMenuActivo() {
+      const rutaActual = window.location.pathname;
+      const normalizar = (p) => p === '' ? '/' : p.endsWith('/') ? p : p + '/';
+      const actualNorm = normalizar(rutaActual);
+
+      // Limpiar estados previos
+      document.querySelectorAll('#menu-principal [aria-current]').forEach(el => el.removeAttribute('aria-current'));
+      document.querySelectorAll('#menu-principal [data-activo]').forEach(el => el.removeAttribute('data-activo'));
+
+      // Marcar enlaces directos
+      document.querySelectorAll('#menu-principal a.menu__enlace').forEach(a => {
+        const href = normalizar(a.getAttribute('href') || '');
+        if (href === '/' && actualNorm === '/') {
+          a.setAttribute('aria-current', 'page');
+        } else if (href !== '/' && actualNorm.startsWith(href)) {
+          a.setAttribute('aria-current', 'page');
+        }
+      });
+
+      // Marcar submenús
+      document.querySelectorAll('#menu-principal .menu__grupo').forEach(grupo => {
+        let grupoTieneActivo = false;
+        grupo.querySelectorAll('.submenu a').forEach(a => {
+          const href = normalizar(a.getAttribute('href') || '');
+          if (href === actualNorm) {
+            a.setAttribute('aria-current', 'page');
+            grupoTieneActivo = true;
+          }
+        });
+        const btn = grupo.querySelector('.menu__desplegar');
+        if (btn && grupoTieneActivo) {
+          btn.setAttribute('data-activo', '');
+        }
+      });
+    }
+
+    document.addEventListener('astro:page-load', () => {
+      actualizarMenuActivo();
+      if (window.iniciarSitio && typeof window.iniciarSitio === 'function') {
+        window.iniciarSitio();
+      }
+    });
+  </script>
+  <slot name="extraScripts" />
+</body>
+</html>

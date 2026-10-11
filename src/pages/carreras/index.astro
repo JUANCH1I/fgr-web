@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import sitio from '../../datos/sitio.json';
+import carrerasJson from '../../datos/carreras.json';
+import { listadoCarreras } from '../../lib/carreras.mjs';
+
+const carreras = carrerasJson.carreras;
+const pagina = listadoCarreras(sitio, carreras);
+---
+<Layout 
+  title={pagina.titulo || "Carreras universitarias a distancia"} 
+  description={pagina.descripcion || "Catálogo completo de carreras de grado, ciclos de complementación y posgrados a distancia."}
+>
+  <Fragment set:html={pagina.contenido} />
+</Layout>

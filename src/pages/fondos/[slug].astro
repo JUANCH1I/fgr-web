@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import sitio from '../../datos/sitio.json';
+import fondosJson from '../../datos/fondos.json';
+import carrerasJson from '../../datos/carreras.json';
+import { paginaFondo } from '../../lib/programas.mjs';
+
+const fondos = fondosJson.fondos;
+const carreras = carrerasJson.carreras;
+
+export async function getStaticPaths() {
+  const fList = fondosJson.fondos;
+  const cList = carrerasJson.carreras;
+  return fList.map((f: any) => ({
+    params: { slug: f.slug },
+    props: { fondo: f, cList }
+  }));
+}
+
+const { fondo, cList } = Astro.props;
+const carrerasMap = new Map(cList.map((c: any) => [c.slug, c]));
+const pagina = paginaFondo(sitio, fondo, carrerasMap);
+---
+<Layout 
+  title={pagina.titulo || `${fondo.antetitulo} ${fondo.titulo}`} 
+  description={pagina.descripcion || fondo.resumen}
+  image={pagina.imagen || fondo.imagenTarjeta}
+  cierre={pagina.cierre}
+>
+  <Fragment set:html={pagina.contenido} />
+</Layout>

@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import sitio from '../../datos/sitio.json';
+import carrerasJson from '../../datos/carreras.json';
+import fondosJson from '../../datos/fondos.json';
+import microJson from '../../datos/microcertificaciones.json';
+import { ficha } from '../../lib/carreras.mjs';
+
+const carreras = carrerasJson.carreras;
+const fondos = fondosJson.fondos;
+const maestrias = microJson.maestrias;
+
+export async function getStaticPaths() {
+  const cList = carrerasJson.carreras;
+  return cList.map((c: any) => ({
+    params: { slug: c.slug },
+    props: { carrera: c }
+  }));
+}
+
+const { carrera } = Astro.props;
+const pagina = ficha(sitio, carrera, { carreras, fondos, maestrias });
+
+// Course schema
+const courseSchema = {
+  '@type': 'Course',
+  '@id': `https://www.fgrec.org/carreras/${carrera.slug}/#course`,
+  'name': carrera.nombre,
+  'description': carrera.resumen || `${carrera.nombre} a distancia en ${carrera.universidad}.`,
+  'provider': {
+    '@type': 'EducationalOrganization',
+    'name': carrera.universidad,
+    'sameAs': 'https://www.fgrec.org'
+  },
+  'educationalCredentialAwarded': carrera.titulo || carrera.nombre,
+  'courseMode': carrera.instanciasPresenciales ? 'Blended' : 'Online',
+  'timeRequired': carrera.duracion,
+  'inLanguage': 'es'
+};
+
+const breadcrumbSchema = {
+  '@type': 'BreadcrumbList',
+  'itemListElement': [
+    {
+      '@type': 'ListItem',
+      'position': 1,
+      'name': 'Inicio',
+      'item': 'https://www.fgrec.org/'
+    },
+    {
+      '@type': 'ListItem',
+      'position': 2,
+      'name': 'Carreras',
+      'item': 'https://www.fgrec.org/carreras/'
+    },
+    {
+      '@type': 'ListItem',
+      'position': 3,
+      'name': carrera.nombre,
+      'item': `https://www.fgrec.org/carreras/${carrera.slug}/`
+    }
+  ]
+};
+---
+<Layout 
+  title={pagina.titulo || carrera.nombre} 
+  description={pagina.descripcion || carrera.resumen || `${carrera.nombre} a distancia.`}
+  image={carrera.imagenTarjeta}
+  type="course"
+  schema={[courseSchema, breadcrumbSchema]}
+>
+  <Fragment set:html={pagina.contenido} />
+</Layout>

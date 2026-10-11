@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import sitio from '../../datos/sitio.json';
+import microJson from '../../datos/microcertificaciones.json';
+import carrerasJson from '../../datos/carreras.json';
+import { paginaMaestria } from '../../lib/programas.mjs';
+
+const maestrias = microJson.maestrias;
+const carreras = carrerasJson.carreras;
+
+export async function getStaticPaths() {
+  const mList = microJson.maestrias;
+  const cList = carrerasJson.carreras;
+  return mList.map((m: any) => ({
+    params: { slug: m.slug },
+    props: { maestria: m, cList }
+  }));
+}
+
+const { maestria, cList } = Astro.props;
+const carrerasMap = new Map(cList.map((c: any) => [c.slug, c]));
+const pagina = paginaMaestria(sitio, maestria, carrerasMap);
+---
+<Layout 
+  title={pagina.titulo || maestria.titulo} 
+  description={pagina.descripcion || maestria.resumen}
+  image={pagina.imagen || maestria.imagen}
+>
+  <Fragment set:html={pagina.contenido} />
+</Layout>

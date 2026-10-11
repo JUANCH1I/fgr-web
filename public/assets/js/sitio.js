@@ -1,0 +1,496 @@
+/* Fundación del Gran Rosario Ecuador — comportamiento del sitio.
+   Sin dependencias. Cada bloque se activa solo si la página tiene el elemento. */
+window.iniciarSitio = function () {
+  'use strict';
+
+  function $(selector, raiz) { return (raiz || document).querySelector(selector); }
+  function $$(selector, raiz) { return Array.prototype.slice.call((raiz || document).querySelectorAll(selector)); }
+  function normalizar(texto) {
+    return String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+  function leerDatos(id) {
+    var el = document.getElementById(id);
+    if (!el) { return null; }
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+
+  // ---------- Menú ----------
+  (function () {
+    var boton = $('.boton-menu');
+    var menu = $('#menu-principal');
+    if (boton && menu && !boton._iniciado) { boton._iniciado = true;
+      boton.addEventListener('click', function () {
+        var abierto = boton.getAttribute('aria-expanded') === 'true';
+        boton.setAttribute('aria-expanded', String(!abierto));
+        menu.classList.toggle('abierto', !abierto);
+      });
+    }
+    var grupos = $$('.menu__grupo');
+    function cerrarTodos(excepto) {
+      grupos.forEach(function (g) {
+        if (g === excepto) { return; }
+        g.classList.remove('abierto');
+        var b = $('.menu__desplegar', g);
+        if (b) { b.setAttribute('aria-expanded', 'false'); }
+      });
+    }
+    grupos.forEach(function (grupo) {
+      var b = $('.menu__desplegar', grupo);
+      if (!b._iniciado) { b._iniciado = true; b.addEventListener('click', function () {
+        var abierto = grupo.classList.toggle('abierto');
+        b.setAttribute('aria-expanded', String(abierto));
+        cerrarTodos(grupo);
+      }); }
+    });
+    if (!document._menuEventsIniciados) { document._menuEventsIniciados = true; document.addEventListener('click', function (e) {
+      if (!e.target.closest('.menu__grupo')) { cerrarTodos(null); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        var abierto = $('.menu__grupo.abierto');
+        cerrarTodos(null);
+        if (abierto) { $('.menu__desplegar', abierto).focus(); }
+      }
+    }); }
+  })();
+
+  // ---------- Buscador de la portada ----------
+  (function () {
+    var form = $('[data-buscador-portada]');
+    var carreras = leerDatos('datos-carreras');
+    if (!form || !carreras) { return; }
+    var campo = $('input', form);
+    var lista = $('.sugerencias', form);
+    var elegida = -1;
+
+    function pintar() {
+      var q = normalizar(campo.value.trim());
+      lista.textContent = '';
+      elegida = -1;
+      if (q.length < 2) { lista.hidden = true; campo.setAttribute('aria-expanded', 'false'); return; }
+      var hallazgos = carreras.filter(function (c) { return normalizar(c.n + ' ' + c.a).indexOf(q) !== -1; }).slice(0, 6);
+      hallazgos.forEach(function (c, i) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '/carreras/' + c.s + '/';
+        a.textContent = c.n;
+        a.id = 'sugerencia-' + i;
+        a.setAttribute('role', 'option');
+        li.appendChild(a);
+        lista.appendChild(li);
+      });
+      var todas = document.createElement('li');
+      todas.className = 'sugerencias__todas';
+      var enlace = document.createElement('a');
+      enlace.href = '/carreras/?q=' + encodeURIComponent(campo.value.trim());
+      enlace.textContent = hallazgos.length ? 'Ver todos los resultados →' : 'Sin coincidencias. Ver las ' + carreras.length + ' carreras →';
+      todas.appendChild(enlace);
+      lista.appendChild(todas);
+      lista.hidden = false;
+      campo.setAttribute('aria-expanded', 'true');
+    }
+    campo.addEventListener('input', pintar);
+    campo.addEventListener('keydown', function (e) {
+      var opciones = $$('a', lista);
+      if (!opciones.length || lista.hidden) { return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        elegida = (elegida + (e.key === 'ArrowDown' ? 1 : -1) + opciones.length) % opciones.length;
+        opciones.forEach(function (o, i) { o.setAttribute('aria-selected', String(i === elegida)); });
+        campo.setAttribute('aria-activedescendant', opciones[elegida].id || '');
+      } else if (e.key === 'Enter' && elegida >= 0) {
+        e.preventDefault();
+        window.location.href = opciones[elegida].href;
+      } else if (e.key === 'Escape') {
+        lista.hidden = true;
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!form.contains(e.target)) { lista.hidden = true; }
+    });
+  })();
+
+  // ---------- Filtros del listado de carreras ----------
+  (function () {
+    var listado = $('[data-listado]');
+    if (!listado) { return; }
+    var tarjetas = $$('.tarjeta-carrera', listado);
+    var campo = $('#buscar-carrera');
+    var filtros = $('[data-filtros]');
+    var total = $('[data-total]');
+    var vacio = $('[data-vacio]');
+    var limpiar = $('[data-limpiar]');
+    var estado = { area: '', nivel: '', modalidad: '' };
+    filtros.hidden = false;
+
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('q')) { campo.value = params.get('q'); }
+    Object.keys(estado).forEach(function (k) { if (params.get(k)) { estado[k] = params.get(k); } });
+
+    function marcar() {
+      $$('[data-filtro]', filtros).forEach(function (grupo) {
+        var clave = grupo.getAttribute('data-filtro');
+        $$('.chip', grupo).forEach(function (chip) {
+          chip.setAttribute('aria-pressed', String(chip.getAttribute('data-valor') === estado[clave]));
+        });
+        var sel = $('select', grupo);
+        if (sel) { sel.value = estado[clave] || ''; }
+      });
+    }
+
+    var animandoTimer = null;
+    function aplicar(conAnimacion) {
+      var q = normalizar(campo.value.trim());
+      var visibles = 0;
+      var stagger = 0;
+      tarjetas.forEach(function (t) {
+        var ok = (!q || t.getAttribute('data-texto').indexOf(q) !== -1) &&
+          (!estado.area || t.getAttribute('data-area') === estado.area) &&
+          (!estado.nivel || t.getAttribute('data-nivel') === estado.nivel) &&
+          (!estado.modalidad || t.getAttribute('data-modalidad') === estado.modalidad);
+        
+        var estabaOculto = t.hidden;
+        t.hidden = !ok;
+        if (ok) {
+          visibles++;
+          if (conAnimacion) {
+            t.classList.remove('tarjeta-animada');
+            t.style.animationDelay = '';
+            // Trigger reflow
+            void t.offsetWidth;
+            // Stagger sutil para los primeros 8 elementos visibles
+            if (stagger < 8) {
+              t.style.animationDelay = (stagger * 35) + 'ms';
+              stagger++;
+            }
+            t.classList.add('tarjeta-animada');
+          }
+        }
+      });
+
+      if (total) {
+        if (total.textContent !== String(visibles)) {
+          total.textContent = visibles;
+          if (conAnimacion) {
+            total.classList.remove('cambio');
+            void total.offsetWidth;
+            total.classList.add('cambio');
+            clearTimeout(animandoTimer);
+            animandoTimer = setTimeout(function () { total.classList.remove('cambio'); }, 220);
+          }
+        } else {
+          total.textContent = visibles;
+        }
+      }
+
+      vacio.hidden = visibles > 0;
+      limpiar.hidden = !(q || estado.area || estado.nivel || estado.modalidad);
+      marcar();
+      var url = new URLSearchParams();
+      if (campo.value.trim()) { url.set('q', campo.value.trim()); }
+      Object.keys(estado).forEach(function (k) { if (estado[k]) { url.set(k, estado[k]); } });
+      var nueva = window.location.pathname + (url.toString() ? '?' + url.toString() : '');
+      window.history.replaceState(null, '', nueva);
+    }
+
+    filtros.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) { return; }
+      var clave = chip.closest('[data-filtro]').getAttribute('data-filtro');
+      estado[clave] = chip.getAttribute('data-valor');
+      aplicar(true);
+    });
+    filtros.addEventListener('change', function (e) {
+      var select = e.target.closest('select');
+      if (!select) { return; }
+      var clave = select.closest('[data-filtro]').getAttribute('data-filtro');
+      estado[clave] = select.value;
+      aplicar(true);
+    });
+    campo.addEventListener('input', function () { aplicar(true); });
+    limpiar.addEventListener('click', function () {
+      campo.value = '';
+      Object.keys(estado).forEach(function (k) { estado[k] = ''; });
+      aplicar(true);
+      campo.focus();
+    });
+    aplicar(false);
+  })();
+
+  // ---------- Pestañas de la ficha ----------
+  (function () {
+    var caja = $('[data-pestanas]');
+    if (!caja) { return; }
+    var lista = $('[role="tablist"]', caja);
+    var botones = $$('[role="tab"]', caja);
+    var paneles = $$('[role="tabpanel"]', caja);
+    lista.hidden = false;
+    caja.classList.add('con-pestanas');
+
+    function elegir(indice, enfocar) {
+      botones.forEach(function (b, i) {
+        var activo = i === indice;
+        b.setAttribute('aria-selected', String(activo));
+        b.tabIndex = activo ? 0 : -1;
+        paneles[i].hidden = !activo;
+      });
+      if (enfocar) { botones[indice].focus(); }
+    }
+    botones.forEach(function (b, i) {
+      b.addEventListener('click', function () { elegir(i, false); });
+      b.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); elegir((i + 1) % botones.length, true); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); elegir((i - 1 + botones.length) % botones.length, true); }
+        if (e.key === 'Home') { e.preventDefault(); elegir(0, true); }
+        if (e.key === 'End') { e.preventDefault(); elegir(botones.length - 1, true); }
+      });
+    });
+    var inicial = paneles.map(function (p) { return '#' + p.id; }).indexOf(window.location.hash);
+    elegir(inicial > 0 ? inicial : 0, false);
+  })();
+
+  // ---------- Filtro de cursos ----------
+  (function () {
+    var filtro = $('[data-filtro-cursos]');
+    var grilla = $('[data-cursos]');
+    if (!filtro || !grilla) { return; }
+    filtro.hidden = false;
+    filtro.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) { return; }
+      var valor = chip.getAttribute('data-valor');
+      $$('.chip', filtro).forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      $$('[data-categoria]', grilla).forEach(function (t) {
+        t.hidden = Boolean(valor) && t.getAttribute('data-categoria') !== valor;
+      });
+    });
+  })();
+
+  // ---------- Envío de formularios ----------
+  // Si sitio.json tiene un destino, los datos se envían ahí. Si no, se arma un correo.
+  function enviar(destino, datos) {
+    return fetch(destino, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(datos)
+    }).then(function (r) {
+      if (!r.ok) { throw new Error('Respuesta ' + r.status); }
+      return r;
+    });
+  }
+  function enlaceCorreo(correo, asunto, datos) {
+    var cuerpo = Object.keys(datos).map(function (k) { return k + ': ' + datos[k]; }).join('\n');
+    return 'mailto:' + correo + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(cuerpo);
+  }
+  function correoValido(texto) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(texto); }
+
+  // ---------- Formulario de contacto ----------
+  (function () {
+    var form = $('[data-formulario-contacto]');
+    if (!form) { return; }
+    var error = $('[data-error]', form);
+    var exito = $('[data-exito]', form);
+    var boton = $('[data-enviar]', form);
+    function fallar(texto, campo) {
+      error.textContent = texto;
+      error.hidden = false;
+      if (campo) { campo.focus(); }
+    }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      error.hidden = true;
+      exito.hidden = true;
+      var f = form.elements;
+      if (f.web.value) { return; }
+      if (f.nombre.value.trim().length < 3) { return fallar('Escribe tu nombre completo.', f.nombre); }
+      if (!correoValido(f.correo.value.trim())) { return fallar('Revisa tu correo: parece incompleto.', f.correo); }
+      if (f.lugar.value.trim().length < 2) { return fallar('Escribe tu ciudad o país.', f.lugar); }
+      if (f.telefono.value.replace(/\D/g, '').length < 8) { return fallar('Escribe tu teléfono con el código de país. Ejemplo: +593 99 123 4567', f.telefono); }
+      if (!f.acepto.checked) { return fallar('Para enviar, marca la casilla de aceptación.', f.acepto); }
+      var datos = {
+        formulario: 'Contacto',
+        nombre: f.nombre.value.trim(),
+        correo: f.correo.value.trim(),
+        lugar: f.lugar.value.trim(),
+        telefono: f.telefono.value.trim(),
+        mensaje: f.mensaje.value.trim(),
+        pagina: window.location.href
+      };
+      var destino = form.getAttribute('data-destino');
+      if (!destino) {
+        window.location.href = enlaceCorreo(form.getAttribute('data-correo'), 'Consulta desde el sitio', datos);
+        exito.textContent = 'Se abrió tu programa de correo con la consulta lista para enviar.';
+        exito.hidden = false;
+        return;
+      }
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      enviar(destino, datos).then(function () {
+        form.reset();
+        exito.textContent = 'Gracias. Recibimos tu consulta y un asesor te va a escribir.';
+        exito.hidden = false;
+      }).catch(function () {
+        fallar('No pudimos enviar tu consulta. Inténtalo de nuevo en un momento o escríbenos a ' + form.getAttribute('data-correo') + '.');
+      }).then(function () {
+        boton.disabled = false;
+        boton.textContent = 'Enviar';
+      });
+    });
+  })();
+
+  // ---------- Precalificador "Evaluar mis estudios" ----------
+  (function () {
+    var caja = $('[data-precalificador]');
+    var datos = leerDatos('datos-precalificador');
+    if (!caja || !datos) { return; }
+
+    var SITUACIONES = [
+      { texto: 'Tengo un título técnico o tecnológico', niveles: ['Ciclo'] },
+      { texto: 'Empecé una carrera y no la terminé', niveles: ['Licenciatura', 'Tecnicatura'] },
+      { texto: 'Tengo un título universitario y quiero otro', niveles: ['Maestr', 'Especializ', 'Doctorado', 'Profesorado'] },
+      { texto: 'Terminé el bachillerato', niveles: ['Licenciatura', 'Tecnicatura'] }
+    ];
+    var MAX = 4;
+    var estado = { situacion: null, area: null };
+    var form = $('[data-formulario]', caja);
+    var error = $('[data-error]', caja);
+    var boton = $('[data-enviar]', caja);
+
+    function mostrar(paso) {
+      $$('[data-paso]', caja).forEach(function (s) {
+        var activo = Number(s.getAttribute('data-paso')) === paso;
+        s.hidden = !activo;
+        if (activo) {
+          s.style.animation = 'none';
+          void s.offsetHeight; // trigger reflow para reiniciar animación
+          s.style.animation = '';
+        }
+      });
+      $('[data-paso-texto]', caja).textContent = 'Evaluar mis estudios · ' + (paso === 4 ? 'Enviado' : 'Paso ' + paso + ' de 3');
+      var barra = $('[data-barra-progreso]', caja);
+      if (barra) {
+        var pct = paso === 1 ? '33%' : (paso === 2 ? '66%' : '100%');
+        barra.style.width = pct;
+      }
+      error.hidden = true;
+      var titulo = $('[data-paso="' + paso + '"] h3', caja);
+      if (titulo) { titulo.focus(); }
+    }
+    function opcion(texto, alElegir) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opcion';
+      b.textContent = texto;
+      b.addEventListener('click', alElegir);
+      return b;
+    }
+    var contSit = $('[data-situaciones]', caja);
+    var contAreas = $('[data-areas]', caja);
+    if (contSit) contSit.innerHTML = '';
+    if (contAreas) contAreas.innerHTML = '';
+
+    SITUACIONES.forEach(function (s, i) {
+      if (contSit) contSit.appendChild(opcion(s.texto, function () { estado.situacion = i; mostrar(2); }));
+    });
+    datos.areas.forEach(function (area) {
+      if (contAreas) contAreas.appendChild(opcion(area, function () {
+        estado.area = area;
+        $('[data-resumen]', caja).textContent = SITUACIONES[estado.situacion].texto + ' · ' + area;
+        mostrar(3);
+      }));
+    });
+    caja.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-volver]');
+      if (b) { mostrar(Number(b.getAttribute('data-volver'))); }
+    });
+
+    function sugeridas() {
+      var niveles = SITUACIONES[estado.situacion].niveles;
+      return datos.carreras
+        .filter(function (c) { return c.a === estado.area && niveles.some(function (n) { return c.v.indexOf(n) === 0; }); })
+        .sort(function (a, b) { return a.o - b.o; })
+        .slice(0, MAX);
+    }
+
+    function resultado(carreras, nota) {
+      var lista = $('[data-resultado]', caja);
+      lista.textContent = '';
+      $('[data-intro]', caja).textContent = carreras.length
+        ? 'Según lo que nos contaste, estas carreras pueden aplicar a tu caso:'
+        : 'No hay una carrera directa en esa área para tu situación. Un asesor revisa alternativas contigo.';
+      carreras.forEach(function (c) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '/carreras/' + c.s + '/';
+        a.textContent = c.n + ' →';
+        li.appendChild(a);
+        lista.appendChild(li);
+      });
+      var notaEl = $('[data-nota-envio]', caja);
+      notaEl.textContent = '';
+      if (typeof nota === 'string') { notaEl.textContent = nota; } else { notaEl.appendChild(nota); }
+      mostrar(4);
+    }
+
+    function fallar(texto, campo) {
+      error.textContent = texto;
+      error.hidden = false;
+      if (campo) { campo.focus(); }
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var f = form.elements;
+      if (f.web.value) { return; }
+      var nombre = f.nombre.value.trim();
+      var whatsapp = f.whatsapp.value.trim();
+      var correo = f.correo.value.trim();
+      if (nombre.length < 3) { return fallar('Escribe tu nombre y apellido.', f.nombre); }
+      if (whatsapp.replace(/\D/g, '').length < 8) { return fallar('Escribe tu WhatsApp con el código de país. Ejemplo: +593 99 123 4567', f.whatsapp); }
+      if (!correoValido(correo)) { return fallar('Revisa tu correo: parece incompleto.', f.correo); }
+      if (!f.acepto.checked) { return fallar('Para enviar, marca la casilla de aceptación.', f.acepto); }
+
+      var lista = sugeridas();
+      var envio = {
+        formulario: 'Evaluar mis estudios',
+        nombre: nombre,
+        whatsapp: whatsapp,
+        correo: correo,
+        situacion: SITUACIONES[estado.situacion].texto,
+        area: estado.area,
+        carrerasSugeridas: lista.map(function (c) { return c.n; }).join(' | ')
+      };
+      var destino = caja.getAttribute('data-destino');
+      var notaFinal = 'La universidad confirma el ingreso después de revisar tu documentación. Un asesor te escribe, o puedes avanzar ahora:';
+
+      if (!destino) {
+        var p = document.createElement('span');
+        p.appendChild(document.createTextNode('Para que un asesor revise tu caso, envíanos esta consulta: '));
+        var a = document.createElement('a');
+        a.href = enlaceCorreo(caja.getAttribute('data-correo'), 'Evaluar mis estudios', envio);
+        a.textContent = 'enviar mi consulta por correo';
+        p.appendChild(a);
+        p.appendChild(document.createTextNode('. La universidad confirma el ingreso después de revisar tu documentación.'));
+        resultado(lista, p);
+        return;
+      }
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      enviar(destino, envio).then(function () {
+        resultado(lista, notaFinal);
+      }).catch(function () {
+        fallar('No pudimos enviar tu consulta. Inténtalo de nuevo en un momento.');
+      }).then(function () {
+        boton.disabled = false;
+        boton.textContent = 'Enviar y ver mis opciones';
+      });
+    });
+  })();
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", window.iniciarSitio);
+} else {
+  window.iniciarSitio();
+}
+document.addEventListener("astro:page-load", window.iniciarSitio);

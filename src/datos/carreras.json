@@ -1,0 +1,2782 @@
+{
+  "_nota": "Carreras de las universidades aliadas. Cada una genera su ficha en /carreras/<slug>/. Para sumar una carrera, copia un bloque completo, cambia el slug (solo minúsculas, números y guiones) y completa los datos. \"orden\" define el orden en el listado.",
+  "carreras": [
+    {
+      "slug": "ciclo-de-licenciatura-en-cosmetologia",
+      "nombre": "Ciclo de Licenciatura en Cosmetología",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Cosmetología Facial y Corporal",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional de la cosmetología capaz de diseñar tratamientos adaptados a las necesidades individuales de cada persona y de incorporar las últimas tendencias, avances científicos y tecnologías a su práctica.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción a la Metodología de la Investigación",
+            "Estética y Salud Integral",
+            "Salud y Gestión Cosmetológica",
+            "Inglés Técnico",
+            "Tricología y Salud Capilar"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Metodología de la Investigación",
+            "Cosmetología Natural y Salud Integral",
+            "Química Aplicada al Desarrollo Cosmético",
+            "Abordaje Cosmetológico en Diversidad Sexual y Género",
+            "Formación Disciplinar Específica I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Innovación Tecnológica en Cosmetología",
+            "Taller de Análisis de Casos",
+            "Cosmetología Aplicada a Pre y Post Quirúrgicos Estéticos",
+            "Formación Disciplinar Específica II",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Lic. Gabriela Di Mauro",
+      "orden": 1
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-gestion-de-la-calidad",
+      "nombre": "Ciclo de Licenciatura en Gestión de la Calidad",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Gestión de la Calidad",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional preparado para liderar el diseño, la implementación y la auditoría de sistemas de gestión integrados bajo normas ISO 9001, 14001 y 45001, y para dirigir la gestión de riesgos y proyectos de mejora continua. También asesora a organizaciones en responsabilidad social y sustentabilidad y coordina equipos interdisciplinarios.",
+      "plan": [],
+      "direccion": "Mg. Ing. Romina Conca",
+      "orden": 2
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-seguridad-vial-y-accidentologia",
+      "nombre": "Ciclo de Licenciatura en Seguridad Vial y Accidentología",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Seguridad Vial y Accidentología",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para diseñar, implementar y evaluar políticas de seguridad vial, y para realizar reconstrucciones técnicas, pericias y análisis de siniestros. Además participa en la planificación de infraestructuras seguras, elabora programas educativos y audita y asesora a instituciones públicas y privadas.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Seguridad Vial",
+            "Diseño y Planificación de Infraestructuras Seguras",
+            "Gestión del Tráfico y Control de Velocidad",
+            "Educación y Concienciación en Seguridad Vial",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Auditoría en Seguridad Vial",
+            "Tecnologías del Tránsito y Movilidad Sustentable",
+            "Planificación Operativa ante Emergencias Viales",
+            "Accidentología Vial",
+            "Taller de Trabajo Final Integrador I",
+            "Formación Disciplinar Específica I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Reconstrucción de Accidentes de Tránsito por Simulación",
+            "Investigación de Causas y Factores de Riesgo",
+            "Salud y Factores Fisiológicos en la Conducción",
+            "Elaboración y Defensa Oral de Dictámenes Periciales",
+            "Taller de Trabajo Final Integrador II",
+            "Formación Disciplinar Específica II"
+          ]
+        }
+      ],
+      "direccion": "Lic. Walter Benitez",
+      "orden": 3
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-acompanamiento-terapeutico",
+      "nombre": "Ciclo de Licenciatura en Acompañamiento Terapéutico",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Acompañamiento Terapéutico",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional que acompaña el cuidado de la salud dentro de equipos interdisciplinarios, facilitando los objetivos terapéuticos de pacientes internados o ambulatorios y la contención de sus familias. También participa en investigación, supervisión y planificación de programas de salud y acción social.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción a la metodología de la investigación",
+            "Dinámica socio historia del acompañamiento terapéutico",
+            "Materia electiva A",
+            "Psicopatología I",
+            "Política e inclusión en el Acompañamiento Terapéutico"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Metodología de la investigación",
+            "Rehabilitación Física",
+            "Gestión en Salud",
+            "Psicopatología II",
+            "Salud Comunitaria"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Seminario de trabajo final integrador",
+            "Materia Electiva B",
+            "Seminario fundamentos de la Clínica",
+            "Seminario de actualización"
+          ]
+        }
+      ],
+      "direccion": "Ps. Alfredo Estupiñan",
+      "orden": 4
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-actividad-fisica",
+      "nombre": "Ciclo de Licenciatura en Actividad Física",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Actividad Física",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capaz de diseñar, planificar, periodizar, dirigir y evaluar procesos de entrenamiento y preparación física en distintas disciplinas y niveles de rendimiento. Realiza evaluaciones funcionales y biomecánicas, interviene en prevención de lesiones y reentrenamiento, y gestiona programas y equipos de alto rendimiento.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Fisiología I",
+            "Entrenamiento Deportivo I",
+            "Psicología del Rendimiento",
+            "Planificación y Periodización del Entrenamiento I",
+            "Evaluación Funcional y Biomecánica Aplicada",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Fisiología II",
+            "Entrenamiento Deportivo II",
+            "Planificación y Periodización del Entrenamiento II",
+            "Formación Disciplinar Específica",
+            "Prevención de Lesiones en el Alto Rendimiento Deportivo",
+            "Taller de Trabajo Final I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Entrenamiento Deportivo III",
+            "Gestión de Programas y Equipos de Alto Desempeño",
+            "Reentrenamiento Deportivo",
+            "Evaluación, Monitoreo y Neurociencias Aplicadas al Rendimiento",
+            "Taller de Trabajo Final II"
+          ]
+        }
+      ],
+      "direccion": "Lic. Martín Santi",
+      "orden": 5
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-ciberseguridad",
+      "nombre": "Ciclo de Licenciatura en Ciberseguridad",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Ciberseguridad",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Estratega digital capaz de anticiparse a las amenazas y liderar la defensa de las organizaciones. Con formación multidisciplinaria en innovación, gestión de riesgos y ciberinteligencia, diseña e implementa soluciones integrales para proteger activos críticos.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Privacidad Digital y Protección de Datos",
+            "Auditoría y Cumplimiento en Ciberseguridad",
+            "Políticas de Seguridad y Gobierno de la Información",
+            "Ética y Deontología en Ciberseguridad"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Ciberdefensa y Estrategias de Resiliencia",
+            "Gestión Avanzada de Riesgos en Ciberseguridad",
+            "Análisis y Gestión de Incidentes Avanzados",
+            "Seminario de Actualización I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Gerenciamiento en Ciberseguridad",
+            "Evaluación de Tecnologías Emergentes en Ciberseguridad",
+            "Dirección de Proyectos",
+            "Seminario de Actualización II",
+            "Seminario de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "",
+      "orden": 6
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-ciencia-de-datos",
+      "nombre": "Ciclo de Licenciatura en Ciencia de Datos",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Tecnología y Negocios",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Ciencia de Datos",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional con competencias para liderar proyectos de ciencia de datos, aplicar el método científico y resolver problemas complejos mediante el análisis de datos. Domina aprendizaje automático, profundo y por refuerzo, procesamiento de lenguaje natural y visión por computadoras.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Matemática Aplicada",
+            "Ciencia de Datos",
+            "Ingeniería del Software",
+            "Herramientas de Software para Análisis de Datos",
+            "Desarrollo de Empresas de Base Tecnológica"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Aprendizaje Automático",
+            "Aprendizaje por Refuerzo",
+            "Seminario de Actualización I",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Procesamiento Digital de Imágenes",
+            "Aprendizaje Profundo",
+            "Visión por Computadoras",
+            "Procesamiento de Lenguaje Natural",
+            "Seminario de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "",
+      "orden": 7
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-discapacidad-y-deporte",
+      "nombre": "Ciclo de Licenciatura en Discapacidad y Deporte",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Discapacidad y Deporte",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional comprometido con la inclusión y los derechos de las personas con discapacidad en el ámbito deportivo y recreativo, con sólidos fundamentos neurofisiológicos y biomecánicos. Se integra a equipos interdisciplinarios terapéuticos y de entrenamiento, y diseña programas de actividad física adaptada y proyectos en instituciones educativas, terapéuticas y deportivas.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Perspectiva de Discapacidad e Inclusión",
+            "Fundamentos Neurofisiológicos Aplicados",
+            "Evaluación del Movimiento",
+            "Clasificación Funcional del Deporte Paralímpico",
+            "Estrategias de Comunicación"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Diversidad Funcional I",
+            "Deporte Adaptado I",
+            "Bases y Fundamentos del Entrenamiento",
+            "Gestión de Proyectos",
+            "Metodología de la Investigación",
+            "Prácticas de Formación en el Campo Profesional I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Seminario de Actualización",
+            "Diversidad Funcional II",
+            "Deporte Adaptado II",
+            "Planificación y Periodización del Entrenamiento",
+            "Seminario de Trabajo Final",
+            "Práctica de Formación en el Campo Profesional II"
+          ]
+        }
+      ],
+      "direccion": "Sergio Esquivel",
+      "orden": 8
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-diseno-de-comunicacion-visual",
+      "nombre": "Ciclo de Licenciatura en Diseño de Comunicación Visual",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Diseño",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Diseño de Comunicación Visual",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para diseñar piezas gráficas complejas y estrategias de comunicación para marcas e instituciones, interfaces digitales centradas en el usuario y gráfica en movimiento. Dirige equipos creativos interdisciplinarios, detecta tendencias e investiga problemáticas de comunicación visual.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Composición Tipográfica",
+            "Narración Creativa",
+            "Producción Gráfica",
+            "Diseño de Información I",
+            "Pensamiento Creativo"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Tipografía Avanzada",
+            "Introducción a la Gráfica en Movimiento",
+            "Seminario de Actualización I",
+            "Diseño de Información II",
+            "Metodología de la Investigación y el Diseño"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Tipografía y Entorno Digital",
+            "Seminario de Actualización II",
+            "Gestión y Dirección de Proyectos",
+            "Diseño de Interfaces",
+            "Seminario de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Mg. Karen Kuschner",
+      "orden": 9
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-diseno-de-espacios-interiores",
+      "nombre": "Ciclo de Licenciatura en Diseño de Espacios Interiores",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Diseño",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Diseño de Espacios Interiores",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para resolver problemas de diseño interior en espacios y usos diversos, con criterios de sustentabilidad, accesibilidad y ergonomía. Asesora a instituciones y empresas del rubro, colabora con arquitectos y especialistas, y participa en proyectos de investigación.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Proyecto Específico I",
+            "Psicología del Ambiente",
+            "Instalaciones Complementarias",
+            "Antropometría y Ergonomía",
+            "Domótica"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Tecnología y Sustentabilidad",
+            "Metodología de la Investigación y el Diseño",
+            "Seminario de Actualización I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Proyecto Específico II",
+            "Accesibilidad y Barreras",
+            "Seminario de Actualización II",
+            "Seminario de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Prof. Arq. Damián A. Villar",
+      "orden": 10
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-diseno-e-innovacion-en-moda",
+      "nombre": "Ciclo de Licenciatura en Diseño e Innovación en Moda",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Diseño",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Diseño e Innovación en Moda",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para dirigir equipos de diseño y desarrollo en empresas textiles y de moda, planificar y evaluar productos y gestionar estratégicamente su inserción en el mercado. Aplica métodos de innovación, incorpora nuevos materiales y gestiona creativamente marcas de moda.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Dirección Creativa",
+            "Imagen y Estética Contemporánea",
+            "Dirección Tecno Productiva",
+            "Management Creativo",
+            "Diseño y Marketing Digital"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño Estratégico",
+            "Negocios y Mercado",
+            "Producción Textil",
+            "Tendencias y Experiencia del Usuario",
+            "Taller de Escritura Académica"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Dirección y Gestión de la Innovación",
+            "Metodología de Escenarios Futuros",
+            "Emprendimientos y Ecosistemas de Innovación",
+            "Formación Disciplinar Específica",
+            "Seminario de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Arq. Cristian Propezzi",
+      "orden": 11
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-gestion-de-la-educacion",
+      "nombre": "Ciclo de Licenciatura en Gestión de la Educación",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Gestión de la Educación",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para dirigir y coordinar equipos de gestión educativa y administrar los recursos académicos y administrativos de las instituciones. Diseña y evalúa propuestas curriculares y proyectos institucionales con foco en la inclusión, e interviene estratégicamente ante situaciones problemáticas.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Análisis de Instituciones Educativas",
+            "Sistema y Política Educativa",
+            "Administración y Organización Educativa",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Gestión del Currículo",
+            "Planificación y Evaluación de la Gestión Educativa I",
+            "Educación en Entornos Virtuales",
+            "Trabajo de Campo Profesional I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Comunicación Institucional",
+            "Planificación y Evaluación de la Gestión Educativa II",
+            "Política y Gestión de la Inclusión",
+            "Trabajo de Campo Profesional II"
+          ]
+        }
+      ],
+      "direccion": "Lic. Mónica Priotti",
+      "orden": 12
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-higiene-y-seguridad-laboral",
+      "nombre": "Ciclo de Licenciatura en Higiene y Seguridad Laboral",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Higiene y Seguridad Laboral",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional habilitado para realizar auditorías internas y externas en ámbitos laborales, diseñar e implementar programas corporativos de prevención y desarrollar capacitaciones. También colabora en la elaboración de normas y especificaciones técnicas de higiene y seguridad para instrumentos, máquinas y herramientas.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Prevención de Riesgos Laborales",
+            "Legislación y Normas de Certificación Internacional",
+            "Salud Laboral",
+            "Ergonomía I",
+            "Seguridad e Higiene Laboral I"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Estudio del Trabajo",
+            "Ética y Deontología Profesional",
+            "Ergonomía II",
+            "Seguridad e Higiene Laboral II",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Psicología Laboral",
+            "Diseño y Gestión de Proyectos",
+            "Gestión de Contingencias",
+            "Taller de Trabajo Final Integral"
+          ]
+        }
+      ],
+      "direccion": "Ing. Martín Edgardo Cuadranti",
+      "orden": 13
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-podologia",
+      "nombre": "Ciclo de Licenciatura en Podología",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Podología",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional con conocimientos y habilidades para promover la salud del pie, prevenir sus afecciones y deformidades, y estudiar y dar respuesta a las distintas patologías cuando se presentan.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Biomecánica aplicada",
+            "Interpretación de imágenes",
+            "Materia electiva A",
+            "Introducción a la metodología de la investigación",
+            "Seminario de actualización"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Gestión de servicios en salud",
+            "Podología geriátrica y pediátrica",
+            "Metodología de la investigación",
+            "Inglés técnico",
+            "Seminario de exploración biomecánica I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Seminario de análisis clínicos",
+            "Seminario de tesina",
+            "Materia electiva B",
+            "Tecnologías y materiales en podología",
+            "Seminario de exploración biomecánica II"
+          ]
+        }
+      ],
+      "direccion": "Mgtr. Sabrina Rossi",
+      "orden": 14
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-psicomotricidad",
+      "nombre": "Ciclo de Licenciatura en Psicomotricidad",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Psicomotricidad",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para intervenir en salud y educación acompañando los distintos momentos evolutivos de las personas, desde la promoción del desarrollo psicomotor hasta la detección, el diagnóstico y el tratamiento de sus alteraciones. Elabora diagnósticos psicomotores y aborda a sujetos con trastornos psicomotores.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Psicodinámica Familiar",
+            "Psicopatología y Clínica Psicoanalítica",
+            "Atención Temprana y Desarrollo Infantil",
+            "Introducción a la Metodología de la Investigación",
+            "Evaluación Psicológica",
+            "Formación Corporal I"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Psicomotricidad Clínica",
+            "Estimulación Temprana",
+            "Metodología de la Investigación",
+            "Evaluación Psicomotriz",
+            "Terapia Psicomotriz",
+            "Formación Corporal II"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Gestión de Servicios en Salud",
+            "Seminario de Trabajo Final",
+            "Dinámica de Grupos",
+            "Formación Corporal III",
+            "Psicomotricidad en Educación y en el Ámbito SocioComunitario"
+          ]
+        }
+      ],
+      "direccion": "Lic. Florencia Fenouil",
+      "orden": 15
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-psicopedagogia",
+      "nombre": "Ciclo de Licenciatura en Psicopedagogía",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Psicopedagogía",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para diagnosticar modalidades de aprendizaje, diseñar terapéuticas y dispositivos de intervención psicopedagógica, e integrar equipos interdisciplinarios en educación formal y no formal y en salud. Interviene además en detección temprana, inclusión de personas con discapacidad, orientación laboral y peritajes.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Perspectiva Epistemológica Disciplinar",
+            "Seminario Operativo",
+            "Diagnóstico Psicopedagógico",
+            "Trabajo de Campo",
+            "Aprendizajes en Entornos Visuales",
+            "Trayecto Teórico Metodológico"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Psicopedagogía y Aprendizajes Tempranos",
+            "Psicopedagogía Clínica",
+            "Psicopedagogía Laboral",
+            "Psicopedagogía de la Diversidad e Inclusión Escolar",
+            "Trayecto Teórico Metodológico II"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Psicopedagogía Forense",
+            "Seminario de la Profundización",
+            "Psicopedagogía y Adultos Mayores",
+            "Trayecto Teórico Metodológico III"
+          ]
+        }
+      ],
+      "direccion": "Lic. Soledad Cattoni",
+      "orden": 16
+    },
+    {
+      "slug": "ciclo-de-licenciatura-en-seguridad-publica-y-ciudadana",
+      "nombre": "Ciclo de Licenciatura en Seguridad Pública y Ciudadana",
+      "nivel": "Ciclo de Licenciatura (CCC)",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Seguridad Pública y Ciudadana",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título técnico o tecnológico de 2½ años o más",
+      "requisitos": "Título técnico o tecnológico afín, de una carrera de 2 años y medio o más.",
+      "perfil": "Profesional capacitado para organizar y administrar dispositivos de vigilancia y protección de personas, bienes, eventos y espacios, y para gestionar estrategias integrales de seguridad pública y ciudadana en organizaciones públicas y privadas. Desarrolla acciones de prevención y respuesta ante siniestros, preservación de indicios, comunicación y capacitación.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Prevención y Tratamiento de la violencia",
+            "Problemática del Narcotráfico, Trata de Personas, Seguridad Informática y Bancaria",
+            "Sociología de las organizaciones",
+            "Teoría de la Seguridad Pública y Ciudadana",
+            "Metodología de la Investigación Científica"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Seminario de Trabajo Final",
+            "Políticas de Seguridad Comparada",
+            "Planificación y Gestión de la Seguridad Pública y Ciudadana",
+            "Instituciones Públicas de Seguridad",
+            "Seguridad Privada y Corporativa"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Gestión de Recursos Humanos",
+            "Seguridad ambiental, en Higiene del Trabajo, en Medios de Transportes y en Accidentología Vial",
+            "Seguridad Física y Electrónica",
+            "Tecnologías aplicadas a la Seguridad",
+            "Seminario de Actualización"
+          ]
+        }
+      ],
+      "direccion": "Abg. María Eugenia Cereigido",
+      "orden": 17
+    },
+    {
+      "slug": "licenciatura-en-actividad-fisica",
+      "nombre": "Licenciatura en Actividad Física",
+      "nivel": "Licenciatura",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Actividad Física",
+      "tituloIntermedio": "",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que planifica, ejecuta y evalúa programas de actividad física y entrenamiento para distintos grupos etarios, a nivel recreativo, deportivo o de alto rendimiento. Puede desempeñarse en instituciones del área, integrar equipos de investigación multidisciplinarios y optimizar el rendimiento deportivo amateur y profesional.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Anatomía I",
+            "Sociología",
+            "Psicología General",
+            "Física Biológica I",
+            "Química Biológica I",
+            "Introducción a la Actividad Física"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Anatomía II",
+            "Química Biológica II",
+            "Entrenamiento I",
+            "Histología I",
+            "Epistemología"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Histología II",
+            "Biomecánica I",
+            "Fisiología I",
+            "Entrenamiento II",
+            "Deportes I (Individuales)",
+            "Actividades Físicas Adaptadas I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Deportes II (Individuales)",
+            "Entrenamiento III",
+            "Práctica Deportiva I",
+            "Biomecánica II",
+            "Fisiología II",
+            "Actividades Físicas Adaptadas II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Fisiología del Ejercicio I",
+            "Entrenamiento IV",
+            "Evaluaciones Aplicadas al Entrenamiento I",
+            "Deportes III (Colectivos)",
+            "Práctica Deportiva II",
+            "Psicología del Deporte I"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Deportes IV (Colectivos)",
+            "Práctica Deportiva III",
+            "Introducción a la Metodología de la Investigación",
+            "Psicología del Deporte II",
+            "Fisiología del Ejercicio II",
+            "Evaluaciones Aplicadas al Entrenamiento II"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Gestión y Administración de la Actividad Física y el Deporte",
+            "Práctica Deportiva IV",
+            "Nutrición e Hidratación Deportiva",
+            "Metodología de la Investigación Aplicada a la Actividad Física",
+            "Entrenamiento V",
+            "Seminario de Tesina"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Informática Aplicada",
+            "Entrenamiento VI",
+            "Práctica Deportiva V",
+            "Electiva A",
+            "Electiva B",
+            "Electiva C"
+          ]
+        }
+      ],
+      "direccion": "Lic. Martín Santi",
+      "orden": 18
+    },
+    {
+      "slug": "licenciatura-en-ortesis-y-protesis",
+      "nombre": "Licenciatura en Ortesis y Prótesis",
+      "nivel": "Licenciatura",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Ortesis y Prótesis",
+      "tituloIntermedio": "Técnico/a Universitario/a en Ortesis y Prótesis",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que integra equipos multidisciplinarios de rehabilitación y programa, coordina y evalúa las actividades de la disciplina, además de administrar organizaciones dedicadas al diseño y confección de ortesis y prótesis. Incorpora avances tecnológicos al equipamiento y produce investigación para validar procedimientos y resultados.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Anatomía Funcional I",
+            "Fisicoquímica Biológica Aplicada",
+            "Ortésica I",
+            "Sociología de la Discapacidad",
+            "Introducción a la Ortesis y Protesis"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Anatomía Funcional II",
+            "Fisiología",
+            "Matemática Aplicada I",
+            "Ortésica II",
+            "Higiene y Bioseguridad Laboral"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Biomecánica I",
+            "Psicología",
+            "Matemática Aplicada II",
+            "Protésica I",
+            "Tecnología de Materiales I",
+            "Práctica en Laboratorio I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Biomecánica II",
+            "Semiopatología Clínica",
+            "Tecnología de Materiales II",
+            "Gestión en Servicios de Salud",
+            "Protésica II",
+            "Práctica en Laboratorio II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Endoprótesis",
+            "Semiopatología Quirúrgica",
+            "Diseño Digitalizado I",
+            "Intervención Dermatofuncional",
+            "Introducción a la Metodología de la Investigación",
+            "Práctica en Laboratorio III"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Metodología de Investigación en Ciencias de la Salud",
+            "Neurorehabilitación Interdisciplinar",
+            "Diseño Digitalizado II",
+            "Sistemas Informáticos y Electrónicos I",
+            "Materia Electiva \"A\"",
+            "Práctica en Laboratorio IV"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Proyecto Final",
+            "Administración",
+            "Sistemas Informáticos y electrónicos II",
+            "Productos de Apoyo y Adaptaciones Funcionales",
+            "Materia Electiva \"B\""
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Materia Electiva \"C\"",
+            "Innovaciones Tecnológicas",
+            "Bioética",
+            "Deporte Adaptado"
+          ]
+        }
+      ],
+      "direccion": "Lic. Marina Silveyra",
+      "orden": 19
+    },
+    {
+      "slug": "licenciatura-en-podologia",
+      "nombre": "Licenciatura en Podología",
+      "nivel": "Licenciatura",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Podología",
+      "tituloIntermedio": "Técnico/a Universitario/a en Podología",
+      "duracion": "4 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional capacitado para la prevención, el diagnóstico y el tratamiento de patologías del pie, trabajando de manera interdisciplinaria con otros agentes de salud. La página indica que el título tiene validez nacional y habilita la matriculación en colegios profesionales de las distintas jurisdicciones.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Anatomía",
+            "Histología y biología celular",
+            "Introducción a la podología",
+            "Bioseguridad"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Microbiología",
+            "Psicología general",
+            "Fisiología",
+            "Módulo de atención primaria"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Biomecánica I",
+            "Clínica podológica I",
+            "Podología general I",
+            "Farmacología"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Biomecánica II",
+            "Clínica podológica II",
+            "Podología general II",
+            "Ética y deontología profesional",
+            "Práctica pre-profesional I"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Podología general III",
+            "Clínica podológica III",
+            "Ortopodología I",
+            "Materia electiva \"A\"",
+            "Práctica pre-profesional II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Podología general IV",
+            "Clínica podológica IV",
+            "Ortopodología II",
+            "Introducción a la metodología de la investigación",
+            "Práctica pre-profesional III"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Gestión de servicios en salud",
+            "Podología geriátrica y pediatría",
+            "Metodología de la investigación",
+            "Inglés técnico",
+            "Seminario de investigación biomecánica I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Seminario de análisis clínicos",
+            "Seminario de tesina",
+            "Materia electiva \"B\"",
+            "Tecnología y materiales en podología",
+            "Seminario de investigación biomecánica II"
+          ]
+        }
+      ],
+      "direccion": "Mgtr. Sabrina Rossi",
+      "orden": 20
+    },
+    {
+      "slug": "licenciatura-en-psicopedagogia",
+      "nombre": "Licenciatura en Psicopedagogía",
+      "nivel": "Licenciatura",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Psicopedagogía",
+      "tituloIntermedio": "",
+      "duracion": "4 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que orienta, evalúa, diagnostica e interviene en los procesos de aprendizaje de personas de todas las edades, en contextos formales y no formales. Integra equipos interdisciplinarios de educación y salud, elabora informes y peritajes, y diseña programas e instancias de formación vinculados al aprendizaje.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Fundamentos Neurobiológicos del Aprendizaje",
+            "Pedagogía",
+            "Psicología general",
+            "Introducción a la Psicopedagogía"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Problemática Filosófica",
+            "Didáctica",
+            "Sociología",
+            "Psicología genética",
+            "Psicología cognitiva"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Diagnóstico Psicopedagógico I",
+            "Psicología del Desarrollo I",
+            "Seminario Optativo I",
+            "Didáctica de la Lengua",
+            "Psicología Educacional"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Psicología del Desarrollo II",
+            "Diagnóstico Psicopedagógico II",
+            "Neurociencias Aplicadas al Aprendizaje",
+            "Trabajo de Campo I (Educativo)",
+            "Seminario Optativo II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Didáctica de la Matemática",
+            "Perspectiva Epistemológica Disciplinar",
+            "Análisis de casos I (Lenguaje)",
+            "Psicopatología",
+            "Trabajo de Campo II (Salud)"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Análisis de Casos II (Lenguaje Escrito)",
+            "Seminario Trabajo de Integración Final I",
+            "Psicopedagogía de la Diversidad e Inclusión Educativa",
+            "Psicopedagogía Institucional",
+            "Psicopedagogía Legal"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Orientación Vocacional - Ocupacional- Laboral",
+            "Análisis de Casos III (Matemática)",
+            "Seminario Trabajo de Integración Final II",
+            "Trayecto de Prácticas Pre Profesionales I (Instituciones Educativas)",
+            "Seminario de Profundización I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Orientación Psicopedagógica Familiar",
+            "Seminario Trabajo de Integración Final III",
+            "Trayecto de Prácticas Pre Profesionales II (Salud)",
+            "Seminario de Profundización II",
+            "Seminario de Profundización III"
+          ]
+        }
+      ],
+      "direccion": "Lic. Soledad Cattoni",
+      "orden": 21
+    },
+    {
+      "slug": "licenciatura-en-terapia-ocupacional",
+      "nombre": "Licenciatura en Terapia Ocupacional",
+      "nivel": "Licenciatura",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Terapia Ocupacional",
+      "tituloIntermedio": "",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que interviene en promoción de la salud, prevención, capacitación, reinserción social y rehabilitación en distintos ámbitos laborales. También puede cumplir funciones de gestión, educación, investigación y asesoría en el campo de las Ciencias de la Salud.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción a la Terapia Ocupacional",
+            "Fundamentos Psicosociales",
+            "Perspectiva de Cuidados, Discapacidad y Derechos Humanos",
+            "Anatomía Funcional",
+            "Histofisiología"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Enfoques Teóricos de Terapia Ocupacional",
+            "Salud Pública",
+            "Taller de Análisis Ocupacional",
+            "Anatomía Fisiológica",
+            "Química Biológica",
+            "Semiopatología Clínica"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Terapia Ocupacional en los Procesos de Envejecimiento",
+            "Análisis Ocupacional",
+            "Ética Profesional",
+            "Salud Mental e Interdisciplina",
+            "Sistemas Integrales de Gestión en Terapia Ocupacional",
+            "Biomecánica",
+            "Clínica General Neurológica"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Introducción a la Investigación",
+            "Terapia Ocupacional en Salud Mental",
+            "Dinámica de los Procesos de Atención e Interdisciplina",
+            "Clínica General Traumatológica",
+            "Práctica Preprofesional de Terapia Ocupacional en Procesos de Envejecimiento"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Metodología de la investigación",
+            "Terapia Ocupacional en Salud Física",
+            "Terapia Ocupacional en Salud de niños/as y adolescentes",
+            "Accesibilidad, productos de apoyo y tecnologías",
+            "Educación y Teorías del Aprendizaje",
+            "Práctica Preprofesional de Terapia Ocupacional en Salud Mental"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Taller de Escritura Científica",
+            "Terapia Ocupacional Laboral",
+            "Legislación",
+            "Ergonomía y Salud Ocupacional",
+            "Práctica Preprofesional de Terapia Ocupacional en Salud Física"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Taller de Trabajo Final I",
+            "Terapia Ocupacional Social y Comunitaria",
+            "Gestión Profesional",
+            "Formación Disciplinar Específica I",
+            "Práctica Preprofesional en Terapia Ocupacional Laboral"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Formación Disciplinar Específica II",
+            "Espacio de Libre Configuración",
+            "Taller de Trabajo Final II",
+            "Práctica Preprofesional en Terapia Ocupacional en niños/as y adolescentes",
+            "Práctica Preprofesional en Terapia Ocupacional Social y Comunitaria"
+          ]
+        }
+      ],
+      "direccion": "T.O. Liliana Lares",
+      "orden": 22
+    },
+    {
+      "slug": "licenciatura-en-acompanamiento-terapeutico",
+      "nombre": "Licenciatura en Acompañamiento Terapéutico",
+      "nivel": "Licenciatura",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Acompañamiento Terapéutico",
+      "tituloIntermedio": "Técnico/a en Acompañamiento Terapéutico (2 años)",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Con el título intermedio, el/la técnico/a realiza acompañamientos en ámbitos domiciliarios, institucionales y comunitarios, elabora informes e interviene en situaciones de crisis. El/la licenciado/a suma el diseño y coordinación de dispositivos de acompañamiento, la gestión de equipos y programas, la investigación, la supervisión profesional y la participación en políticas públicas de salud mental, discapacidad e inclusión.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción al Acompañamiento Terapéutico",
+            "Psicopatología",
+            "Teorías Psicológicas Contemporáneas",
+            "Farmacología",
+            "Teorías Sociales y Salud"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Acompañamiento Terapéutico I",
+            "Introducción a las Prácticas Pre-Profesionales",
+            "Perspectiva de Cuidados, Discapacidad y Derechos Humanos",
+            "Salud Mental",
+            "Primeros Auxilios en Salud Mental"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Acompañamiento Terapéutico II",
+            "Taller de Escritura de Informes y Plan de Trabajo",
+            "Ética y Deontología Profesional",
+            "Práctica Pre-Profesional",
+            "Gestión y Desarrollo Profesional"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Prevención y Promoción de la Salud",
+            "Ámbitos de Inserción del Acompañamiento Terapéutico",
+            "Introducción a la Metodología de la Investigación",
+            "Formación Disciplinar Específica I"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Dinámicas Grupales",
+            "Espacio de Libre Configuración",
+            "Problemáticas Epistemológicas Disciplinares",
+            "Lingüística y Discursividad Social"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Acompañamiento Terapéutico y Abordajes Psicopatológicos",
+            "Taller de Discusión de Casos",
+            "Metodología de la Investigación",
+            "Dinámica Sociohistórica del Acompañamiento Terapéutico",
+            "Política e Inclusión en el Acompañamiento Terapéutico"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Psicopatología y Padecimiento Subjetivo",
+            "Formación Disciplinar Específica II",
+            "Salud Comunitaria y Colectiva",
+            "Gestión en Servicios de Salud",
+            "Taller de Trabajo Final I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Problemáticas Actuales en el Acompañamiento Terapéutico",
+            "Rehabilitación Física",
+            "Fundamentos de la Clínica",
+            "Formación Disciplinar Específica III",
+            "Taller de Trabajo Final II"
+          ]
+        }
+      ],
+      "direccion": "",
+      "orden": 23
+    },
+    {
+      "slug": "licenciatura-en-agrotecnologia",
+      "nombre": "Licenciatura en Agrotecnología",
+      "nivel": "Licenciatura",
+      "area": "Agroganadería",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Agrotecnología",
+      "tituloIntermedio": "Técnico/a Universitario/a en Agrotecnología (2,5 años)",
+      "duracion": "4 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que implementa y opera tecnologías de agricultura de precisión (SIG, teledetección, drones, maquinaria de dosis variable), analiza datos con IA y machine learning y gestiona robots y sistemas automatizados para el agro. Lidera la innovación y la transferencia tecnológica, participa en el desarrollo de bioinsumos y trabaja en conjunto con ingenieros/as agrónomos/as.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Matemática I",
+            "Química general e inorgánica",
+            "Biología celular y molecular",
+            "Introducción a la agrotecnología"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Matemática II",
+            "Química orgánica",
+            "Física general y aplicada",
+            "Botánica Morfológica y Sistemática",
+            "Informática y Programación Aplicada"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Estadística y Diseño Experimental",
+            "Química Biológica",
+            "Edafología General",
+            "Agroclimatología",
+            "Inglés Técnico"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Fisiología Vegetal",
+            "Microbiología Agrícola",
+            "Sistemas de Información Geográfica y Teledetección Básica",
+            "Economía General y Gestión Agropecuaria",
+            "Inteligencia Artificial Aplicada y Machine Learning para el Agro"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Biotecnología Agrícola y Genética",
+            "Maquinaria Agrícola y de Precisión",
+            "Sensores Remotos y Drones en Agricultura",
+            "Prácticas Profesionales I",
+            "Formación Disciplinar Específica I"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Sanidad Vegetal Integrada y Manejo de Recursos",
+            "Big Data Agronómico y Plataformas de Gestión",
+            "Agricultura de Precisión Avanzada y Gestión Sitio-Específico",
+            "Economía Aplicada, Gestión y Legislación Agrotecnológica",
+            "Metodología de la Investigación I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Biotecnología Avanzada y Bioinformática",
+            "Robótica y Automatización Agrícola",
+            "Innovación y Emprendimiento AgTech",
+            "Sistemas de Producción Agropecuaria Sostenible",
+            "Formulación y Evaluación de Proyectos Agrotecnológicos"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Gestión de la Innovación y Transferencia Tecnológica en el Agro",
+            "Espacio de Libre Configuración",
+            "Formación Disciplinar Específica II",
+            "Prácticas Profesionales II",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Dr. Exequiel Porta",
+      "orden": 24
+    },
+    {
+      "slug": "licenciatura-en-cosmetologia-facial-y-corporal",
+      "nombre": "Licenciatura en Cosmetología Facial y Corporal",
+      "nivel": "Licenciatura",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Cosmetología Facial y Corporal",
+      "tituloIntermedio": "Técnico Universitario en Cosmetología Facial y Corporal (2,5 años)",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Con el título intermedio, el/la técnico/a evalúa y cuida la piel sana con tratamientos faciales y corporales personalizados, identifica alteraciones que requieren derivación y realiza acciones de promoción y prevención. El/la licenciado/a suma la investigación y el desarrollo de productos cosméticos, la salud capilar, la intervención en pre y postquirúrgicos estéticos, la coordinación de equipos interdisciplinarios y el asesoramiento a instituciones.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción a la Cosmetología Facial y Corporal",
+            "Anatomía Funcional",
+            "Histología",
+            "Bioseguridad",
+            "Fundamentos Psicosociales"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Práctica Preprofesional I",
+            "Fisiología",
+            "Microbiología",
+            "Introducción a la Química",
+            "Física Biológica"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Práctica Preprofesional II",
+            "Cosmetología Facial y Corporal I",
+            "Química Cosmética",
+            "Dermatología y Semiología Cosmetológica",
+            "Tecnología Cosmetológica"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Práctica Preprofesional III",
+            "Cosmetología Facial y Corporal II",
+            "Farmacología",
+            "Patología de Interés Cosmetológico"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Taller de Salud Integral",
+            "Práctica Preprofesional IV",
+            "Gestión y Desarrollo Profesional",
+            "Espacio de Libre Configuración"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Introducción a la Metodología de la Investigación",
+            "Estética y Salud Integral",
+            "Salud y Gestión Cosmetológica",
+            "Inglés Técnico",
+            "Tricología y Salud Capilar"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Metodología de la Investigación",
+            "Cosmetología Natural y Salud Integral",
+            "Química Aplicada al Desarrollo Cosmético",
+            "Abordaje Cosmetológico en Diversidad Sexual y Género",
+            "Formación Disciplinar Específica I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Innovación Tecnológica en Cosmetología",
+            "Taller de Análisis de Casos",
+            "Cosmetología Aplicada a Pre y Post Quirúrgicos Estéticos",
+            "Formación Disciplinar Específica II",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Lic. Gabriela Di Mauro",
+      "orden": 25
+    },
+    {
+      "slug": "licenciatura-en-diseno-de-espacios-interiores",
+      "nombre": "Licenciatura en Diseño de Espacios Interiores",
+      "nivel": "Licenciatura",
+      "area": "Diseño",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Diseño de Espacio de Interiores",
+      "tituloIntermedio": "Técnico/a Universitario/a en Diseño de Espacios Interiores (3 años)",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Con el título intermedio, el/la técnico/a interviene en proyectos de interiorismo, los representa y documenta, y aplica conocimientos de materiales, mobiliario, color, iluminación y ambientación. El/la licenciado/a planifica y dirige proyectos de alta complejidad con criterios de sustentabilidad e innovación tecnológica, asesora a instituciones y empresas y desarrolla investigación aplicada.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción al Diseño de Espacios Interiores",
+            "Laboratorio de Gráfica Vectorial",
+            "Representación Expresiva",
+            "Historia de la Cultura y el Diseño",
+            "Pensamiento Creativo"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Espacios Interiores I",
+            "Materiales y Técnicas de Aplicación",
+            "Representación y Visualización",
+            "Teoría y Aplicación del Color",
+            "Morfología y Composición",
+            "Ergonomía y Antropometría"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Diseño de Espacios Interiores II",
+            "Iluminación y Acústica",
+            "Fotografía",
+            "Representación Digital I",
+            "Comunicación en el Diseño"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Espacios Interiores III",
+            "Ambientación y Decoración de Interiores",
+            "Movimientos y Estilos Contemporáneos",
+            "Diseño de Mobiliario",
+            "Representación Digital II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Diseño de Espacios Interiores IV",
+            "Remodelación, Restauración y Rehabilitación de Interiores",
+            "Gestión y Organización de Obra",
+            "Seminario de Actualización I",
+            "Estrategias y Práctica Profesional"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Espacios Interiores V",
+            "Diseño de Jardines y Espacios Exteriores",
+            "Diseño y Marketing Digital",
+            "Accesibilidad y Diseño Universal",
+            "Espacio de Libre Configuración"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Proyectos Específicos",
+            "Taller de Escritura Académica",
+            "Domótica",
+            "Seminario de Actualización II",
+            "Optativa I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Seminario de Trabajo Final",
+            "Legislación y Gestión Estratégica de Recursos",
+            "Sostenibilidad en el Diseño de Interiores",
+            "Psicología del Espacio",
+            "Optativa II"
+          ]
+        }
+      ],
+      "direccion": "Prof. Arq. Damián Angel Villar",
+      "orden": 26
+    },
+    {
+      "slug": "licenciatura-en-diseno-grafico",
+      "nombre": "Licenciatura en Diseño Gráfico",
+      "nivel": "Licenciatura",
+      "area": "Diseño",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Diseño Gráfico",
+      "tituloIntermedio": "Técnico/a Universitario/a en Diseño Gráfico (3 años)",
+      "duracion": "4 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Con el título intermedio, el/la técnico/a diseña piezas de comunicación visual impresas y digitales e interviene en diseño editorial, identitario, multimedial, audiovisual e interactivo. El/la licenciado/a planifica sistemas integrales de comunicación visual de alta complejidad, fundamenta teóricamente sus decisiones, supervisa procesos de producción gráfica y lidera proyectos y emprendimientos de diseño.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción al Diseño de Comunicación Visual",
+            "Lenguajes Visuales I",
+            "Historia de la Cultura y el Diseño",
+            "Laboratorio de Gráfica Vectorial",
+            "Pensamiento Creativo"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Comunicación Visual I",
+            "Lenguajes Visuales II",
+            "Semiótica Visual",
+            "Tecnologías de la Producción",
+            "Representación y Visualización",
+            "Laboratorio de Creación y Edición de Imágenes"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Diseño de Comunicación Visual II",
+            "Tipografía I",
+            "Fotografía",
+            "Laboratorio de Estructuras y Maquetación",
+            "Comunicación en el Diseño"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Comunicación Visual III",
+            "Tipografía II",
+            "Diseño Tridimensional",
+            "Diseño y Producción Audiovisual",
+            "Laboratorio de Narrativas Audiovisuales"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Diseño de Comunicación Visual IV",
+            "Diseño Editorial I",
+            "Laboratorio de Gráfica en Movimiento",
+            "Seminario de Actualización I",
+            "Estrategias y Práctica Profesional"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Diseño de Comunicación Visual V",
+            "Diseño Editorial II",
+            "Laboratorio de Convergencia de Medios",
+            "Diseño y Marketing Digital",
+            "Espacio de Libre Configuración"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Taller de Trabajo Final I",
+            "Taller de Escritura Académica I",
+            "Diseño de Interfaces I",
+            "Seminario de Actualización II",
+            "Optativa I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Taller de Trabajo Final II",
+            "Taller de Escritura Académica II",
+            "Diseño de Interfaces II",
+            "Gestión Estratégica del Diseño",
+            "Optativa II"
+          ]
+        }
+      ],
+      "direccion": "",
+      "orden": 27
+    },
+    {
+      "slug": "licenciatura-en-psicomotricidad",
+      "nombre": "Licenciatura en Psicomotricidad",
+      "nivel": "Licenciatura",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Licenciado/a en Psicomotricidad",
+      "tituloIntermedio": "Técnico/a Universitario/a en Psicomotricidad",
+      "duracion": "4 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional habilitado para diagnosticar y abordar alteraciones psicomotrices en ámbitos clínicos, educativos y sociocomunitarios, supervisar evaluaciones, liderar estrategias de intervención y trabajar en equipos interdisciplinarios. Promueve la inclusión social y los derechos de las personas, y puede asesorar en políticas públicas y participar en investigación.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Anatomía funcional I",
+            "Sociología de la discapacidad",
+            "Psicomotricidad I",
+            "Taller de cuerpo y movimiento"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Anatomía funcional II",
+            "Desarrollo psicomotor en infancia",
+            "Psicología del desarrollo",
+            "Psicomotricidad II",
+            "Taller de cuerpo y movimiento"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Fundamentos neurofisiológicos aplicados",
+            "Semiología psicomotriz",
+            "Desarrollo psicomotor en adolescencia y adultez",
+            "Psicomotricidad III",
+            "Formación corporal I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Dinámica de grupos",
+            "Evaluación psicomotriz",
+            "Psicopatología clínica",
+            "Formación corporal II",
+            "Prácticas pre-profesionales I"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Organización y gestión",
+            "Introducción a la metodología de la investigación",
+            "Psicomotricidad en educación y en ámbito socio comunitario",
+            "Formación corporal III",
+            "Prácticas pre-profesionales II"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 2.º cuatrimestre",
+          "materias": [
+            "Metodología de investigación en ciencias de la salud",
+            "Terapia psicomotriz",
+            "Formación en el campo profesional I",
+            "Seminario de actualización I"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 1.er cuatrimestre",
+          "materias": [
+            "Seminario de actualización I",
+            "Atención temprana del desarrollo infantil",
+            "Gerontopsicomotricidad",
+            "Formación en el campo profesional II",
+            "Seminario de actualización II"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · 2.º cuatrimestre",
+          "materias": [
+            "Gestión en servicios de salud",
+            "Psicomotricidad clínica",
+            "Formación en el campo profesional III",
+            "Seminario de actualización III"
+          ]
+        }
+      ],
+      "direccion": "Florencia Fenouil",
+      "orden": 28
+    },
+    {
+      "slug": "profesorado-de-educacion-secundaria-modalidad-tecnico-profesional",
+      "nombre": "Profesorado de Educación Secundaria (Modalidad Técnico Profesional)",
+      "nivel": "Profesorado",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Profesor/a de Educación Secundaria - modalidad Técnico Profesional",
+      "tituloIntermedio": "",
+      "duracion": "4 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título previo",
+      "requisitos": "Título técnico de nivel secundario (6 o 7 años) o de nivel superior, con al menos 1.600 horas y competencia para el ejercicio de la docencia.",
+      "perfil": "Docente de la modalidad técnico profesional del nivel secundario, con formación pedagógico-didáctica para la práctica profesional y actualización científico-tecnológica en concurrencia con su título técnico de base.",
+      "plan": [
+        {
+          "periodo": "Primer año · Todo el año",
+          "materias": [
+            "Didactica en la escuela secundaria técnica I",
+            "Adolescencia y educación secundaria técnica",
+            "Producción de textos para la educación técnico profesional secundaria I",
+            "Práctica profesional I",
+            "Didáctica en la escuela secundaria técnica II",
+            "Política y legislación del sistema educativo argentino"
+          ]
+        },
+        {
+          "periodo": "Segundo año · Todo el año",
+          "materias": [
+            "Producción de textos para la educación técnico profesional secundaria nivel II",
+            "Psicología educativa",
+            "Competencias comunicacionales y compresión de textos I",
+            "Práctica profesional II",
+            "Aplicación de TIC en la educación técnica",
+            "Competencias comunicacionales y comprensión de textos II",
+            "Psicología y cultura del alumno"
+          ]
+        },
+        {
+          "periodo": "Tercer año · Todo el año",
+          "materias": [
+            "Actualización científico tecnológica en concurrencia con título de base",
+            "Contexto de aprendizaje I",
+            "Pedagogía para la inclusión",
+            "Práctica profesional III",
+            "Contexto de aprendizaje II",
+            "Saberes digitales"
+          ]
+        },
+        {
+          "periodo": "Cuarto año · Todo el año",
+          "materias": [
+            "Vinculación con el sector socio productivo",
+            "El aprendizaje en la escuela secundaria técnica",
+            "Planeamiento y administración de las instituciones de educación técnico profesional secundaria",
+            "Práctica profesional IV",
+            "Taller de análisis de la práctica",
+            "Gestión de instituciones educativas",
+            "Condiciones del ejercicio profesional",
+            "Seminario"
+          ]
+        }
+      ],
+      "direccion": "Jorgelina Amado",
+      "orden": 29
+    },
+    {
+      "slug": "profesorado-universitario",
+      "nombre": "Profesorado Universitario",
+      "nivel": "Profesorado",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Profesor/a Universitario/a",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título previo",
+      "requisitos": "Título de grado universitario (4 años o 2.600 horas), o título de pregrado o superior no universitario de al menos 2 años y medio y 1.700 horas.",
+      "perfil": "Docente habilitado para enseñar su especialidad de base en el nivel superior y para participar en la dirección y gestión de instituciones universitarias. También asesora en la planificación, ejecución y evaluación de la docencia de nivel superior y en la educación formal dentro de su especialidad.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Curriculum",
+            "Teoría de la educación y epistemología",
+            "Teorías de aprendizaje"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Política y legislación educativa",
+            "Taller de análisis de la práctica I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Gestión de las instituciones educativas",
+            "Didáctica general",
+            "Enseñanza en entornos virtuales"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Estrategias de enseñanza",
+            "Taller de análisis de la práctica II",
+            "Residencia y didáctica específica"
+          ]
+        }
+      ],
+      "direccion": "Irene López",
+      "orden": 30
+    },
+    {
+      "slug": "tecnicatura-universitaria-en-ciberseguridad",
+      "nombre": "Tecnicatura Universitaria en Ciberseguridad",
+      "nivel": "Tecnicatura",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Técnico/a Universitario/a en Ciberseguridad",
+      "tituloIntermedio": "",
+      "duracion": "2 años y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional capacitado para diseñar y ejecutar estrategias y políticas de ciberseguridad en organizaciones, gobiernos y empresas. Previene, detecta y responde a amenazas como phishing, ransomware, denegación de servicio e ingeniería social.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Introducción a la Seguridad de la Información",
+            "Introducción a Tecnologías de la Información y las Comunicaciones (TIC)",
+            "Tecnologías de las Comunicaciones",
+            "Seguridad Física",
+            "Inglés Técnico"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Sistemas de Gestión de Seguridad de la Información (Marcos normativos)",
+            "Auditorías de Seguridad de la Información",
+            "Ciberdelitos",
+            "Evaluación y Gestión de Riesgos",
+            "Gestión de Activos de la Información"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Tratamiento de Vulnerabilidades",
+            "Aspectos Legales y Normativos",
+            "Gestión de Continuidad del Negocio",
+            "Seguridad en el Software Base y las Aplicaciones",
+            "Gestión de Accesos",
+            "Conceptos de Desarrollo de Software"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Tratamiento de Incidentes",
+            "Introducción a la Criptografía",
+            "Técnicas de Hacking Ético",
+            "Infraestructuras Críticas",
+            "Desarrollo de Software Seguro",
+            "Seguridad en Cloud Services"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Análisis forense",
+            "Cibercrimen Evidencia e Investigación Digital",
+            "Ciberdefensa",
+            "Pasantía Profesional"
+          ]
+        }
+      ],
+      "direccion": "Lic. Leonardo Gianzone",
+      "orden": 31
+    },
+    {
+      "slug": "tecnicatura-universitaria-en-gestion-de-la-educacion",
+      "nombre": "Tecnicatura Universitaria en Gestión de la Educación",
+      "nivel": "Tecnicatura",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Técnico Universitario en Gestión de la Educación",
+      "tituloIntermedio": "",
+      "duracion": "2 años y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Profesional que aborda la gestión de la educación como campo de trabajo, con una mirada integradora, contextualizada, plural y multidimensional de los procesos de gestión y organización del sistema educativo y sus instituciones.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Epistemología",
+            "Historia de la educación Latinoamericana y Argentina",
+            "Sociología de la educación",
+            "Psicología general"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Sociología de las organizaciones",
+            "Psicología educacional",
+            "Teoría de la administración",
+            "Introducción a la política educativa"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Legislación educativa",
+            "Gestión de las instituciones educativas",
+            "Financiamiento de la educación",
+            "Resolución de conflictos institucionales"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Didáctica",
+            "Educación no formal",
+            "Teoría del currículum",
+            "Comunicación y educación en la sociedad del conocimiento"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Calidad Educativa y Evaluación Institucional",
+            "Diseño de proyectos educativos",
+            "Asesoramiento pedagógico de las organizaciones educativas",
+            "Introducción a la metodología de la investigación"
+          ]
+        }
+      ],
+      "direccion": "",
+      "orden": 32
+    },
+    {
+      "slug": "tecnicatura-universitaria-en-seguridad-publica-y-ciudadana",
+      "nombre": "Tecnicatura Universitaria en Seguridad Pública y Ciudadana",
+      "nivel": "Tecnicatura",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Técnico/a en Seguridad Pública y Ciudadana",
+      "tituloIntermedio": "",
+      "duracion": "2 años y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Técnico/a con habilidad para desarrollar acciones de promoción y prevención en seguridad pública, capaz de reflexionar y participar en las problemáticas sociales y culturales. Puede actuar ante situaciones de transgresión de la seguridad pública identificando y preservando a los actores intervinientes y su contexto.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Estado y Sociedad",
+            "Psicología General",
+            "Análisis del Delito I",
+            "Lenguaje y Comunicación",
+            "Introducción al Derecho"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Criminología",
+            "Psicología Criminal",
+            "Análisis del Delito II",
+            "Teoría Social del Orden y el Conflicto",
+            "Derecho Constitucional"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Sociología Sistemática",
+            "Psicología Social",
+            "Informática",
+            "Estructura Jurídica del Estado",
+            "Derecho Penal"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Defensa Nacional",
+            "Abordaje y Resolución Alternativa de Conflictos",
+            "Criminalística",
+            "Doctrina de la Seguridad",
+            "Derecho Procesal Penal"
+          ]
+        },
+        {
+          "periodo": "Tercer año · 1.er cuatrimestre",
+          "materias": [
+            "Marco Legal de Actuación de los Agentes de Seguridad y Legislación de la Seguridad",
+            "Tecnología de las Comunicaciones",
+            "Introducción a la Metodología de la Investigación",
+            "Liderazgo y Conducción de Grupos",
+            "Derechos Humanos y Género"
+          ]
+        }
+      ],
+      "direccion": "Dra. María Eugenia Cereigido",
+      "orden": 33
+    },
+    {
+      "slug": "tecnicatura-universitaria-en-yoga-y-salud-integral",
+      "nombre": "Tecnicatura Universitaria en Yoga y Salud Integral",
+      "nivel": "Tecnicatura",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Técnico/a Universitario/a en Yoga y Salud Integral",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con bachillerato aprobado",
+      "requisitos": "Bachillerato aprobado.",
+      "perfil": "Técnico/a que diseña y dicta clases individuales y grupales de yoga, adaptando técnicas posturales, respiratorias y meditativas a distintas personas y grupos, y organiza cursos y talleres orientados a hábitos saludables. Realiza valoraciones integrales de bienestar, colabora en proyectos de promoción de la salud e integra equipos interdisciplinarios de salud, educación, deporte y gestión organizacional.",
+      "plan": [
+        {
+          "periodo": "Primer año · 1.er cuatrimestre",
+          "materias": [
+            "Filosofía Clásica y Psicología del Yoga I",
+            "Haṭha Yoga I",
+            "Meditación y Prácticas Contemplativas I",
+            "Anatomía Funcional",
+            "Introducción a la Salud Integral y al Ayurveda"
+          ]
+        },
+        {
+          "periodo": "Primer año · 2.º cuatrimestre",
+          "materias": [
+            "Filosofía Clásica y Psicología del Yoga II",
+            "Haṭha Yoga II",
+            "Meditación y Prácticas Contemplativas II",
+            "Biomecánica",
+            "Ayurveda I"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 1.er cuatrimestre",
+          "materias": [
+            "Filosofías de la India y Estudios de la Paz I",
+            "Haṭha Yoga III",
+            "Meditación y Prácticas Contemplativas III",
+            "Ayurveda II",
+            "Innovación y Desarrollo Emprendedor en Salud"
+          ]
+        },
+        {
+          "periodo": "Segundo año · 2.º cuatrimestre",
+          "materias": [
+            "Filosofías de la India y Estudios de la Paz II",
+            "Haṭha Yoga IV",
+            "Meditación y Prácticas Contemplativas IV",
+            "Anatomía Fisiológica",
+            "Formación Disciplinar Específica"
+          ]
+        }
+      ],
+      "direccion": "Lic. Patricia Rossi",
+      "orden": 34
+    },
+    {
+      "slug": "maestria-en-abordaje-integral-en-gerontologia",
+      "nombre": "Maestría en Abordaje Integral en Gerontología",
+      "nivel": "Maestría",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Abordaje Integral en Gerontología",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título en carreras vinculadas al área gerontológica, preferentemente de la salud: medicina, kinesiología, enfermería, psicología, odontología, psicopedagogía, terapia ocupacional, educación física, podología y acompañamiento terapéutico.",
+      "perfil": "Profesional capaz de liderar políticas públicas y programas gerontológicos, dirigir instituciones y servicios para personas mayores y coordinar intervenciones interdisciplinarias de salud. También puede asesorar en accesibilidad y diseño de entornos e investigar en el campo de la gerontología.",
+      "plan": [],
+      "direccion": "",
+      "orden": 35
+    },
+    {
+      "slug": "maestria-en-ergonomia-ocupacional",
+      "nombre": "Maestría en Ergonomía Ocupacional",
+      "nivel": "Maestría",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Ergonomía Ocupacional",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título universitario de grado de al menos 4 años en ciencias de la salud, tecnológicas o sociales: terapia ocupacional, kinesiología, medicina, enfermería, psicología, higiene y seguridad, ingeniería, recursos humanos y carreras afines.",
+      "perfil": "Profesional de alto nivel académico con formación específica en Ergonomía Ocupacional, preparado para la gestión preventiva, planificación e investigación de enfermedades profesionales y para eliminar o reducir riesgos ergonómicos cumpliendo la normativa vigente.",
+      "plan": [
+        {
+          "periodo": "Primer año - Primer cuatrimestre",
+          "materias": [
+            "Prevención de Riesgos Laborales: Introducción a la Ergonomía Ocupacional",
+            "Legislación y Normas de Certificación Internacionales",
+            "Salud Ocupacional",
+            "Metodología de la Investigación"
+          ]
+        },
+        {
+          "periodo": "Primer año - Segundo cuatrimestre",
+          "materias": [
+            "Ergonomía: ambiental, física, cognitiva y organizacional",
+            "Factores de Riesgos Ergonómicos",
+            "Evaluaciones Ergonómicas I",
+            "Taller Metodológico de Análisis de casos"
+          ]
+        },
+        {
+          "periodo": "Segundo año - Primer cuatrimestre",
+          "materias": [
+            "Evaluaciones Ergonómicas II",
+            "Diagnóstico Ocupacional",
+            "Diseño y Gestión del Plan Ergonómico",
+            "Taller de Elaboración de Trabajo Final Integrador",
+            "Prácticas Profesionales"
+          ]
+        }
+      ],
+      "direccion": "Esp. Mauro Samperi",
+      "orden": 36
+    },
+    {
+      "slug": "maestria-en-gestion-de-las-instituciones-educativas",
+      "nombre": "Maestría en Gestión de las Instituciones Educativas",
+      "nivel": "Maestría",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Gestión de las Instituciones Educativas",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de grado de al menos 4 años en carreras vinculadas a la educación o a la gestión y administración, o en otras carreras con experiencia en docencia o gestión educativa.",
+      "perfil": "Graduado/a con sólida formación teórica, metodológica y técnica en las dimensiones de la gestión de instituciones educativas, capaz de analizar la complejidad de sus problemáticas con una mirada interdisciplinaria. También está preparado/a para investigar y generar aportes relevantes en el área.",
+      "plan": [
+        {
+          "periodo": "Módulos",
+          "materias": [
+            "Nuevos Escenarios Educativos y la Gestión de las Instituciones Educativas",
+            "Instituciones Educativas: Comunidad y Actores",
+            "Análisis Institucional para la Gestión Educativa",
+            "Metodología de la Investigación",
+            "Liderazgo Pedagógico y Desarrollo Profesional Docente",
+            "Sistemas de Información y de Evaluación y Calidad Educativa",
+            "Gestión de la Innovación en la Enseñanza",
+            "Diseño y Evaluación de Proyectos Educativo",
+            "Seminario de Actualización I",
+            "Seminario de Actualización II",
+            "Espacio de Práctica Profesional",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Dr. Nelson Abaca",
+      "orden": 37
+    },
+    {
+      "slug": "maestria-en-inteligencia-e-investigacion-criminal",
+      "nombre": "Maestría en Inteligencia e Investigación Criminal",
+      "nivel": "Maestría",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Inteligencia e Investigación Criminal",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de grado de al menos 4 años en carreras vinculadas a las ciencias sociales (seguridad, sociología, criminología, ciencia política, derecho, entre otras), o en otros campos con antecedentes en el área.",
+      "perfil": "Profesional capacitado para detectar y abordar delitos complejos aplicando técnicas de investigación criminal y análisis de inteligencia, incluida la recolección de elementos probatorios. Puede planificar y dirigir políticas multiagenciales, gestionar organizaciones y coordinar equipos interdisciplinarios en inteligencia e investigación criminal.",
+      "plan": [
+        {
+          "periodo": "Primer año (todo el año)",
+          "materias": [
+            "Historia institucional de la investigación y la inteligencia criminal",
+            "Análisis de inteligencia criminal",
+            "Introducción a la metodología de la investigación social",
+            "Legislación en seguridad interior e inteligencia",
+            "Metodología de la investigación",
+            "Control público de la actividad de inteligencia",
+            "Narcotráfico y mercado ilegal de drogas",
+            "Lavado de dinero y mercados financieros ilegales"
+          ]
+        },
+        {
+          "periodo": "Segundo año (cuatrimestral)",
+          "materias": [
+            "Seminario de actualización I",
+            "Seminario de actualización II",
+            "Fuentes de información de inteligencia",
+            "Técnicas de investigación criminal",
+            "Taller de trabajo final",
+            "Trabajo final"
+          ]
+        }
+      ],
+      "direccion": "Mg. Gastón Pezzuchi",
+      "orden": 38
+    },
+    {
+      "slug": "maestria-en-kinesiologia-y-fisioterapia-cardiorrespiratoria",
+      "nombre": "Maestría en Kinesiología y Fisioterapia Cardiorrespiratoria",
+      "nivel": "Maestría",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Kinesiología y Fisioterapia Cardiorrespiratoria",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de Licenciatura en Kinesiología y Fisiatría y al menos dos años de experiencia laboral certificada en el área cardiorrespiratoria.",
+      "perfil": "Profesional de alto nivel académico capaz de responder a las necesidades de intervención integral de la kinesiología aplicada a patologías respiratorias y cardíacas en pacientes adultos y pediátricos.",
+      "plan": [
+        {
+          "periodo": "Primer año - Primer cuatrimestre",
+          "materias": [
+            "Fundamentos de la atención Fisioterapéutica/Kinésica en los cuidados respiratorios",
+            "Anatomía y fisiología aplicada a los cuidados Cardiorrespiratorios",
+            "Evaluación de los trastornos respiratorios"
+          ]
+        },
+        {
+          "periodo": "Primer año - Segundo cuatrimestre",
+          "materias": [
+            "Revisión de la enfermedad cardiopulmonar",
+            "Terapéutica Básica del Fisioterapeuta/Kinesiólogo respiratorio",
+            "Cuidado Fisioterapéuticos/Kinésicos del paciente agudo y crítico",
+            "Educación del paciente y atención crónica del paciente"
+          ]
+        },
+        {
+          "periodo": "Segundo año - Primer cuatrimestre",
+          "materias": [
+            "Metodología de la Investigación",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Dr. Martín Managó",
+      "orden": 39
+    },
+    {
+      "slug": "maestria-en-politica-y-gestion-de-la-discapacidad-e-inclusion-social",
+      "nombre": "Maestría en Política y Gestión de la Discapacidad e Inclusión Social",
+      "nivel": "Maestría",
+      "area": "Discapacidad e Inclusión Social",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Política y Gestión de la Discapacidad e Inclusión Social",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Profesionales universitarios de educación, derecho, economía, salud, gestión, trabajo social, políticas públicas, arquitectura, ingeniería o tecnología, con interés o actividad en el campo de la discapacidad y la inclusión social.",
+      "perfil": "Profesional con capacidades y herramientas para el diseño, elaboración y gestión de políticas en discapacidad, que aborda la temática en su complejidad desde un enfoque interdisciplinario.",
+      "plan": [
+        {
+          "periodo": "Primer año - Primer cuatrimestre",
+          "materias": [
+            "Determinación social de la discapacidad",
+            "Formaciones histórico sociales de la subjetividad contemporánea en discapacidad",
+            "Abordaje de la discapacidad desde la política y gestión"
+          ]
+        },
+        {
+          "periodo": "Primer año - Segundo cuatrimestre",
+          "materias": [
+            "Políticas y planificación en discapacidad e inclusión social",
+            "Metodología de la investigación I",
+            "Taller de tesis I"
+          ]
+        },
+        {
+          "periodo": "Segundo año - Primer cuatrimestre",
+          "materias": [
+            "Producción, gestión y evaluación de programas y políticas en discapacidad e inclusión social",
+            "Metodología de la investigación II",
+            "Seminario de actualización I"
+          ]
+        },
+        {
+          "periodo": "Segundo año - Segundo cuatrimestre",
+          "materias": [
+            "Seminario de actualización II",
+            "Taller de tesis 2",
+            "Espacio de práctica profesional"
+          ]
+        }
+      ],
+      "direccion": "Dr. José Luis Aguirre",
+      "orden": 40
+    },
+    {
+      "slug": "maestria-en-politica-y-gestion-de-la-seguridad-ciudadana",
+      "nombre": "Maestría en Política y Gestión de la Seguridad Ciudadana",
+      "nivel": "Maestría",
+      "area": "Seguridad",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Política y Gestión de la Seguridad Ciudadana",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "A distancia con prácticas profesionales presenciales",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de grado de al menos 4 años en carreras vinculadas a las ciencias sociales (seguridad, sociología, criminología, ciencia política, derecho, entre otras), o en otros campos con antecedentes en el área.",
+      "perfil": "Profesional con competencias para planificar, implementar y dirigir políticas públicas de prevención del delito y coordinar políticas multiagenciales de seguridad ciudadana. Puede asesorar en proyectos legislativos, realizar análisis de riesgos, diseñar estrategias de seguridad en organizaciones públicas y privadas y dirigir equipos de investigación en el área.",
+      "plan": [
+        {
+          "periodo": "Primer año (todo el año)",
+          "materias": [
+            "Políticas Públicas y Derechos Humanos",
+            "Historia Social de las Instituciones de Seguridad",
+            "Violencia de Género y la Institución Policial",
+            "Introducción a la Metodología de Investigación",
+            "Criminología",
+            "Legislación en Seguridad Interior e Inteligencia",
+            "Metodología de Investigación",
+            "Control Público de la Actividad de Inteligencia"
+          ]
+        },
+        {
+          "periodo": "Segundo año (cuatrimestral)",
+          "materias": [
+            "Seminario de Actualización I",
+            "Gestión Penitenciaria",
+            "Seminario de Actualización II",
+            "Armas Autónomas No Tripuladas y Prevención al Tráfico de Armas",
+            "Gestión de la Seguridad Privada y Recursos Tecnológicos",
+            "Gestión de la Seguridad en Espectáculos Deportivos",
+            "Espacio de Prácticas Profesionales",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Dr. Daniel Garibaldi",
+      "orden": 41
+    },
+    {
+      "slug": "maestria-en-reentrenamiento-deportivo-y-prevencion-de-lesiones",
+      "nombre": "Maestría en Reentrenamiento Deportivo y Prevención de Lesiones",
+      "nivel": "Maestría",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Magíster en Reentrenamiento Deportivo y Prevención de Lesiones",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "A distancia con prácticas presenciales concentradas",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de Licenciatura en Actividad Física, Educación Física o Kinesiología y Fisiatría, o título universitario afín con antecedentes que el Comité Académico de la maestría considere suficientes.",
+      "perfil": "Profesional capaz de diseñar programas de entrenamiento para la prevención de lesiones y de gestionar el reentrenamiento del deportista hasta recuperar su forma física, trabajando con otros profesionales del ámbito deportivo. Aplica criterios de programación y periodización, herramientas tecnológicas y una actitud científica en estos procesos.",
+      "plan": [
+        {
+          "periodo": "Módulos",
+          "materias": [
+            "Ciencias del Ejercicio",
+            "Introducción al Reentrenamiento Deportivo y la Prevención de Lesiones",
+            "Metodología de la Investigación",
+            "Rendimiento y Condición Física",
+            "Seminario de trabajo final I",
+            "Evaluaciones y Diagnóstico Deportivo",
+            "Prevención y Reentrenamiento",
+            "Seminario de trabajo final II",
+            "Prácticas Profesionales",
+            "Estrategias y Herramientas Complementarias en el Deporte",
+            "Taller de trabajo final"
+          ]
+        }
+      ],
+      "direccion": "Mg. Romina González",
+      "orden": 42
+    },
+    {
+      "slug": "doctorado-en-ciencias-de-la-rehabilitacion",
+      "nombre": "Doctorado en Ciencias de la Rehabilitación",
+      "nivel": "Doctorado",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Doctor/a en Ciencias de la Rehabilitación",
+      "tituloIntermedio": "",
+      "duracion": "2 años de cursado más tesis",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título universitario de grado de al menos 4 años en carreras del campo de la salud.",
+      "perfil": "Posgraduado/a con sólida formación teórica y metodológica, capacitado/a para planificar y dirigir proyectos de investigación, ejercer la docencia y ocupar cargos de gestión en las Ciencias de la Rehabilitación. Desarrolla capacidad crítica sobre su práctica profesional y puede liderar y formar equipos de investigación.",
+      "plan": [],
+      "direccion": "",
+      "orden": 43
+    },
+    {
+      "slug": "especializacion-en-kinesiologia-y-fisioterapia-del-deporte",
+      "nombre": "Especialización en Kinesiología y Fisioterapia del Deporte",
+      "nivel": "Especialización",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Especialista en Kinesiología y Fisioterapia del Deporte",
+      "tituloIntermedio": "",
+      "duracion": "2 años y medio",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "Modalidad de cursado combinada: seminarios de cursado virtual con prácticas presenciales a partir del 2do año",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de Licenciatura en Kinesiología y Fisiatría o equivalente.",
+      "perfil": "Especialista capaz de responder a las demandas de intervención integral de la kinesiología del deporte, con competencia en evaluación, prevención, tratamiento y readaptación física de lesiones deportivas según edad y nivel de exigencia. Puede asesorar programas deportivos, integrar equipos interdisciplinarios e investigar en su especialidad.",
+      "plan": [
+        {
+          "periodo": "Primer año (todo el año)",
+          "materias": [
+            "Traumatología y rehabilitación deportiva",
+            "Fisiología del Ejercicio, nutrición, hidratación y entrenamiento"
+          ]
+        },
+        {
+          "periodo": "Segundo año (todo el año)",
+          "materias": [
+            "Seminarios específicos de rehabilitación deportiva: Técnicas manuales aplicadas a la patología deportiva",
+            "Seminarios específicos de rehabilitación deportiva: Fisioterapia aplicadas a la patología deportiva",
+            "Seminarios específicos de rehabilitación deportiva: Técnicas de estabilización articular",
+            "Seminarios específicos de rehabilitación deportiva: Evaluaciones morfofuncionales en el deporte",
+            "Seminario de Metodología de la investigación"
+          ]
+        },
+        {
+          "periodo": "Tercer año (primer cuatrimestre)",
+          "materias": [
+            "Prácticas en centros especializados",
+            "Taller de Trabajo Final"
+          ]
+        }
+      ],
+      "direccion": "Mg. Klga. Clarisa Mildenberger",
+      "orden": 44
+    },
+    {
+      "slug": "especializacion-en-kinesiologia-y-fisioterapia-neurologica",
+      "nombre": "Especialización en Kinesiología y Fisioterapia Neurológica",
+      "nivel": "Especialización",
+      "area": "Salud y Rehabilitación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Especialista en Kinesiología y Fisioterapia Neurológica",
+      "tituloIntermedio": "",
+      "duracion": "2 años",
+      "modalidad": "A distancia, con instancias presenciales",
+      "instanciasPresenciales": true,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de Licenciatura en Kinesiología de al menos 4 años.",
+      "perfil": "Especialista capaz de detectar las desviaciones del movimiento causadas por patologías neurológicas y fundamentar intervenciones kinésicas en personas con afectación del sistema nervioso central o periférico. Maneja evaluación, prevención, terapéutica y readaptación física, e integra equipos de salud en recuperación neurológica pediátrica y de adultos.",
+      "plan": [],
+      "direccion": "Esp. Georgina Jimenez",
+      "orden": 45
+    },
+    {
+      "slug": "especializacion-en-psicopedagogia-y-atencion-temprana-del-desarrollo-humano",
+      "nombre": "Especialización en Psicopedagogía y Atención Temprana del Desarrollo Humano",
+      "nivel": "Especialización",
+      "area": "Ciencias Sociales y Educación",
+      "universidad": "Universidad del Gran Rosario",
+      "pais": "Argentina",
+      "titulo": "Especialista en Psicopedagogía y Atención Temprana del Desarrollo Humano",
+      "tituloIntermedio": "",
+      "duracion": "1 año y medio",
+      "modalidad": "A distancia",
+      "instanciasPresenciales": false,
+      "detalleModalidad": "",
+      "viaIngreso": "Con título de grado",
+      "requisitos": "Título de grado en disciplinas afines, como Licenciatura o Profesorado en Psicopedagogía, o título extranjero equivalente.",
+      "perfil": "Especialista capaz de evaluar de manera integral el desarrollo del aprendizaje en las infancias y de diseñar e implementar estrategias de intervención basadas en evidencia en ámbitos educativos, clínicos y comunitarios. Trabaja en equipos interdisciplinarios para la detección temprana, acompaña a docentes y familias y contribuye a políticas públicas de protección de derechos de las niñeces.",
+      "plan": [],
+      "direccion": "",
+      "orden": 46
+    }
+  ]
+}

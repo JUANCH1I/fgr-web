@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Contacto" description="Escríbenos o visítanos en Quito. Un asesor de la Fundación del Gran Rosario Ecuador revisa tu caso y te dice qué opciones tienes." >
+  <Fragment set:html={`<section class="cabecera cabecera--simple">
+  <div class="contenedor">
+    <p class="antetitulo">Contacto</p>
+    <h1>Hablemos de tu caso</h1>
+    <p class="entrada">Un asesor revisa tu situación y te dice qué opciones tienes. Sin compromiso.</p>
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2>Escríbenos</h2>
+      <form class="formulario" novalidate data-formulario-contacto data-destino="/api/formulario/" data-correo="info@fgrec.org">
+  <div class="campo"><label for="ct-nombre">Nombre completo</label><input id="ct-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" required></div>
+  <div class="campo"><label for="ct-correo">Correo</label><input id="ct-correo" name="correo" type="email" autocomplete="email" maxlength="100" required></div>
+  <div class="campo"><label for="ct-lugar">Ciudad / País</label><input id="ct-lugar" name="lugar" type="text" autocomplete="address-level2" maxlength="80" required></div>
+  <div class="campo"><label for="ct-telefono">Teléfono, con código de país</label><input id="ct-telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required></div>
+  <div class="campo"><label for="ct-mensaje">Mensaje</label><textarea id="ct-mensaje" name="mensaje" rows="5" maxlength="2000"></textarea></div>
+  <div class="campo campo--oculto" aria-hidden="true"><label for="ct-web">No completar</label><input id="ct-web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
+  <label class="acepto"><input type="checkbox" name="acepto" required><span>Acepto que la Fundación use estos datos para responder mi consulta. <a href="/proteccion-de-datos/" target="_blank">Ver política de protección de datos</a></span></label>
+  <p class="error" role="alert" data-error hidden></p>
+  <p class="exito" role="status" data-exito hidden></p>
+  <button type="submit" class="boton boton--oscuro" data-enviar>Enviar</button>
+</form>
+    </div>
+    <div class="contacto-datos">
+      <h2>Sede internacional</h2>
+      <div>
+        <h3>Dirección</h3>
+        <p>Av. 12 de Octubre N26-97 y Abraham Lincoln, Edificio Torre 1492, Oficina 902.<br>Quito, Ecuador.</p>
+      </div>
+      <div>
+        <h3>Teléfono</h3>
+        <p>+593 96 301 7631</p>
+      </div>
+      <div>
+        <h3>Correo</h3>
+        <p><a href="mailto:info@fgrec.org">info@fgrec.org</a></p>
+      </div>
+      <div>
+        <h3>Oficinas</h3>
+        <p>Oficinas en Colombia y Uruguay. Próximamente en Perú y Paraguay.</p>
+      </div>
+      <p><a class="enlace-flecha" href="https://www.google.com/maps/search/?api=1&amp;query=Torre+1492+Av.+12+de+Octubre+N26-97+Quito" target="_blank" rel="noopener">Ver en el mapa <span aria-hidden="true">→</span></a></p>
+      <div class="botones">
+  <a class="boton boton--oscuro" href="/contacto/">Hablar ahora con un asesor</a>
+  
+</div>
+    </div>
+  </div>
+</section>
+`} />
+</Layout>

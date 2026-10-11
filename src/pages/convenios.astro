@@ -1,0 +1,55 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Convenios" description="Institutos y asociaciones profesionales con los que la Fundación del Gran Rosario Ecuador articula rutas de continuidad hacia la universidad." >
+  <Fragment set:html={`<section class="cabecera cabecera--clara">
+  <div class="contenedor">
+    <p class="antetitulo">Convenios</p>
+    <h1>Instituciones con las que articulamos rutas de continuidad.</h1>
+    <p class="entrada">La Fundación firma convenios con institutos y asociaciones profesionales de la región para que sus estudiantes y egresados tengan un camino claro hacia la universidad.</p>
+    <p class="entrada">Cada convenio define qué carreras de la institución son afines a qué ciclos o licenciaturas, y qué documentación hace falta para postular.</p>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="instituciones-titulo">
+  <div class="contenedor">
+    <h2 id="instituciones-titulo">Instituciones con convenio</h2>
+    <div class="grilla grilla--2">
+  <article class="tarjeta">
+    <p class="antetitulo">Instituto superior tecnológico · Ecuador</p>
+    <h3>Instituto Superior Tecnológico Yavirac</h3>
+  </article>
+  <article class="tarjeta">
+    <p class="antetitulo">Instituto superior tecnológico · Ecuador</p>
+    <h3>Instituto Tecnológico Superior Daniel Álvarez Burneo</h3>
+  </article>
+  <article class="tarjeta">
+    <p class="antetitulo">Instituto superior tecnológico · Ecuador</p>
+    <h3>Instituto Superior Tecnológico Mayor Pedro Traversari</h3>
+  </article>
+  <article class="tarjeta">
+    <p class="antetitulo">Asociación profesional · Perú</p>
+    <h3>Asociación de Podólogos Titulados de Perú</h3>
+  </article>
+</div>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="significa-titulo">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2 id="significa-titulo">Qué significa para ti</h2>
+      <p>Si estudias o te graduaste en una de estas instituciones, un asesor ya conoce tu plan de estudios y sabe qué documentos pedirte.</p>
+      <p>El ingreso lo define siempre la universidad, después de revisar tu título y tu trayectoria.</p>
+      <p><a class="enlace-flecha" href="/continuidad-academica/">Evaluar mis estudios <span aria-hidden="true">→</span></a></p>
+      <p><a class="enlace-flecha" href="/ccc/">Conocer el CCC <span aria-hidden="true">→</span></a></p>
+    </div>
+    <div>
+      <h2>¿Tu institución no está en la lista?</h2>
+      <p>Puedes postular igual: la universidad analiza cada caso. Y si representas a un instituto o a una asociación, podemos conversar sobre un convenio.</p>
+      <p><a class="enlace-flecha" href="/contacto/">Hablar ahora con un asesor <span aria-hidden="true">→</span></a></p>
+    </div>
+  </div>
+</section>
+`} />
+</Layout>

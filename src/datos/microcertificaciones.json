@@ -1,0 +1,244 @@
+{
+  "_nota": "Maestrías cuyos seminarios se pueden cursar como microcertificaciones. Cada maestría genera su página en /microcertificaciones/<slug>/. \"carrera\" es el slug de su ficha en carreras.json. Un seminario lleva \"horas\" o \"tipo\". \"_pendiente\" marca un dato que hay que confirmar: no se muestra en el sitio.",
+  "maestrias": [
+    {
+      "slug": "inteligencia-e-investigacion-criminal",
+      "titulo": "Maestría en Inteligencia e Investigación Criminal",
+      "carrera": "maestria-en-inteligencia-e-investigacion-criminal",
+      "resumen": "Orientada a profesionales que buscan fortalecer el análisis, la investigación y la toma de decisiones en contextos de seguridad.",
+      "imagen": "64d480_0d79c8b5477d4a50b540fc52cc2254f0~mv2.jpg",
+      "rutaAnterior": "/copia-de-gestión-de-las-instituciones",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Inteligencia e Investigación Criminal",
+      "campo": "Seguridad",
+      "areas": [
+        { "nombre": "Área Social", "seminarios": [
+          { "nombre": "Historia institucional de la investigación y la inteligencia criminal", "texto": "Seminario orientado a comprender la evolución institucional y el desarrollo histórico de la investigación y la inteligencia criminal.", "horas": 30 },
+          { "nombre": "Fuentes de información de inteligencia", "texto": "Seminario centrado en el análisis, clasificación y utilización estratégica de fuentes de información aplicadas a inteligencia.", "horas": 50 }
+        ]},
+        { "nombre": "Área Jurídica", "seminarios": [
+          { "nombre": "Marco normativo de la seguridad interior y la inteligencia", "texto": "Seminario enfocado en fundamentos normativos y marcos regulatorios relacionados con seguridad interior e inteligencia.", "horas": 40, "_pendiente": "En el sitio anterior figuraba con el nombre de otro seminario (Liderazgo Pedagógico y Desarrollo Profesional Docente). Confirmar el nombre real." },
+          { "nombre": "Control público de la actividad de inteligencia", "texto": "Seminario dedicado al análisis del control, la supervisión y la legitimidad institucional de la actividad de inteligencia.", "horas": 40 }
+        ]},
+        { "nombre": "Área Inteligencia e Investigación Criminal", "seminarios": [
+          { "nombre": "Análisis de inteligencia criminal", "texto": "Seminario orientado a desarrollar criterios analíticos e interpretación estratégica de inteligencia criminal.", "horas": 50 },
+          { "nombre": "Narcotráfico y mercado ilegal de drogas", "texto": "Seminario dedicado a comprender dinámicas, actores y estructuras del narcotráfico y los mercados ilegales de drogas.", "horas": 40 },
+          { "nombre": "Lavado de dinero y mercados financieros ilegales", "texto": "Seminario enfocado en circuitos económicos ilícitos, estructuras de lavado y mercados financieros ilegales.", "horas": 40 }
+        ]},
+        { "nombre": "Área de Actualización", "seminarios": [
+          { "nombre": "Seminario de Actualización I", "texto": "Espacio orientado a reforzar contenidos emergentes y fortalecer conocimientos de actualización temática.", "horas": 40 },
+          { "nombre": "Seminario de Actualización II", "texto": "Seminario de profundización y actualización diseñado para reforzar competencias analíticas del campo.", "horas": 40 },
+          { "nombre": "Técnicas de investigación criminal", "texto": "Seminario para fortalecer procedimientos, métodos y herramientas aplicadas a la investigación criminal.", "horas": 50 }
+        ]},
+        { "nombre": "Área Metodológica", "seminarios": [
+          { "nombre": "Introducción a la metodología de la investigación social", "texto": "Seminario inicial para comprender fundamentos metodológicos aplicados a la investigación social.", "horas": 30 },
+          { "nombre": "Metodología de la investigación", "texto": "Seminario orientado al diseño, organización y desarrollo de procesos de investigación académica.", "horas": 30 },
+          { "nombre": "Taller de trabajo final", "texto": "Espacio orientado al acompañamiento metodológico y estructuración del trabajo final de la maestría.", "horas": 60 },
+          { "nombre": "Elaboración de trabajo final", "texto": "Tramo de cierre académico destinado al desarrollo integral del trabajo final del posgrado.", "horas": 175 }
+        ]}
+      ]
+    },
+    {
+      "slug": "gestion-de-las-instituciones-educativas",
+      "titulo": "Maestría en Gestión de las Instituciones Educativas",
+      "carrera": "maestria-en-gestion-de-las-instituciones-educativas",
+      "resumen": "Para profesionales que buscan fortalecer la dirección, planificación y mejora estratégica de organizaciones educativas.",
+      "imagen": "64d480_3f17aa757ae04ea1b78faa0d54c2f5db~mv2.jpg",
+      "rutaAnterior": "/copia-de-seguridad-inteligencia-y-es-2",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Gestión de las Instituciones Educativas",
+      "campo": "Ciencias Sociales y Educación",
+      "areas": [
+        { "nombre": "Gestión institucional", "seminarios": [
+          { "nombre": "Nuevos escenarios educativos y la gestión de las instituciones educativas", "texto": "Seminario orientado a comprender los nuevos escenarios educativos y su impacto en la gestión institucional.", "horas": 30 },
+          { "nombre": "Instituciones educativas: comunidad y actores", "texto": "", "horas": 50, "_pendiente": "En el sitio anterior tenía la descripción de un seminario de inteligencia. Falta su descripción." },
+          { "nombre": "Análisis institucional para la gestión educativa", "texto": "Unidad dedicada al análisis institucional como base para la toma de decisiones en gestión educativa.", "horas": 40 }
+        ]},
+        { "nombre": "Liderazgo, innovación y calidad", "seminarios": [
+          { "nombre": "Liderazgo pedagógico y desarrollo profesional docente", "texto": "Unidad orientada al fortalecimiento del liderazgo pedagógico y el desarrollo profesional docente.", "horas": 30 },
+          { "nombre": "Sistemas de información y de evaluación y calidad educativa", "texto": "Espacio enfocado en sistemas de información, evaluación y calidad aplicados a instituciones educativas.", "horas": 30 },
+          { "nombre": "Gestión de la innovación en la enseñanza", "texto": "Unidad orientada a la innovación pedagógica y a la transformación de prácticas de enseñanza.", "horas": 30 }
+        ]},
+        { "nombre": "Investigación y proyectos", "seminarios": [
+          { "nombre": "Metodología de la investigación", "texto": "Unidad orientada a introducir herramientas metodológicas para la producción académica y el análisis institucional.", "horas": 25 },
+          { "nombre": "Diseño y evaluación de proyectos educativos", "texto": "Espacio orientado al diseño, formulación y evaluación de proyectos en el ámbito educativo.", "horas": 30 }
+        ]},
+        { "nombre": "Actualización, práctica y trabajo final", "seminarios": [
+          { "nombre": "Seminario de Actualización I", "texto": "Espacio para reforzar contenidos vigentes y debates actuales del campo de la gestión educativa.", "horas": 30 },
+          { "nombre": "Seminario de Actualización II", "texto": "Continuación del trayecto de actualización para profundizar contenidos estratégicos del programa.", "horas": 30 },
+          { "nombre": "Espacio de práctica profesional", "texto": "Espacio orientado a la aplicación profesional de los aprendizajes del programa en contextos reales.", "horas": 60 },
+          { "nombre": "Taller de trabajo final", "texto": "Espacio de acompañamiento orientado al desarrollo del trabajo final del posgrado.", "horas": 60 }
+        ]}
+      ]
+    },
+    {
+      "slug": "ergonomia-ocupacional",
+      "titulo": "Maestría en Ergonomía Ocupacional",
+      "carrera": "maestria-en-ergonomia-ocupacional",
+      "resumen": "Para profesionales que desean mejorar condiciones de trabajo, prevenir riesgos y optimizar el bienestar ocupacional.",
+      "imagen": "64d480_18c0dc3d99d84c83a198b21063de8f1d~mv2.jpg",
+      "rutaAnterior": "/copia-de-kinesiología-cardiorrepiratoria",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Ergonomía Ocupacional",
+      "campo": "Salud y Rehabilitación",
+      "areas": [
+        { "nombre": "Fundamentos y marco ocupacional", "seminarios": [
+          { "nombre": "Prevención de riesgos laborales: introducción a la ergonomía ocupacional", "texto": "Unidad de entrada al campo de la ergonomía ocupacional y la prevención de riesgos laborales.", "tipo": "Seminario" },
+          { "nombre": "Legislación y normas de certificación internacionales", "texto": "Espacio orientado al marco normativo y a estándares de certificación aplicables al campo ocupacional.", "tipo": "Seminario" },
+          { "nombre": "Salud ocupacional", "texto": "Unidad orientada a la comprensión de la salud en contextos laborales y su articulación con la ergonomía.", "tipo": "Seminario" },
+          { "nombre": "Metodología de la investigación", "texto": "Espacio inicial de investigación que aporta herramientas de análisis para el desarrollo del recorrido académico.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Evaluación y factores ergonómicos", "seminarios": [
+          { "nombre": "Ergonomía ambiental, física, cognitiva y organizacional", "texto": "Unidad que integra las principales dimensiones de la ergonomía en contextos ocupacionales.", "tipo": "Seminario" },
+          { "nombre": "Factores de riesgos ergonómicos", "texto": "Seminario enfocado en identificar, clasificar y comprender factores de riesgo ergonómico en el trabajo.", "tipo": "Seminario" },
+          { "nombre": "Evaluaciones ergonómicas", "texto": "Unidad orientada al desarrollo de criterios y herramientas para la evaluación ergonómica inicial.", "tipo": "Seminario" },
+          { "nombre": "Taller metodológico de análisis de casos", "texto": "Espacio aplicado para analizar situaciones reales y fortalecer el razonamiento ergonómico.", "tipo": "Taller" }
+        ]},
+        { "nombre": "Diagnóstico e intervención ergonómica", "seminarios": [
+          { "nombre": "Evaluaciones ergonómicas II", "texto": "Continuación del proceso de evaluación con mayor profundidad técnica y criterio de análisis.", "tipo": "Seminario" },
+          { "nombre": "Diagnóstico ocupacional", "texto": "Unidad enfocada en el análisis de condiciones ocupacionales y la identificación de problemáticas ergonómicas.", "tipo": "Taller" },
+          { "nombre": "Diseño y gestión del plan ergonómico", "texto": "Espacio orientado al diseño, implementación y gestión de planes ergonómicos en organizaciones.", "tipo": "Taller" }
+        ]},
+        { "nombre": "Metodología, integración y práctica profesional", "seminarios": [
+          { "nombre": "Taller de elaboración de trabajo final integrador", "texto": "Espacio orientado al acompañamiento y desarrollo del trabajo final integrador del programa.", "tipo": "Taller" },
+          { "nombre": "Prácticas profesionales", "texto": "Espacio de aplicación profesional orientado a integrar los aprendizajes del programa en contextos reales.", "tipo": "Práctica profesional" }
+        ]}
+      ]
+    },
+    {
+      "slug": "politica-y-gestion-de-la-seguridad-ciudadana",
+      "titulo": "Maestría en Política y Gestión de la Seguridad Ciudadana",
+      "carrera": "maestria-en-politica-y-gestion-de-la-seguridad-ciudadana",
+      "resumen": "Dirigida a profesionales que buscan liderar, planificar y optimizar políticas, programas y acciones en seguridad ciudadana.",
+      "imagen": "64d480_36e7154726ee4616bd215043b315fb87~mv2.jpg",
+      "rutaAnterior": "/copia-de-inteligencia-e-investigación-1",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Política y Gestión de la Seguridad Ciudadana",
+      "campo": "Seguridad",
+      "areas": [
+        { "nombre": "Área Social", "seminarios": [
+          { "nombre": "Historia institucional de la investigación y la inteligencia criminal", "texto": "Unidad orientada a comprender la evolución histórica y social de las instituciones vinculadas a la seguridad.", "tipo": "Seminario" },
+          { "nombre": "Violencia de género y la institución policial", "texto": "Seminario dedicado al análisis de la violencia de género en su vínculo con la institución policial y sus respuestas.", "tipo": "Seminario" },
+          { "nombre": "Criminología", "texto": "Espacio orientado a comprender fundamentos teóricos y analíticos del fenómeno criminal.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área Jurídica", "seminarios": [
+          { "nombre": "Derechos humanos", "texto": "Seminario orientado a integrar el enfoque de derechos humanos dentro del análisis y la gestión de la seguridad pública.", "tipo": "Seminario" },
+          { "nombre": "Legislación en seguridad interior e inteligencia", "texto": "Unidad académica orientada a los marcos regulatorios que rigen la seguridad interior y la inteligencia.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área de Gestión", "seminarios": [
+          { "nombre": "Gestión penitenciaria", "texto": "Seminario enfocado en administración, organización y desafíos de la gestión penitenciaria.", "tipo": "Seminario" },
+          { "nombre": "Gestión de la seguridad en espectáculos deportivos", "texto": "Unidad orientada a la planificación y administración de la seguridad en eventos y espectáculos deportivos.", "tipo": "Seminario" },
+          { "nombre": "Control público de la actividad de inteligencia", "texto": "", "tipo": "Seminario", "_pendiente": "En el sitio anterior tenía la descripción del seminario de seguridad privada. Falta su descripción." },
+          { "nombre": "Seminario de Actualización I", "texto": "Espacio orientado a reforzar contenidos contemporáneos del campo de la seguridad pública.", "tipo": "Seminario" },
+          { "nombre": "Seminario de Actualización II", "texto": "Continuación del trayecto de actualización para profundizar contenidos estratégicos del programa.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área de Actualización", "seminarios": [
+          { "nombre": "Armas autónomas no tripuladas y prevención al tráfico de armas", "texto": "Seminario orientado a tecnologías emergentes, prevención y análisis de riesgos vinculados al tráfico de armas.", "tipo": "Seminario" },
+          { "nombre": "Gestión de la seguridad privada y recursos tecnológicos", "texto": "Unidad orientada al abordaje de la seguridad privada y la integración de recursos tecnológicos en su gestión.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área Metodológica", "seminarios": [
+          { "nombre": "Introducción a la metodología de la investigación", "texto": "Seminario inicial para comprender fundamentos metodológicos aplicados al desarrollo académico.", "tipo": "Seminario" },
+          { "nombre": "Metodología de la investigación", "texto": "Continuación del trayecto metodológico orientado al diseño y desarrollo de investigaciones.", "tipo": "Seminario" },
+          { "nombre": "Taller de trabajo final", "texto": "Espacio orientado al acompañamiento del trabajo final del programa.", "tipo": "Taller" }
+        ]}
+      ]
+    },
+    {
+      "slug": "kinesiologia-y-fisioterapia-cardiorrespiratoria",
+      "titulo": "Maestría en Kinesiología y Fisioterapia Cardiorrespiratoria",
+      "carrera": "maestria-en-kinesiologia-y-fisioterapia-cardiorrespiratoria",
+      "resumen": "Formación avanzada para profesionales que desean profundizar en la evaluación e intervención en salud cardiorrespiratoria.",
+      "imagen": "64d480_79df2a780ae54b5e809844be0c6db770~mv2.jpg",
+      "rutaAnterior": "/copia-de-inteligencia-e-investigación",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Kinesiología y Fisioterapia Cardiorrespiratoria",
+      "campo": "Salud y Rehabilitación",
+      "areas": [
+        { "nombre": "Área de Formación General", "seminarios": [
+          { "nombre": "Fundamentos de la atención", "texto": "Unidad introductoria orientada a los fundamentos de atención dentro del campo cardiorrespiratorio.", "tipo": "Seminario" },
+          { "nombre": "Fisioterapéutica y kinésica en los cuidados respiratorios", "texto": "Unidad enfocada en los fundamentos fisioterapéuticos y kinésicos aplicados al cuidado respiratorio.", "tipo": "Seminario" },
+          { "nombre": "Anatomía y fisiología aplicada a los cuidados cardiorrespiratorios", "texto": "Espacio dedicado a la comprensión anatómica y fisiológica aplicada al abordaje cardiorrespiratorio.", "tipo": "Seminario" },
+          { "nombre": "Evaluación de los trastornos respiratorios", "texto": "Unidad centrada en el reconocimiento y la evaluación de alteraciones respiratorias.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área Clínica", "_pendiente": "En el sitio anterior figuraba como \"Área Jurídica\", un nombre copiado de otra maestría. Confirmar el nombre del área.", "seminarios": [
+          { "nombre": "Revisión de la enfermedad cardiopulmonar", "texto": "Unidad orientada a la revisión clínica de las enfermedades cardiopulmonares más relevantes del campo.", "tipo": "Seminario" },
+          { "nombre": "Terapéutica básica del fisioterapeuta o kinesiólogo respiratorio", "texto": "Espacio dedicado a la terapéutica básica aplicada por el fisioterapeuta o kinesiólogo respiratorio.", "tipo": "Seminario" },
+          { "nombre": "Cuidados fisioterapéuticos y kinésicos del paciente agudo y crítico", "texto": "Unidad enfocada en el abordaje del paciente agudo y crítico desde la fisioterapia y la kinesiología.", "tipo": "Seminario" },
+          { "nombre": "Educación del paciente y atención crónica", "texto": "Espacio orientado a educación del paciente y abordaje de la atención crónica en el campo cardiorrespiratorio.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área Metodológica", "_pendiente": "En el sitio anterior figuraba como \"Área Inteligencia e Investigación Criminal\", un nombre copiado de otra maestría.", "seminarios": [
+          { "nombre": "Metodología de la investigación", "texto": "Unidad orientada al desarrollo de herramientas metodológicas para la producción académica e investigativa.", "tipo": "Seminario" },
+          { "nombre": "Taller de trabajo final", "texto": "Espacio de acompañamiento orientado al desarrollo del trabajo final de la maestría.", "tipo": "Taller" }
+        ]}
+      ]
+    },
+    {
+      "slug": "politica-y-gestion-de-la-discapacidad-e-inclusion-social",
+      "titulo": "Maestría en Política y Gestión de la Discapacidad e Inclusión Social",
+      "carrera": "maestria-en-politica-y-gestion-de-la-discapacidad-e-inclusion-social",
+      "resumen": "Formación para profesionales interesados en diseñar, gestionar y evaluar políticas y estrategias de inclusión social.",
+      "imagen": "64d480_51254f3e2d2d48e4993737c046112b85~mv2.jpg",
+      "rutaAnterior": "/politica-y-gestion-de-la-discapacidad-e-inclusion-social",
+      "duracion": "24 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Política y Gestión de la Discapacidad e Inclusión Social",
+      "campo": "Discapacidad e Inclusión",
+      "areas": [
+        { "nombre": "Área de política, planificación y gestión", "seminarios": [
+          { "nombre": "Políticas y planificación en discapacidad e inclusión social", "texto": "Unidad académica orientada al diseño, planificación y comprensión estratégica de políticas en discapacidad e inclusión social.", "tipo": "Seminario" },
+          { "nombre": "Abordaje de la discapacidad desde la política y gestión", "texto": "Espacio orientado al análisis de enfoques, políticas y gestión aplicada a discapacidad en distintos entornos institucionales.", "tipo": "Seminario" },
+          { "nombre": "Producción, gestión y evaluación de programas y políticas en discapacidad e inclusión social", "texto": "Unidad enfocada en formulación, gestión y evaluación de programas orientados a discapacidad e inclusión social.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área social y subjetividad", "seminarios": [
+          { "nombre": "Determinación social de la discapacidad", "texto": "Seminario centrado en la comprensión de los factores sociales que inciden en la discapacidad y sus contextos de producción.", "tipo": "Seminario" },
+          { "nombre": "Formaciones histórico-sociales de la subjetividad contemporánea en discapacidad", "texto": "Unidad académica enfocada en comprender configuraciones históricas y sociales de la subjetividad en discapacidad.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área de actualización y debates contemporáneos", "seminarios": [
+          { "nombre": "Seminario de actualización I", "texto": "Espacio pensado para reforzar contenidos vigentes y problemáticas actuales vinculadas a discapacidad e inclusión social.", "tipo": "Seminario" },
+          { "nombre": "Seminario de actualización II", "texto": "Segundo espacio de actualización orientado a profundizar debates y perspectivas actuales del campo.", "tipo": "Seminario" }
+        ]},
+        { "nombre": "Área metodológica, tesis y práctica profesional", "seminarios": [
+          { "nombre": "Metodología de la investigación I", "texto": "Unidad metodológica orientada a introducir al estudiante en herramientas de investigación aplicadas al campo.", "tipo": "Seminario" },
+          { "nombre": "Metodología de la investigación II", "texto": "Continuación del trayecto metodológico, orientado a profundizar el desarrollo de proyectos y diseños de investigación.", "tipo": "Seminario" },
+          { "nombre": "Taller de tesis I", "texto": "Primer espacio de acompañamiento al desarrollo del trabajo final de maestría.", "tipo": "Taller" },
+          { "nombre": "Taller de tesis II", "texto": "Continuación del trabajo metodológico y académico orientado a la finalización de la tesis.", "tipo": "Taller" },
+          { "nombre": "Espacio de práctica profesional", "texto": "Espacio orientado a la aplicación práctica de los aprendizajes del programa en contextos profesionales.", "tipo": "Práctica profesional" }
+        ]}
+      ],
+      "_pendiente": "En el sitio anterior esta página repetía un \"Área de Actualización\" copiada de la Maestría en Inteligencia e Investigación Criminal (incluía \"Técnicas de investigación criminal\"). Se quitó."
+    },
+    {
+      "slug": "reentrenamiento-deportivo-y-prevencion-de-lesiones",
+      "titulo": "Maestría en Reentrenamiento Deportivo y Prevención de Lesiones",
+      "carrera": "maestria-en-reentrenamiento-deportivo-y-prevencion-de-lesiones",
+      "resumen": "Maestría enfocada en profesionales que buscan optimizar el rendimiento físico y reducir riesgos de lesión en contextos deportivos.",
+      "imagen": "64d480_bd7f1ef26b3d4b199422ae4e1cbb8eaa~mv2.jpg",
+      "rutaAnterior": "/copia-de-kinesiología-cardiorrepiratoria-1",
+      "duracion": "18 meses",
+      "modalidad": "A distancia",
+      "tituloObtenido": "Magíster en Reentrenamiento Deportivo y Prevención de Lesiones",
+      "campo": "Salud y Rehabilitación",
+      "areas": [
+        { "nombre": "Seminarios del programa", "seminarios": [
+          { "nombre": "Ciencias del ejercicio", "texto": "Unidad inicial orientada a comprender fundamentos del ejercicio y su aplicación en el rendimiento físico.", "tipo": "Seminario" },
+          { "nombre": "Introducción a la prevención de lesiones y el reentrenamiento físico-deportivo", "texto": "Unidad centrada en los fundamentos de la prevención de lesiones y el reentrenamiento en contextos deportivos.", "tipo": "Seminario" },
+          { "nombre": "Metodología de la investigación", "texto": "Espacio destinado al desarrollo de herramientas metodológicas para el abordaje académico e investigativo.", "tipo": "Seminario" },
+          { "nombre": "Rendimiento y condición física", "texto": "Unidad orientada al análisis del rendimiento físico y de la condición física en el ámbito deportivo.", "tipo": "Seminario" },
+          { "nombre": "Evaluaciones y diagnóstico deportivo", "texto": "Unidad enfocada en procesos de evaluación y diagnóstico aplicados al contexto deportivo.", "tipo": "Seminario" },
+          { "nombre": "Prevención y reentrenamiento", "texto": "Espacio orientado a estrategias de prevención y a la readaptación físico-deportiva del deportista.", "tipo": "Seminario" },
+          { "nombre": "Estrategias y herramientas complementarias en el deporte", "texto": "Unidad dedicada a recursos y estrategias complementarias aplicadas al ámbito deportivo.", "tipo": "Seminario" },
+          { "nombre": "Seminario de trabajo final I", "texto": "Primer espacio de acompañamiento al desarrollo académico del trabajo final del programa.", "tipo": "Seminario" },
+          { "nombre": "Seminario de trabajo final II", "texto": "Continuación del acompañamiento al proceso de trabajo final del posgrado.", "tipo": "Seminario" },
+          { "nombre": "Taller de trabajo final", "texto": "Taller orientado a la consolidación y finalización del trabajo final del programa.", "tipo": "Taller" },
+          { "nombre": "Prácticas profesionales", "texto": "Espacio orientado a la aplicación profesional de los aprendizajes del programa en contextos reales.", "tipo": "Práctica profesional" },
+          { "nombre": "Actividades prácticas", "texto": "Bloque destinado a la aplicación práctica de los contenidos y al fortalecimiento del aprendizaje experiencial.", "tipo": "Actividad práctica" }
+        ]}
+      ]
+    }
+  ]
+}

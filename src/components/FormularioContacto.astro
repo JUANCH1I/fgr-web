@@ -1,0 +1,15 @@
+---
+import sitio from '../datos/sitio.json';
+---
+<form class="formulario" novalidate data-formulario-contacto data-destino={sitio.formularios.destino} data-correo={sitio.contacto.correo}>
+  <div class="campo"><label for="ct-nombre">Nombre completo</label><input id="ct-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" required /></div>
+  <div class="campo"><label for="ct-correo">Correo</label><input id="ct-correo" name="correo" type="email" autocomplete="email" maxlength="100" required /></div>
+  <div class="campo"><label for="ct-lugar">Ciudad / País</label><input id="ct-lugar" name="lugar" type="text" autocomplete="address-level2" maxlength="80" required /></div>
+  <div class="campo"><label for="ct-telefono">Teléfono, con código de país</label><input id="ct-telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required /></div>
+  <div class="campo"><label for="ct-mensaje">Mensaje</label><textarea id="ct-mensaje" name="mensaje" rows="5" maxlength="2000"></textarea></div>
+  <div class="campo campo--oculto" aria-hidden="true"><label for="ct-web">No completar</label><input id="ct-web" name="web" type="text" tabindex="-1" autocomplete="off" /></div>
+  <label class="acepto"><input type="checkbox" name="acepto" required /><span>Acepto que la Fundación use estos datos para responder mi consulta. <a href="/proteccion-de-datos/" target="_blank">Ver política de protección de datos</a></span></label>
+  <p class="error" role="alert" data-error hidden></p>
+  <p class="exito" role="status" data-exito hidden></p>
+  <button type="submit" class="boton boton--oscuro" data-enviar>Enviar</button>
+</form>

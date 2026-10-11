@@ -1,0 +1,315 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Formación continua y actualización profesional" description="Cursos, micromásters, diplomaturas y seminarios de posgrado con contenidos prácticos y actuales, y acceso gratuito al contenido. Certificado opcional." >
+  <Fragment set:html={`<section class="cabecera cabecera--clara">
+  <div class="contenedor">
+    <p class="antetitulo">Formación continua</p>
+    <h1>Programa de Formación Continua y Actualización Profesional</h1>
+    <p class="entrada">Impulsamos tu desarrollo académico y profesional con cursos de contenidos prácticos y actuales, disponibles para quienes buscan seguir formándose de manera permanente. El acceso al contenido es gratuito y el certificado es opcional.</p>
+    <div class="botones">
+      <a class="boton boton--oscuro" href="#cursos">Ver cursos disponibles</a>
+      <a class="boton boton--contorno" href="/contacto/">Hablar ahora con un asesor</a>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" id="cursos" aria-labelledby="cursos-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="cursos-titulo">Cursos disponibles</h2>
+      <p>Cursos, micromásters, diplomaturas y seminarios de posgrado con acceso gratuito al contenido.</p>
+    </div>
+    <div class="filtros filtros--simple" data-filtro-cursos hidden>
+  <fieldset class="filtro">
+    <legend>Tipo de formación</legend>
+    <div class="filtro__opciones">
+      <button type="button" class="chip" data-valor="" aria-pressed="true">Todas</button>
+      <button type="button" class="chip" data-valor="curso" aria-pressed="false">Curso</button>
+      <button type="button" class="chip" data-valor="seminario-de-posgrado" aria-pressed="false">Seminario de posgrado</button>
+      <button type="button" class="chip" data-valor="micromaster" aria-pressed="false">Micromáster</button>
+      <button type="button" class="chip" data-valor="diplomatura" aria-pressed="false">Diplomatura</button>
+    </div>
+  </fieldset>
+</div>
+<div class="grilla grilla--3" data-cursos>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_6c6ca83198414240953059725d011f32~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_6c6ca83198414240953059725d011f32~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Terapias con Ventosas Aplicadas al Dolor Miofascial</h3>
+      <p>Descubre los beneficios de la Terapia de Ventosas, una técnica ancestral que ha cobrado relevancia en Occidente por su efectividad en la recuperación muscular y el rendimiento físico.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>30 días</dd></div>
+        <div><dt>Inicio</dt><dd>Abierto todo el año</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_2f44cfb5064844f3abde52a376f5aea1~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_2f44cfb5064844f3abde52a376f5aea1~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Punción Seca Aplicada a Puntos Gatillo Miofasciales</h3>
+      <p>Aprende a identificar y tratar el Síndrome de Dolor Miofascial (SDM) mediante técnicas manuales y la aplicación de punción seca (PS).</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>30 días</dd></div>
+        <div><dt>Inicio</dt><dd>Abierto todo el año</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_850728288703468f9d63b8bf4cd0cfb9~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_850728288703468f9d63b8bf4cd0cfb9~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Entrenamiento con Restricción del Flujo Sanguíneo</h3>
+      <p>Aprenderás una técnica avanzada y segura para ganar fuerza y optimizar la recuperación muscular. Ideal para entrenadores, fisioterapeutas y profesionales del deporte.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>30 días</dd></div>
+        <div><dt>Inicio</dt><dd>Abierto todo el año</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_a99a5f9e594243719cd945fe4ce99f1b~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_a99a5f9e594243719cd945fe4ce99f1b~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Inteligencia Artificial (IA) en clave pedagógica</h3>
+      <p>Curso virtual y autogestionado sobre inteligencia artificial en educación. Diseñado para docentes de todos los niveles. Aprende a integrar la IA con una mirada crítica y pedagógica.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>30 días</dd></div>
+        <div><dt>Inicio</dt><dd>Abierto todo el año</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_cd51164cc2ad4e1983f03c740a6eea21~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_cd51164cc2ad4e1983f03c740a6eea21~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>IA para tu negocio: descubriendo sus aplicaciones prácticas</h3>
+      <p>Aprende a aplicar inteligencia artificial en tu negocio sin saber programación. Curso online, práctico y certificado, ideal para emprendedores y líderes que buscan optimizar procesos y tomar mejores decisiones.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>30 días</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="seminario-de-posgrado">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_b399c9b5c0a340e899ed79c453aa5073~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_b399c9b5c0a340e899ed79c453aa5073~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Seminario de posgrado</p>
+      <h3>Psicopedagogía Laboral</h3>
+      <p>Formación online de 4 semanas con talleres prácticos y contenidos críticos e inclusivos, ideal para profesionales interesados en aprendizaje organizacional.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>4 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="micromaster">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_b75144b2457d4816aac56770421aecc5~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_b75144b2457d4816aac56770421aecc5~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Micromáster</p>
+      <h3>Supervisión en Acompañamiento Terapéutico</h3>
+      <p>Aprenderás a supervisar procesos de acompañamiento terapéutico, fortalecer la práctica clínica, aplicar marcos éticos y desarrollar habilidades reflexivas para guiar equipos interdisciplinarios.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>2 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_2dd212ed0a85484389bc8806313159bf~mv2.png/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_2dd212ed0a85484389bc8806313159bf~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>El cuerpo del profesional en la atención de las infancias</h3>
+      <p>Entrena tu presencia corporal y registro tónico-emocional para crear espacios de confianza, juego y transformación con infancias. Modalidad presencial o híbrida, 6 horas, cupos limitados y certificación.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>6 horas</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="diplomatura">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_33b6a847158b4f63860b5be1f09a28b1~mv2.jpeg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_33b6a847158b4f63860b5be1f09a28b1~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Diplomatura</p>
+      <h3>Dermatoestética Integral</h3>
+      <p>Fortalece tu perfil en salud y estética con bases científicas y práctica aplicada. Aprende a evaluar la piel, planificar y ejecutar tratamientos con criterio profesional, elevando la calidad de atención al paciente.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>4 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_dc84d5253b7846569dd4a350de1e53df~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_dc84d5253b7846569dd4a350de1e53df~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Cuidado Integral de Personas Mayores</h3>
+      <p>Curso interdisciplinario que brinda herramientas teóricas y prácticas para el cuidado de personas mayores, abordando su bienestar emocional, físico y social desde una mirada humana.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>1 mes</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="diplomatura">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_bef9b8d4ccee4ff488b860a692975b34~mv2.png/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_bef9b8d4ccee4ff488b860a692975b34~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Diplomatura</p>
+      <h3>Criminología y Perfilamiento Criminal en Sujetos en Conflicto con la Ley</h3>
+      <p>Enfocada en el análisis del comportamiento delictivo, técnicas de perfilamiento criminal y comprensión de sujetos en conflicto con la ley.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>3 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_afb611498bcf4020846f85bbd7712716~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_afb611498bcf4020846f85bbd7712716~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Privacidad y Protección de Datos: enfoque práctico legal y tecnológico</h3>
+      <p>Programa práctico que integra enfoques legales y tecnológicos para la gestión de datos personales, cumplimiento normativo y estrategias de seguridad de la información.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>5 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="diplomatura">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_5f814fd2df3e4b9388f4ec3494b00866~mv2.png/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_5f814fd2df3e4b9388f4ec3494b00866~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Diplomatura</p>
+      <h3>Manejo de Heridas en Miembro Inferior</h3>
+      <p>Estudia el manejo de heridas en miembro inferior y aprende a evaluar, tratar y aplicar cuidados especializados con enfoque práctico, bioseguridad, cicatrización, métodos de descarga y protocolos actualizados.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>3 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="seminario-de-posgrado">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_6722336860ac453f9adb0363d00f47d7~mv2.png/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_6722336860ac453f9adb0363d00f47d7~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Seminario de posgrado</p>
+      <h3>Gestión de la Seguridad en Eventos Deportivos</h3>
+      <p>Curso orientado a la planificación y control de seguridad en eventos deportivos, abordando prevención de riesgos, gestión operativa y protocolos para garantizar la protección de asistentes.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>1 mes</dd></div>
+        <div><dt>Inicio</dt><dd>Octubre 2026</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="micromaster">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_7cd36bcb60fb43778ab0743e296bcbe0~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_7cd36bcb60fb43778ab0743e296bcbe0~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Micromáster</p>
+      <h3>Acompañamiento Terapéutico en el Ámbito Educativo</h3>
+      <p>Especialízate en intervenciones psicoeducativas para apoyar a estudiantes con necesidades emocionales y sociales. Modalidad online, con certificación.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>3 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="diplomatura">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_8680a88241ba4622b916b53b47965fb7~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_8680a88241ba4622b916b53b47965fb7~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Diplomatura</p>
+      <h3>Psicomotricidad: la construcción del cuerpo en los procesos del desarrollo</h3>
+      
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>9 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_42b9b7bb1bc247ed9317e19c9b5365b7~mv2.png/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_42b9b7bb1bc247ed9317e19c9b5365b7~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Gestión de RAEE en organizaciones: enfoques y herramientas para su abordaje integral</h3>
+      <p>Curso que aborda el manejo integral de residuos de aparatos eléctricos y electrónicos, con herramientas para su gestión sostenible, normativa ambiental y aplicación en organizaciones.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>5 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Octubre 2026</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="diplomatura">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_cbb6b7169a8e4353bfcd11310c892890~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_cbb6b7169a8e4353bfcd11310c892890~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Diplomatura</p>
+      <h3>Enseñanza Basada en Proyectos</h3>
+      <p>Diplomatura que desarrolla estrategias pedagógicas centradas en el aprendizaje activo, diseño de proyectos educativos y metodologías innovadoras aplicadas a distintos niveles formativos.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>4 meses</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="seminario-de-posgrado">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_9e8b62a9f86949d2955c6b39e55830dc~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_9e8b62a9f86949d2955c6b39e55830dc~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Seminario de posgrado</p>
+      <h3>Armas Autónomas no Tripuladas y Prevención al Tráfico de Armas</h3>
+      <p>Programa especializado en el análisis de tecnologías autónomas, sistemas no tripulados y estrategias de prevención del tráfico ilícito de armas en contextos de seguridad internacional.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>5 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Octubre 2026</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+  <article class="tarjeta-imagen" data-categoria="curso">
+    <div class="tarjeta-imagen__foto"><img src="https://static.wixstatic.com/media/64d480_9d1448f9db4349748e2cca713a161ad6~mv2.jpg/v1/fit/w_700,h_2100,q_80,enc_jpg/64d480_9d1448f9db4349748e2cca713a161ad6~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    <div class="tarjeta-imagen__cuerpo">
+      <p class="antetitulo">Curso</p>
+      <h3>Dermomaquillaje y Abordaje Estético en Pieles Oncológicas y Alteraciones Pigmentarias</h3>
+      <p>Técnicas de dermoestética y maquillaje correctivo en pieles oncológicas y con alteraciones pigmentarias, priorizando el bienestar y la atención especializada del paciente.</p>
+      <dl class="datos-chicos">
+        <div><dt>Duración</dt><dd>5 semanas</dd></div>
+        <div><dt>Inicio</dt><dd>Próxima edición a confirmar</dd></div>
+      </dl>
+      <a class="enlace-flecha" href="/contacto/">Consultar por este curso <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+</div>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="sigue-titulo">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2 id="sigue-titulo">¿Quieres ir más allá de un curso?</h2>
+      <p class="entrada">Las microcertificaciones te permiten cursar seminarios de una maestría de manera individual, como puerta de entrada al posgrado.</p>
+      <a class="enlace-flecha" href="/microcertificaciones/">Conocer las microcertificaciones <span aria-hidden="true">→</span></a>
+    </div>
+    <div>
+      <h2>¿Buscas una carrera completa?</h2>
+      <p class="entrada">Tecnicaturas, ciclos de licenciatura, licenciaturas y posgrados a distancia de la red de universidades aliadas.</p>
+      <a class="enlace-flecha" href="/carreras/">Ver carreras <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+`} />
+</Layout>

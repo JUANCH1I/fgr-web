@@ -1,0 +1,168 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Continuidad académica" description="Si tienes un título técnico o tecnológico, o materias universitarias aprobadas, la universidad aliada analiza tu trayectoria y define qué se reconoce. Evalúa tus estudios sin compromiso." >
+  <Fragment set:html={`<section class="cabecera cabecera--clara">
+  <div class="contenedor">
+    <p class="antetitulo">Continuidad académica</p>
+    <h1>Lo que ya estudiaste puede contar para tu licenciatura.</h1>
+    <p class="entrada">Si tienes un título técnico o tecnológico, o materias universitarias aprobadas, la universidad aliada analiza tu trayectoria y define qué se reconoce.</p>
+    <p class="entrada">La decisión académica es de la universidad, caso por caso. La Fundación te acompaña en cada paso.</p>
+    <div class="botones">
+      <a class="boton boton--oscuro" href="#evaluar">Evaluar mis estudios</a>
+      <a class="boton boton--contorno" href="/carreras/">Ver carreras</a>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="como-titulo">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2 id="como-titulo">Cómo funciona</h2>
+      <ol class="pasos">
+        <li><strong>Nos cuentas qué estudiaste.</strong> Completas el formulario y envías tu título o tu récord académico.</li>
+        <li><strong>La Fundación arma tu expediente.</strong> Un asesor te indica qué documentos hacen falta y lo presenta a la universidad.</li>
+        <li><strong>La universidad analiza.</strong> Compara tu malla, tu carga horaria y tu perfil de egreso con la carrera de destino.</li>
+        <li><strong>Recibes tu ruta.</strong> Sabes qué vía te corresponde y qué te queda por cursar antes de decidir.</li>
+      </ol>
+    </div>
+    <div class="media__foto">
+      <img src="https://static.wixstatic.com/media/64d480_dab8b85e90cf4d16942d0776ab71653a~mv2.jpg/v1/fit/w_900,h_2700,q_80,enc_jpg/64d480_dab8b85e90cf4d16942d0776ab71653a~mv2.jpg" alt="" loading="lazy" decoding="async">
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="vias-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="vias-titulo">Tres vías posibles</h2>
+      <p>Cuál aplica depende de tu título de origen y de la carrera que elijas.</p>
+    </div>
+    <div class="grilla grilla--3">
+      <div class="tarjeta camino">
+        <h3>Ciclo de Complementación Curricular (CCC)</h3>
+        <p>Un tramo de licenciatura pensado para quienes ya tienen un título técnico o tecnológico afín, de una carrera de 2½ años o más.</p>
+        <a class="enlace-flecha" href="/ccc/">Conocer el CCC <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta camino">
+        <h3>Reconocimiento de trayectoria</h3>
+        <p>La universidad evalúa equivalencias entre las materias que aprobaste y las de la carrera.</p>
+      </div>
+      <div class="tarjeta camino">
+        <h3>Licenciatura completa</h3>
+        <p>Si tu formación previa no es afín, cursas la carrera desde el inicio con el mismo acompañamiento.</p>
+        <a class="enlace-flecha" href="/carreras/">Ver carreras <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--evaluar" id="evaluar" aria-labelledby="evaluar-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza seccion__cabeza--centrada">
+      <h2 id="evaluar-titulo">Evalúa tus estudios previos</h2>
+      <p class="entrada">Descubre en 3 pasos qué carreras aplican a tu formación previa. <strong>Sin costo ni compromiso</strong>.</p>
+    </div>
+    <div class="precalificador precalificador--destacado" data-precalificador data-destino="/api/formulario/" data-correo="info@fgrec.org" data-asesor="/contacto/" data-agenda="">
+      <div class="precalificador__barra-progreso" aria-hidden="true">
+        <div class="precalificador__barra-indicador" data-barra-progreso></div>
+      </div>
+      <div class="precalificador__encabezado">
+        <p class="precalificador__paso" data-paso-texto>Evaluar mis estudios · Paso 1 de 3</p>
+        <span class="precalificador__badge-tiempo">⏱ Toma 1 min</span>
+      </div>
+
+      <section data-paso="1" class="precalificador__vista">
+        <h3 tabindex="-1">¿Cuál es tu situación académica hoy?</h3>
+        <p class="precalificador__subtitulo">Selecciona la opción que mejor describa tus estudios hasta la fecha:</p>
+        <div class="opciones" data-situaciones></div>
+      </section>
+
+      <section data-paso="2" class="precalificador__vista" hidden>
+        <h3 tabindex="-1">¿En qué área quieres continuar tu formación?</h3>
+        <p class="precalificador__subtitulo">Elige el área de conocimiento de tu interés para encontrar las mejores alternativas:</p>
+        <div class="opciones" data-areas></div>
+        <div class="fila fila--espaciada">
+          <button type="button" class="boton-texto" data-volver="1">← Volver al paso anterior</button>
+        </div>
+      </section>
+
+      <section data-paso="3" class="precalificador__vista" hidden>
+        <h3 tabindex="-1">¿A dónde te enviamos el resultado de tu evaluación?</h3>
+        <div class="resumen-eleccion">
+          <span class="resumen-eleccion__etiqueta">Tu selección:</span>
+          <p class="nota" data-resumen></p>
+        </div>
+        <form novalidate data-formulario class="formulario--evaluar">
+          <div class="grilla-formulario">
+            <div class="campo">
+              <label for="pc-nombre">Nombre y apellido completo</label>
+              <input id="pc-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" placeholder="Ej: María José Fernández" required>
+            </div>
+            <div class="campo">
+              <label for="pc-whatsapp">WhatsApp (con código de país)</label>
+              <input id="pc-whatsapp" name="whatsapp" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="pc-correo">Correo electrónico</label>
+            <input id="pc-correo" name="correo" type="email" autocomplete="email" maxlength="100" placeholder="tu-correo@ejemplo.com" required>
+          </div>
+          <div class="campo campo--oculto" aria-hidden="true">
+            <label for="pc-web">No completar</label>
+            <input id="pc-web" name="web" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <label class="acepto">
+            <input type="checkbox" name="acepto" required>
+            <span>Acepto que la Fundación use estos datos para enviarme la propuesta académica y responder mi consulta. <a href="/proteccion-de-datos/" target="_blank">Ver política de protección de datos</a></span>
+          </label>
+          <p class="error" role="alert" data-error hidden></p>
+          <div class="fila fila--acciones">
+            <button type="submit" class="boton boton--acento boton--grande" data-enviar>
+              <span>Ver mis opciones de estudio</span>
+              <span aria-hidden="true">→</span>
+            </button>
+            <button type="button" class="boton-texto" data-volver="2">← Volver</button>
+          </div>
+        </form>
+      </section>
+
+      <section data-paso="4" class="precalificador__vista precalificador__resultado" hidden>
+        <div class="icono-exito" aria-hidden="true">✓</div>
+        <h3 tabindex="-1">¡Listo! Tu caso ya fue precalificado.</h3>
+        <p class="entrada" data-intro></p>
+        <div class="resultado-carreras">
+          <ul class="lista-enlaces lista-enlaces--tarjetas" data-resultado></ul>
+        </div>
+        <p class="nota nota-destacada" data-nota-envio></p>
+        <div class="fila fila--centrada">
+          <a class="boton boton--oscuro boton--grande" href="/contacto/">Hablar ahora con un asesor</a>
+          <a class="boton boton--contorno boton--grande" href="/carreras/">Explorar todas las carreras</a>
+        </div>
+        <div class="fila fila--centrada"><button type="button" class="boton-texto" data-volver="1">↺ Realizar otra evaluación</button></div>
+      </section>
+      <noscript><p>Para usar el evaluador necesitas activar JavaScript. También puedes <a href="/contacto/">escribirnos desde Contacto</a>.</p></noscript>
+    </div>
+  </div>
+</section>
+<script type="application/json" id="datos-precalificador">{"areas":["Agroganadería","Ciencias Sociales y Educación","Discapacidad e Inclusión Social","Diseño","Salud y Rehabilitación","Seguridad","Tecnología y Negocios"],"carreras":[{"n":"Ciclo de Licenciatura en Cosmetología","s":"ciclo-de-licenciatura-en-cosmetologia","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)","o":1},{"n":"Ciclo de Licenciatura en Gestión de la Calidad","s":"ciclo-de-licenciatura-en-gestion-de-la-calidad","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)","o":2},{"n":"Ciclo de Licenciatura en Seguridad Vial y Accidentología","s":"ciclo-de-licenciatura-en-seguridad-vial-y-accidentologia","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)","o":3},{"n":"Ciclo de Licenciatura en Acompañamiento Terapéutico","s":"ciclo-de-licenciatura-en-acompanamiento-terapeutico","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)","o":4},{"n":"Ciclo de Licenciatura en Actividad Física","s":"ciclo-de-licenciatura-en-actividad-fisica","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)","o":5},{"n":"Ciclo de Licenciatura en Ciberseguridad","s":"ciclo-de-licenciatura-en-ciberseguridad","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)","o":6},{"n":"Ciclo de Licenciatura en Ciencia de Datos","s":"ciclo-de-licenciatura-en-ciencia-de-datos","a":"Tecnología y Negocios","v":"Ciclo de Licenciatura (CCC)","o":7},{"n":"Ciclo de Licenciatura en Discapacidad y Deporte","s":"ciclo-de-licenciatura-en-discapacidad-y-deporte","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)","o":8},{"n":"Ciclo de Licenciatura en Diseño de Comunicación Visual","s":"ciclo-de-licenciatura-en-diseno-de-comunicacion-visual","a":"Diseño","v":"Ciclo de Licenciatura (CCC)","o":9},{"n":"Ciclo de Licenciatura en Diseño de Espacios Interiores","s":"ciclo-de-licenciatura-en-diseno-de-espacios-interiores","a":"Diseño","v":"Ciclo de Licenciatura (CCC)","o":10},{"n":"Ciclo de Licenciatura en Diseño e Innovación en Moda","s":"ciclo-de-licenciatura-en-diseno-e-innovacion-en-moda","a":"Diseño","v":"Ciclo de Licenciatura (CCC)","o":11},{"n":"Ciclo de Licenciatura en Gestión de la Educación","s":"ciclo-de-licenciatura-en-gestion-de-la-educacion","a":"Ciencias Sociales y Educación","v":"Ciclo de Licenciatura (CCC)","o":12},{"n":"Ciclo de Licenciatura en Higiene y Seguridad Laboral","s":"ciclo-de-licenciatura-en-higiene-y-seguridad-laboral","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)","o":13},{"n":"Ciclo de Licenciatura en Podología","s":"ciclo-de-licenciatura-en-podologia","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)","o":14},{"n":"Ciclo de Licenciatura en Psicomotricidad","s":"ciclo-de-licenciatura-en-psicomotricidad","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)","o":15},{"n":"Ciclo de Licenciatura en Psicopedagogía","s":"ciclo-de-licenciatura-en-psicopedagogia","a":"Ciencias Sociales y Educación","v":"Ciclo de Licenciatura (CCC)","o":16},{"n":"Ciclo de Licenciatura en Seguridad Pública y Ciudadana","s":"ciclo-de-licenciatura-en-seguridad-publica-y-ciudadana","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)","o":17},{"n":"Licenciatura en Actividad Física","s":"licenciatura-en-actividad-fisica","a":"Salud y Rehabilitación","v":"Licenciatura","o":18},{"n":"Licenciatura en Ortesis y Prótesis","s":"licenciatura-en-ortesis-y-protesis","a":"Discapacidad e Inclusión Social","v":"Licenciatura","o":19},{"n":"Licenciatura en Podología","s":"licenciatura-en-podologia","a":"Salud y Rehabilitación","v":"Licenciatura","o":20},{"n":"Licenciatura en Psicopedagogía","s":"licenciatura-en-psicopedagogia","a":"Ciencias Sociales y Educación","v":"Licenciatura","o":21},{"n":"Licenciatura en Terapia Ocupacional","s":"licenciatura-en-terapia-ocupacional","a":"Salud y Rehabilitación","v":"Licenciatura","o":22},{"n":"Licenciatura en Acompañamiento Terapéutico","s":"licenciatura-en-acompanamiento-terapeutico","a":"Discapacidad e Inclusión Social","v":"Licenciatura","o":23},{"n":"Licenciatura en Agrotecnología","s":"licenciatura-en-agrotecnologia","a":"Agroganadería","v":"Licenciatura","o":24},{"n":"Licenciatura en Cosmetología Facial y Corporal","s":"licenciatura-en-cosmetologia-facial-y-corporal","a":"Salud y Rehabilitación","v":"Licenciatura","o":25},{"n":"Licenciatura en Diseño de Espacios Interiores","s":"licenciatura-en-diseno-de-espacios-interiores","a":"Diseño","v":"Licenciatura","o":26},{"n":"Licenciatura en Diseño Gráfico","s":"licenciatura-en-diseno-grafico","a":"Diseño","v":"Licenciatura","o":27},{"n":"Licenciatura en Psicomotricidad","s":"licenciatura-en-psicomotricidad","a":"Discapacidad e Inclusión Social","v":"Licenciatura","o":28},{"n":"Profesorado de Educación Secundaria (Modalidad Técnico Profesional)","s":"profesorado-de-educacion-secundaria-modalidad-tecnico-profesional","a":"Ciencias Sociales y Educación","v":"Profesorado","o":29},{"n":"Profesorado Universitario","s":"profesorado-universitario","a":"Ciencias Sociales y Educación","v":"Profesorado","o":30},{"n":"Tecnicatura Universitaria en Ciberseguridad","s":"tecnicatura-universitaria-en-ciberseguridad","a":"Seguridad","v":"Tecnicatura","o":31},{"n":"Tecnicatura Universitaria en Gestión de la Educación","s":"tecnicatura-universitaria-en-gestion-de-la-educacion","a":"Ciencias Sociales y Educación","v":"Tecnicatura","o":32},{"n":"Tecnicatura Universitaria en Seguridad Pública y Ciudadana","s":"tecnicatura-universitaria-en-seguridad-publica-y-ciudadana","a":"Seguridad","v":"Tecnicatura","o":33},{"n":"Tecnicatura Universitaria en Yoga y Salud Integral","s":"tecnicatura-universitaria-en-yoga-y-salud-integral","a":"Salud y Rehabilitación","v":"Tecnicatura","o":34},{"n":"Maestría en Abordaje Integral en Gerontología","s":"maestria-en-abordaje-integral-en-gerontologia","a":"Salud y Rehabilitación","v":"Maestría","o":35},{"n":"Maestría en Ergonomía Ocupacional","s":"maestria-en-ergonomia-ocupacional","a":"Salud y Rehabilitación","v":"Maestría","o":36},{"n":"Maestría en Gestión de las Instituciones Educativas","s":"maestria-en-gestion-de-las-instituciones-educativas","a":"Ciencias Sociales y Educación","v":"Maestría","o":37},{"n":"Maestría en Inteligencia e Investigación Criminal","s":"maestria-en-inteligencia-e-investigacion-criminal","a":"Seguridad","v":"Maestría","o":38},{"n":"Maestría en Kinesiología y Fisioterapia Cardiorrespiratoria","s":"maestria-en-kinesiologia-y-fisioterapia-cardiorrespiratoria","a":"Salud y Rehabilitación","v":"Maestría","o":39},{"n":"Maestría en Política y Gestión de la Discapacidad e Inclusión Social","s":"maestria-en-politica-y-gestion-de-la-discapacidad-e-inclusion-social","a":"Discapacidad e Inclusión Social","v":"Maestría","o":40},{"n":"Maestría en Política y Gestión de la Seguridad Ciudadana","s":"maestria-en-politica-y-gestion-de-la-seguridad-ciudadana","a":"Seguridad","v":"Maestría","o":41},{"n":"Maestría en Reentrenamiento Deportivo y Prevención de Lesiones","s":"maestria-en-reentrenamiento-deportivo-y-prevencion-de-lesiones","a":"Salud y Rehabilitación","v":"Maestría","o":42},{"n":"Doctorado en Ciencias de la Rehabilitación","s":"doctorado-en-ciencias-de-la-rehabilitacion","a":"Salud y Rehabilitación","v":"Doctorado","o":43},{"n":"Especialización en Kinesiología y Fisioterapia del Deporte","s":"especializacion-en-kinesiologia-y-fisioterapia-del-deporte","a":"Salud y Rehabilitación","v":"Especialización","o":44},{"n":"Especialización en Kinesiología y Fisioterapia Neurológica","s":"especializacion-en-kinesiologia-y-fisioterapia-neurologica","a":"Salud y Rehabilitación","v":"Especialización","o":45},{"n":"Especialización en Psicopedagogía y Atención Temprana del Desarrollo Humano","s":"especializacion-en-psicopedagogia-y-atencion-temprana-del-desarrollo-humano","a":"Ciencias Sociales y Educación","v":"Especialización","o":46}]}</script>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="beneficio-titulo">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2 id="beneficio-titulo">Beneficio Institucional FGREC</h2>
+      <p class="entrada">Al postular al fondo de la Fundación, el Comité de Evaluación y Otorgamiento de Fondos revisa tu perfil y define el porcentaje que se te asigna.</p>
+      <a class="enlace-flecha" href="/programa-de-cooperacion-y-excelencia-academica/">Conocer el programa de fondos <span aria-hidden="true">→</span></a>
+    </div>
+    <div>
+      <h2>De tu título técnico a la licenciatura</h2>
+      <p>El CCC es un ciclo de licenciatura de la universidad aliada para egresados de carreras técnicas y tecnológicas. Se cursa a distancia.</p>
+      <p><strong>Requisito de ingreso:</strong> título técnico o tecnológico de nivel superior, de una carrera de 2½ años o más, en un área afín al ciclo elegido.</p>
+      <p>El ingreso lo define la universidad después de revisar tu título y tu plan de estudios.</p>
+    </div>
+  </div>
+</section>
+`} />
+</Layout>

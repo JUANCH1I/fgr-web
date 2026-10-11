@@ -1,0 +1,227 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const siteSearchSchema = {
+  '@type': 'WebSite',
+  '@id': 'https://www.fgrec.org/#website',
+  'url': 'https://www.fgrec.org',
+  'name': 'Fundación del Gran Rosario Ecuador',
+  'potentialAction': {
+    '@type': 'SearchAction',
+    'target': {
+      '@type': 'EntryPoint',
+      'urlTemplate': 'https://www.fgrec.org/carreras/?q={search_term_string}'
+    },
+    'query-input': 'required name=search_term_string'
+  }
+};
+---
+<Layout 
+  title="Inicio" 
+  description="La Fundación del Gran Rosario Ecuador te acompaña desde la primera consulta hasta la cursada, en carreras universitarias a distancia de una red de universidades aliadas."
+  schema={siteSearchSchema}
+>
+  <Fragment set:html={`<section class="portada" style="--foto: url('https://static.wixstatic.com/media/64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.png/v1/fit/w_1920,h_5760,q_80,enc_jpg/64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.jpg')">
+  <div class="contenedor">
+    <div class="portada__texto">
+      <p class="antetitulo">Articulación y continuidad universitaria</p>
+      <h1>Tu carrera universitaria a distancia, acompañada en toda <em>América Latina</em>.</h1>
+      <p class="entrada">La Fundación del Gran Rosario Ecuador te acompaña desde la primera consulta hasta la cursada, en carreras a distancia de una red de universidades aliadas.</p>
+      <form class="buscador-portada" action="/carreras/" method="get" role="search" data-buscador-portada>
+  <label for="buscar-portada">¿Qué quieres estudiar?</label>
+  <div class="buscador-portada__campo">
+    <input id="buscar-portada" name="q" type="search" role="combobox" placeholder="Ej.: seguridad, diseño, podología" autocomplete="off" aria-autocomplete="list" aria-controls="sugerencias-portada" aria-expanded="false">
+    <button type="submit" class="boton boton--contorno">Buscar</button>
+  </div>
+  <ul class="sugerencias" id="sugerencias-portada" role="listbox" hidden></ul>
+</form>
+<script type="application/json" id="datos-carreras">[{"n":"Ciclo de Licenciatura en Cosmetología","s":"ciclo-de-licenciatura-en-cosmetologia","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Gestión de la Calidad","s":"ciclo-de-licenciatura-en-gestion-de-la-calidad","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Seguridad Vial y Accidentología","s":"ciclo-de-licenciatura-en-seguridad-vial-y-accidentologia","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Acompañamiento Terapéutico","s":"ciclo-de-licenciatura-en-acompanamiento-terapeutico","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Actividad Física","s":"ciclo-de-licenciatura-en-actividad-fisica","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Ciberseguridad","s":"ciclo-de-licenciatura-en-ciberseguridad","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Ciencia de Datos","s":"ciclo-de-licenciatura-en-ciencia-de-datos","a":"Tecnología y Negocios","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Discapacidad y Deporte","s":"ciclo-de-licenciatura-en-discapacidad-y-deporte","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Diseño de Comunicación Visual","s":"ciclo-de-licenciatura-en-diseno-de-comunicacion-visual","a":"Diseño","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Diseño de Espacios Interiores","s":"ciclo-de-licenciatura-en-diseno-de-espacios-interiores","a":"Diseño","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Diseño e Innovación en Moda","s":"ciclo-de-licenciatura-en-diseno-e-innovacion-en-moda","a":"Diseño","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Gestión de la Educación","s":"ciclo-de-licenciatura-en-gestion-de-la-educacion","a":"Ciencias Sociales y Educación","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Higiene y Seguridad Laboral","s":"ciclo-de-licenciatura-en-higiene-y-seguridad-laboral","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Podología","s":"ciclo-de-licenciatura-en-podologia","a":"Salud y Rehabilitación","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Psicomotricidad","s":"ciclo-de-licenciatura-en-psicomotricidad","a":"Discapacidad e Inclusión Social","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Psicopedagogía","s":"ciclo-de-licenciatura-en-psicopedagogia","a":"Ciencias Sociales y Educación","v":"Ciclo de Licenciatura (CCC)"},{"n":"Ciclo de Licenciatura en Seguridad Pública y Ciudadana","s":"ciclo-de-licenciatura-en-seguridad-publica-y-ciudadana","a":"Seguridad","v":"Ciclo de Licenciatura (CCC)"},{"n":"Licenciatura en Actividad Física","s":"licenciatura-en-actividad-fisica","a":"Salud y Rehabilitación","v":"Licenciatura"},{"n":"Licenciatura en Ortesis y Prótesis","s":"licenciatura-en-ortesis-y-protesis","a":"Discapacidad e Inclusión Social","v":"Licenciatura"},{"n":"Licenciatura en Podología","s":"licenciatura-en-podologia","a":"Salud y Rehabilitación","v":"Licenciatura"},{"n":"Licenciatura en Psicopedagogía","s":"licenciatura-en-psicopedagogia","a":"Ciencias Sociales y Educación","v":"Licenciatura"},{"n":"Licenciatura en Terapia Ocupacional","s":"licenciatura-en-terapia-ocupacional","a":"Salud y Rehabilitación","v":"Licenciatura"},{"n":"Licenciatura en Acompañamiento Terapéutico","s":"licenciatura-en-acompanamiento-terapeutico","a":"Discapacidad e Inclusión Social","v":"Licenciatura"},{"n":"Licenciatura en Agrotecnología","s":"licenciatura-en-agrotecnologia","a":"Agroganadería","v":"Licenciatura"},{"n":"Licenciatura en Cosmetología Facial y Corporal","s":"licenciatura-en-cosmetologia-facial-y-corporal","a":"Salud y Rehabilitación","v":"Licenciatura"},{"n":"Licenciatura en Diseño de Espacios Interiores","s":"licenciatura-en-diseno-de-espacios-interiores","a":"Diseño","v":"Licenciatura"},{"n":"Licenciatura en Diseño Gráfico","s":"licenciatura-en-diseno-grafico","a":"Diseño","v":"Licenciatura"},{"n":"Licenciatura en Psicomotricidad","s":"licenciatura-en-psicomotricidad","a":"Discapacidad e Inclusión Social","v":"Licenciatura"},{"n":"Profesorado de Educación Secundaria (Modalidad Técnico Profesional)","s":"profesorado-de-educacion-secundaria-modalidad-tecnico-profesional","a":"Ciencias Sociales y Educación","v":"Profesorado"},{"n":"Profesorado Universitario","s":"profesorado-universitario","a":"Ciencias Sociales y Educación","v":"Profesorado"},{"n":"Tecnicatura Universitaria en Ciberseguridad","s":"tecnicatura-universitaria-en-ciberseguridad","a":"Seguridad","v":"Tecnicatura"},{"n":"Tecnicatura Universitaria en Gestión de la Educación","s":"tecnicatura-universitaria-en-gestion-de-la-educacion","a":"Ciencias Sociales y Educación","v":"Tecnicatura"},{"n":"Tecnicatura Universitaria en Seguridad Pública y Ciudadana","s":"tecnicatura-universitaria-en-seguridad-publica-y-ciudadana","a":"Seguridad","v":"Tecnicatura"},{"n":"Tecnicatura Universitaria en Yoga y Salud Integral","s":"tecnicatura-universitaria-en-yoga-y-salud-integral","a":"Salud y Rehabilitación","v":"Tecnicatura"},{"n":"Maestría en Abordaje Integral en Gerontología","s":"maestria-en-abordaje-integral-en-gerontologia","a":"Salud y Rehabilitación","v":"Maestría"},{"n":"Maestría en Ergonomía Ocupacional","s":"maestria-en-ergonomia-ocupacional","a":"Salud y Rehabilitación","v":"Maestría"},{"n":"Maestría en Gestión de las Instituciones Educativas","s":"maestria-en-gestion-de-las-instituciones-educativas","a":"Ciencias Sociales y Educación","v":"Maestría"},{"n":"Maestría en Inteligencia e Investigación Criminal","s":"maestria-en-inteligencia-e-investigacion-criminal","a":"Seguridad","v":"Maestría"},{"n":"Maestría en Kinesiología y Fisioterapia Cardiorrespiratoria","s":"maestria-en-kinesiologia-y-fisioterapia-cardiorrespiratoria","a":"Salud y Rehabilitación","v":"Maestría"},{"n":"Maestría en Política y Gestión de la Discapacidad e Inclusión Social","s":"maestria-en-politica-y-gestion-de-la-discapacidad-e-inclusion-social","a":"Discapacidad e Inclusión Social","v":"Maestría"},{"n":"Maestría en Política y Gestión de la Seguridad Ciudadana","s":"maestria-en-politica-y-gestion-de-la-seguridad-ciudadana","a":"Seguridad","v":"Maestría"},{"n":"Maestría en Reentrenamiento Deportivo y Prevención de Lesiones","s":"maestria-en-reentrenamiento-deportivo-y-prevencion-de-lesiones","a":"Salud y Rehabilitación","v":"Maestría"},{"n":"Doctorado en Ciencias de la Rehabilitación","s":"doctorado-en-ciencias-de-la-rehabilitacion","a":"Salud y Rehabilitación","v":"Doctorado"},{"n":"Especialización en Kinesiología y Fisioterapia del Deporte","s":"especializacion-en-kinesiologia-y-fisioterapia-del-deporte","a":"Salud y Rehabilitación","v":"Especialización"},{"n":"Especialización en Kinesiología y Fisioterapia Neurológica","s":"especializacion-en-kinesiologia-y-fisioterapia-neurologica","a":"Salud y Rehabilitación","v":"Especialización"},{"n":"Especialización en Psicopedagogía y Atención Temprana del Desarrollo Humano","s":"especializacion-en-psicopedagogia-y-atencion-temprana-del-desarrollo-humano","a":"Ciencias Sociales y Educación","v":"Especialización"}]</script>
+      <div class="botones">
+        <a class="boton boton--acento" href="/carreras/">Ver carreras</a>
+        <a class="boton boton--claro" href="/continuidad-academica/#evaluar">Evaluar mis estudios</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="caminos-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="caminos-titulo">¿Cuál es tu situación?</h2>
+      <p>Elige el camino que se parece al tuyo. En todos hay un asesor que revisa tu caso antes de que decidas.</p>
+    </div>
+    <div class="grilla grilla--3">
+      <div class="tarjeta camino">
+        <p class="antetitulo">Camino 1</p>
+        <h3>Quiero empezar una carrera</h3>
+        <p>Terminaste el bachillerato y buscas una licenciatura o tecnicatura universitaria a distancia.</p>
+        <a class="enlace-flecha" href="/carreras/">Ver carreras <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta camino">
+        <p class="antetitulo">Camino 2</p>
+        <h3>Ya tengo estudios y quiero continuar</h3>
+        <p>Cursaste materias o tienes un título previo. La universidad analiza tu trayectoria y define qué se reconoce.</p>
+        <a class="enlace-flecha" href="/continuidad-academica/">Evaluar mis estudios <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta camino">
+        <p class="antetitulo">Camino 3</p>
+        <h3>Tengo un título técnico o tecnológico</h3>
+        <p>Si tu carrera duró 2½ años o más, puedes postular a un Ciclo de Complementación Curricular (CCC).</p>
+        <a class="enlace-flecha" href="/ccc/">Conocer el CCC <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="trayectoria-titulo">
+  <div class="contenedor">
+    <h2 id="trayectoria-titulo">Nuestra trayectoria</h2>
+    <dl class="cifras">
+      <div><dt>17</dt><dd>países con estudiantes acompañados</dd></div>
+      <div><dt>+1.200</dt><dd>matriculaciones</dd></div>
+      <div><dt>+800</dt><dd>egresados</dd></div>
+      <div><dt>965</dt><dd>matriculaciones en Ecuador</dd></div>
+    </dl>
+    <p class="nota" style="margin-top:20px">Trayectoria del equipo desde 2021. Ecuador es la sede y hub internacional de la Fundación, que obtuvo su personalidad jurídica en enero de 2026.</p>
+    <a class="enlace-flecha" href="/la-fundacion/">Conocer la Fundación <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" aria-labelledby="quien-titulo">
+  <div class="contenedor">
+    <div class="media">
+      <div>
+        <p class="antetitulo">¿Qué es la Fundación?</p>
+        <h2 id="quien-titulo">Acompañamiento de principio a fin</h2>
+        <p class="entrada">La Fundación no es una universidad: te orienta y te acompaña para estudiar a distancia en una red de universidades aliadas. La universidad admite, evalúa y titula. Nosotros estamos contigo en cada paso, desde cualquier país.</p>
+      </div>
+      <div class="media__foto"><img src="https://static.wixstatic.com/media/64d480_af63e4274091478d9a7b26226aefef39~mv2.png/v1/fit/w_900,h_2700,q_80,enc_jpg/64d480_af63e4274091478d9a7b26226aefef39~mv2.jpg" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="roles">
+      <div class="rol rol--universidad">
+        <p class="antetitulo">La universidad aliada</p>
+        <h3>Lo académico</h3>
+        <ul>
+          <li>Define las carreras y sus planes de estudio.</li>
+          <li>Admite y fija los requisitos de ingreso.</li>
+          <li>Analiza equivalencias y reconocimiento de trayectoria.</li>
+          <li>Evalúa, certifica y titula.</li>
+        </ul>
+      </div>
+      <div class="rol rol--fundacion">
+        <p class="antetitulo">Fundación del Gran Rosario Ecuador</p>
+        <h3>El acompañamiento</h3>
+        <ul>
+          <li>Te orienta para elegir carrera y vía de ingreso.</li>
+          <li>Te acompaña con la documentación y la admisión.</li>
+          <li>Articula convenios con institutos y asociaciones de la región.</li>
+          <li>Otorga el Beneficio Institucional FGREC a quienes postulan.</li>
+          <li>Te sigue durante la cursada.</li>
+        </ul>
+      </div>
+    </div>
+    <a class="enlace-flecha" href="/la-fundacion/">Conocer la Fundación <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="red-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="red-titulo">Red de universidades aliadas</h2>
+      <p>La Fundación articula la oferta de universidades de la región. La red está abierta a nuevas incorporaciones.</p>
+    </div>
+    <div class="grilla grilla--2">
+      <div class="tarjeta">
+        <p class="antetitulo">Universidad aliada desde 2021</p>
+        <h3>Universidad del Gran Rosario</h3>
+        <p>Argentina. Tecnicaturas, ciclos de licenciatura, licenciaturas y posgrados a distancia.</p>
+        <a class="enlace-flecha" href="/carreras/">Ver sus 46 carreras <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta" style="background:var(--crema)">
+        <p class="antetitulo">Próximamente</p>
+        <h3>Nuevas universidades</h3>
+        <p>Este espacio se completa a medida que se suman universidades a la red.</p>
+      </div>
+    </div>
+
+    <h2 style="margin-top:56px">Presencia regional</h2>
+    <p class="entrada" style="margin-bottom:24px">Ecuador es el hub internacional de la Fundación. Desde ahí acompañamos a estudiantes de 17 países, con oficinas en la región.</p>
+    <ul class="regiones">
+      <li><strong>Ecuador</strong><span>Sede y hub internacional</span></li>
+      <li><strong>Colombia</strong><span>Oficina</span></li>
+      <li><strong>Uruguay</strong><span>Oficina</span></li>
+      <li class="proximamente"><strong>Perú</strong><span>Próximamente</span></li>
+      <li class="proximamente"><strong>Paraguay</strong><span>Próximamente</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="seccion seccion--crema" id="programas" aria-labelledby="programas-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <p class="antetitulo">Educación como línea de vida profesional</p>
+      <h2 id="programas-titulo">Programas de la Fundación</h2>
+    </div>
+    <div class="grilla grilla--3">
+      <div class="tarjeta camino">
+        <h3>Programa de Cooperación y Excelencia Académica</h3>
+        <p>Seis fondos por área de conocimiento. Postulas a un fondo, y el Comité de Evaluación y Otorgamiento de Fondos define el Beneficio Institucional FGREC que te corresponde.</p>
+        <a class="enlace-flecha" href="/programa-de-cooperacion-y-excelencia-academica/">Ver los fondos <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta camino">
+        <h3>Formación continua y actualización profesional</h3>
+        <p>Cursos, diplomaturas y seminarios de actualización profesional en distintas áreas, con acceso gratuito al contenido.</p>
+        <a class="enlace-flecha" href="/programa-de-actualizacion-profesional/">Ver cursos <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="tarjeta camino">
+        <h3>Microcertificaciones académicas</h3>
+        <p>Seminarios especializados de las maestrías que puedes cursar de manera individual, para fortalecer competencias concretas.</p>
+        <a class="enlace-flecha" href="/microcertificaciones/">Ver seminarios <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--azul" aria-labelledby="por-que-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="por-que-titulo">¿Por qué elegir la Fundación del Gran Rosario?</h2>
+    </div>
+    <div class="motivos">
+      <div>
+        <h3>Claridad</h3>
+        <p>Información ordenada y fácil de entender para que identifiques rápidamente qué necesitas y cómo avanzar.</p>
+      </div>
+      <div>
+        <h3>Flexibilidad</h3>
+        <p>Distintas formas de ingreso y formación, adaptadas a los intereses, perfiles y objetivos de cada postulante.</p>
+      </div>
+      <div>
+        <h3>Continuidad</h3>
+        <p>Una propuesta que conecta cursos, programas y trayectos académicos dentro de un camino de crecimiento progresivo.</p>
+      </div>
+      <div>
+        <h3>Respaldo</h3>
+        <p>Acompañamiento institucional, procesos serios de evaluación y una propuesta académica con base sólida y proyección.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="convenios-titulo">
+  <div class="contenedor">
+    <div class="seccion__cabeza">
+      <h2 id="convenios-titulo">Instituciones con convenio</h2>
+      <p>Institutos y asociaciones con los que articulamos rutas de continuidad.</p>
+    </div>
+    <ul class="chips-lista">
+  <li>Instituto Superior Tecnológico Yavirac</li>
+  <li>Instituto Tecnológico Superior Daniel Álvarez Burneo</li>
+  <li>Instituto Superior Tecnológico Mayor Pedro Traversari</li>
+  <li>Asociación de Podólogos Titulados de Perú</li>
+</ul>
+    <a class="enlace-flecha" href="/convenios/">Ver todos los convenios <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+`} />
+</Layout>

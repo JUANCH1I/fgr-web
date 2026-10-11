@@ -1,0 +1,89 @@
+{
+  "_nota": "Datos generales del sitio: nombre, contacto, menú, redes, pie y enlaces de los botones principales. Lo que cambies acá se aplica a todas las páginas.",
+
+  "nombre": "Fundación del Gran Rosario Ecuador",
+  "nombreCorto": "Fundación Gran Rosario",
+  "dominio": "https://www.fgrec.org",
+  "idioma": "es",
+  "logo": "64d480_878e9bae365142a8a7cfd49040026764~mv2.png",
+  "imagenCompartir": "64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.png",
+
+  "contacto": {
+    "direccion": "Av. 12 de Octubre N26-97 y Abraham Lincoln, Edificio Torre 1492, Oficina 902",
+    "ciudad": "Quito, Ecuador",
+    "telefono": "+593 96 301 7631",
+    "correo": "info@fgrec.org",
+    "mapa": "https://www.google.com/maps/search/?api=1&query=Torre+1492+Av.+12+de+Octubre+N26-97+Quito"
+  },
+
+  "enlaces": {
+    "_nota": "asesor: a dónde lleva el botón «Hablar ahora con un asesor» (puede ser /contacto/ o un enlace de WhatsApp como https://wa.me/593963017631). agenda: enlace de la agenda de entrevistas; mientras esté vacío, el botón «Agendar entrevista» no se muestra. resolucion: PDF de la resolución (con los documentos de los fundadores tapados); mientras esté vacío, el enlace «Ver resolución» no se muestra.",
+    "asesor": "/contacto/",
+    "agenda": "",
+    "resolucion": ""
+  },
+
+  "formularios": {
+    "_nota": "Dirección que recibe los formularios de Contacto y de «Evaluar mis estudios». Ahora procesado internamente con Resend en /api/formulario/.",
+    "destino": "/api/formulario/"
+  },
+
+  "menu": [
+    { "texto": "Inicio", "url": "/" },
+    { "texto": "Carreras", "url": "/carreras/" },
+    { "texto": "Continuidad académica", "url": "/continuidad-academica/" },
+    { "texto": "CCC", "url": "/ccc/" },
+    { "texto": "Formación continua", "url": "/programa-de-actualizacion-profesional/", "submenu": [
+      { "texto": "Actualización profesional", "url": "/programa-de-actualizacion-profesional/" },
+      { "texto": "Microcertificaciones", "url": "/microcertificaciones/" }
+    ] },
+    { "texto": "La Fundación", "url": "/la-fundacion/", "submenu": [
+      { "texto": "Quiénes somos", "url": "/la-fundacion/" },
+      { "texto": "Programa de Cooperación y Excelencia Académica", "url": "/programa-de-cooperacion-y-excelencia-academica/" },
+      { "texto": "Convenios", "url": "/convenios/" }
+    ] },
+    { "texto": "Contacto", "url": "/contacto/" }
+  ],
+
+  "redes": [
+    { "nombre": "Instagram", "url": "https://www.instagram.com/fundaciongranrosarioec" },
+    { "nombre": "Facebook", "url": "https://www.facebook.com/fgranrosarioec" },
+    { "nombre": "X (Twitter)", "url": "https://twitter.com/rosario_gran" },
+    { "nombre": "LinkedIn", "url": "https://www.linkedin.com/in/fgrinternacional" },
+    { "nombre": "YouTube", "url": "https://www.youtube.com/@centrodeeducacioncontinuaugr" },
+    { "nombre": "TikTok", "url": "https://www.tiktok.com/@fgranrosario" }
+  ],
+
+  "pie": {
+    "oficinas": "Oficinas en Colombia y Uruguay. Próximamente en Perú y Paraguay.",
+    "enlaces": [
+      { "texto": "Carreras", "url": "/carreras/" },
+      { "texto": "Continuidad académica", "url": "/continuidad-academica/" },
+      { "texto": "La Fundación", "url": "/la-fundacion/" },
+      { "texto": "Convenios", "url": "/convenios/" },
+      { "texto": "Contacto", "url": "/contacto/" }
+    ],
+    "legales": [
+      { "texto": "Política de privacidad", "url": "/politicas-de-privacidad-del-sitio/" },
+      { "texto": "Términos y condiciones", "url": "/terminos-y-condiciones/" },
+      { "texto": "Protección de datos", "url": "/proteccion-de-datos/" }
+    ],
+    "resolucion": "Estatuto aprobado y personalidad jurídica otorgada por el Ministerio de Educación, Deporte y Cultura del Ecuador mediante Resolución Nro. MINEDEC-SEDMQ-2026-00026-R, del 15 de enero de 2026."
+  },
+
+  "convenios": [
+    { "nombre": "Instituto Superior Tecnológico Yavirac", "pais": "Ecuador", "tipo": "Instituto superior tecnológico" },
+    { "nombre": "Instituto Tecnológico Superior Daniel Álvarez Burneo", "pais": "Ecuador", "tipo": "Instituto superior tecnológico" },
+    { "nombre": "Instituto Superior Tecnológico Mayor Pedro Traversari", "pais": "Ecuador", "tipo": "Instituto superior tecnológico" },
+    { "nombre": "Asociación de Podólogos Titulados de Perú", "pais": "Perú", "tipo": "Asociación profesional" }
+  ],
+
+  "redirecciones": {
+    "_nota": "Direcciones del sitio anterior (Wix) y a dónde llevan ahora. Las de los fondos y las maestrías se agregan solas desde fondos.json y microcertificaciones.json (campo rutaAnterior).",
+    "/diplomados": "/contacto/",
+    "/microcertifiaciones-academicas": "/microcertificaciones/",
+    "/fondos": "/programa-de-cooperacion-y-excelencia-academica/",
+    "/inicio": "/",
+    "/home": "/"
+  }
+}
