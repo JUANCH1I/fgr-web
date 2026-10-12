@@ -2,6 +2,33 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { randomUUID } from 'node:crypto';
+import { renderCorreoInterno, renderCorreoPostulante } from '../../lib/correos';
+import { firmarLlamadaFGREC } from '../../lib/firma-fgrec';
+
+function escapeHtml(str: unknown): string {
+  if (typeof str !== 'string') {
+    return str === null || str === undefined ? '' : String(str);
+  }
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitizeHref(url: unknown, allowedProtocol: 'mailto' | 'https'): string {
+  if (typeof url !== 'string') return '#';
+  const clean = url.trim();
+  if (allowedProtocol === 'mailto' && clean.includes('@') && !clean.includes('javascript:')) {
+    return `mailto:${clean.replace(/[^\w.@+-]/g, '')}`;
+  }
+  if (allowedProtocol === 'https' && (clean.startsWith('https://') || clean.startsWith('/'))) {
+    return clean.replace(/[<>"']/g, '');
+  }
+  return '#';
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -29,20 +56,47 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const {
+      tipo = '',
       formulario = 'Consulta general',
       nombre = '',
       correo = '',
       telefono = '',
       whatsapp = '',
       lugar = '',
+      pais = '',
+      ciudad = '',
       mensaje = '',
       situacion = '',
       area = '',
       carrerasSugeridas = '',
-      pagina = ''
+      pagina = '',
+      acepto,
+      consentimiento: consentInput,
+      origen: origenInput
     } = body;
 
     const contactoTel = (telefono || whatsapp || '').trim();
+
+    // 1. Consentimiento: obligatorio. Sin aceptación explícita no se procesa nada.
+    const consentAceptado = Boolean(
+      (consentInput && consentInput.aceptado === true) ||
+      acepto === true ||
+      acepto === 'on' ||
+      acepto === 'true'
+    );
+
+    if (!consentAceptado) {
+      return new Response(JSON.stringify({ error: 'Debes aceptar la política de protección de datos para continuar.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const consentimiento = {
+      aceptado: true,
+      version: typeof consentInput?.version === 'string' ? consentInput.version : 'proteccion-de-datos-2026-10',
+      at: typeof consentInput?.at === 'string' ? consentInput.at : new Date().toISOString()
+    };
 
     if (!nombre.trim() || !correo.trim()) {
       return new Response(JSON.stringify({ error: 'Faltan campos obligatorios (nombre y correo)' }), {
@@ -51,110 +105,220 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // País y ciudad: ISO-2 obligatorio para FGREC. Sin default.
+    const paisCodigo = (pais || '').trim().toUpperCase();
+    const ciudadNombre = (ciudad || lugar || '').trim();
+
+    // Tipo de formulario normalizado desde el input oculto o fallback a nombres canónicos
+    const tipoNormalizado = (tipo || '').toLowerCase().trim();
+    const tipoFormulario = ['precalificador', 'contacto', 'continuidad', 'ccc'].includes(tipoNormalizado)
+      ? tipoNormalizado
+      : (formulario.toLowerCase().includes('evaluar') || formulario.toLowerCase().includes('precalificador') ? 'precalificador' : 'contacto');
+
+    // Situación: viaja solo el valor fijo de cada tarjeta (bachillerato | tecnico_tecnologo | incompleta | titulo).
+    // Si llega otro valor, que FGREC responda 400.
+    const situacionNormalizada = situacion ? String(situacion).trim() : undefined;
+
+    // 1. Intentar llamada firmada a FGREC si están configuradas las variables Y vino el país
+    const fgrecUrl = import.meta.env.FGREC_INTAKE_URL || process.env.FGREC_INTAKE_URL;
+    const fgrecSecret = import.meta.env.FGREC_INTAKE_SECRET || process.env.FGREC_INTAKE_SECRET;
+
+    let fgrecRespuesta: { leadRef?: string; codigo?: string; whatsapp?: string; via?: string } | null = null;
+
+    if (fgrecUrl && fgrecSecret && paisCodigo) {
+      try {
+        const idempotencyKey = randomUUID();
+
+        const fgrecPayload = {
+          idempotencyKey,
+          formulario: tipoFormulario,
+          contacto: {
+            nombre: nombre.trim(),
+            correo: correo.trim(),
+            whatsapp: contactoTel,
+            pais: paisCodigo,
+            ciudad: ciudadNombre || undefined
+          },
+          precalificacion: tipoFormulario === 'precalificador' || tipoFormulario === 'continuidad' || tipoFormulario === 'ccc' ? {
+            situacion: situacionNormalizada,
+            areaInteres: area || undefined,
+            carrerasSugeridas: Array.isArray(carrerasSugeridas)
+              ? carrerasSugeridas
+              : (carrerasSugeridas ? String(carrerasSugeridas).split(' | ') : undefined)
+          } : undefined,
+          mensaje: mensaje ? mensaje.trim() : undefined,
+          consentimiento,
+          origen: origenInput || {
+            pagina: pagina || undefined
+          }
+        };
+
+        const rawBody = JSON.stringify(fgrecPayload);
+        const timestamp = Math.floor(Date.now() / 1000).toString();
+
+        // Extraer pathname sin query (la URL no debe llevar query)
+        const targetUrl = new URL(fgrecUrl);
+        targetUrl.search = ''; // asegurar que no lleve query
+
+        // Extraer IP del visitante (informada por Vercel / proxy) y User-Agent
+        const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+          request.headers.get('x-real-ip') ||
+          '127.0.0.1';
+        const clientUa = request.headers.get('user-agent') || '';
+
+        const firma = firmarLlamadaFGREC({
+          secreto: fgrecSecret,
+          timestamp,
+          metodo: 'POST',
+          ruta: targetUrl.pathname,
+          cuerpoCrudo: rawBody,
+          clientIp,
+          clientUa
+        });
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        const response = await fetch(targetUrl.toString(), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...firma.headers
+          },
+          body: rawBody,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          fgrecRespuesta = await response.json();
+        } else {
+          const errText = await response.text();
+          console.warn(`[FGREC Intake]: Falló respuesta con status ${response.status}:`, errText);
+        }
+      } catch (err: any) {
+        console.warn('[FGREC Intake]: Error o timeout en llamada a FGREC:', err.message);
+      }
+    }
+
+    // 2. Envío de correos mediante el módulo de plantillas institucionales
     const apiKey = import.meta.env.RESEND_API_KEY || process.env.RESEND_API_KEY;
     const destinatario = import.meta.env.EMAIL_DESTINATARIO || process.env.EMAIL_DESTINATARIO || 'info@fgrec.org';
-    const remitente = import.meta.env.EMAIL_REMITENTE || process.env.EMAIL_REMITENTE || 'Fundación Gran Rosario <contacto@fgrec.com>';
+    const remitente = import.meta.env.EMAIL_REMITENTE || process.env.EMAIL_REMITENTE || 'Fundación Gran Rosario <contacto@fgrec.org>';
 
-    // Si aún no está configurada la API KEY en .env, logueamos y avisamos limpiamente
-    if (!apiKey) {
+    let resendInternoEnviado = false;
+    let resendInternoId: string | undefined;
+    let resendPostulanteEnviado = false;
+    let resendPostulanteId: string | undefined;
+
+    if (apiKey) {
+      const resend = new Resend(apiKey);
+
+      // A. Correo interno para la Fundación / Asesoras
+      const correoInterno = renderCorreoInterno({
+        formulario,
+        nombre,
+        correo,
+        telefono: contactoTel,
+        pais: paisCodigo,
+        ciudad: ciudadNombre,
+        situacion,
+        area,
+        carrerasSugeridas: Array.isArray(carrerasSugeridas) ? carrerasSugeridas.join(' | ') : carrerasSugeridas,
+        mensaje,
+        pagina,
+        codigo: fgrecRespuesta?.codigo,
+        leadRef: fgrecRespuesta?.leadRef,
+        via: fgrecRespuesta?.via,
+        primerToque: origenInput?.primerToque
+      });
+
+      try {
+        const { data: dataInterno, error: errInterno } = await resend.emails.send({
+          from: remitente,
+          to: [destinatario],
+          replyTo: correo.trim(),
+          subject: correoInterno.asunto,
+          html: correoInterno.html
+        });
+        if (errInterno) {
+          console.error('[Resend Error Interno]:', errInterno);
+        } else {
+          resendInternoEnviado = true;
+          resendInternoId = dataInterno?.id;
+        }
+      } catch (err: any) {
+        console.error('[Resend Excepción Interno]:', err.message);
+      }
+
+      // B. Correo nuevo para el POSTULANTE ("Ya tenemos tu información" con lenguaje prudente y WhatsApp)
+      if (correo.trim()) {
+        const correoPostulante = renderCorreoPostulante({
+          nombre,
+          codigo: fgrecRespuesta?.codigo,
+          whatsappNumero: fgrecRespuesta?.whatsapp,
+          via: fgrecRespuesta?.via,
+          area,
+          carrerasSugeridas: Array.isArray(carrerasSugeridas) ? carrerasSugeridas.join(' | ') : carrerasSugeridas
+        });
+
+        try {
+          const { data: dataPostulante, error: errPostulante } = await resend.emails.send({
+            from: remitente,
+            to: [correo.trim()],
+            replyTo: destinatario,
+            subject: correoPostulante.asunto,
+            html: correoPostulante.html
+          });
+          if (errPostulante) {
+            console.error('[Resend Error Postulante]:', errPostulante);
+          } else {
+            resendPostulanteEnviado = true;
+            resendPostulanteId = dataPostulante?.id;
+          }
+        } catch (err: any) {
+          console.error('[Resend Excepción Postulante]:', err.message);
+        }
+      }
+    } else {
       console.warn('⚠️ [API Formulario]: RESEND_API_KEY no configurada en las variables de entorno.');
+    }
+
+    // 3. Verificación de entrega: si ni FGREC respondió ni se pudo enviar correo interno de respaldo, es un 502 Bad Gateway
+    if (!fgrecRespuesta && !resendInternoEnviado) {
+      console.error('[API Formulario]: Error de entrega - Ni FGREC ni Resend pudieron recibir la consulta.');
       return new Response(JSON.stringify({
-        warning: 'RESEND_API_KEY_MISSING',
-        message: 'Consulta recibida en servidor, pero falta configurar la clave de Resend en el entorno.'
+        error: 'No se pudo entregar tu consulta en este momento por problemas de conectividad con los servicios de recepción.',
+        fallbackWhatsapp: true
       }), {
-        status: 200,
+        status: 502,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const resend = new Resend(apiKey);
-    const asunto = `[${formulario}] Nueva consulta de ${nombre.trim()}`;
-
-    // Construir tabla HTML ordenada para el correo
-    const htmlContenido = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #14202E; border: 1px solid #E3DCCF; border-radius: 8px; overflow: hidden;">
-        <div style="background-color: #0B1B2E; padding: 24px; text-align: center; border-bottom: 4px solid #C98A4B;">
-          <h2 style="color: #FFFFFF; margin: 0; font-size: 20px; font-weight: 700;">Fundación del Gran Rosario</h2>
-          <p style="color: #E2B587; margin: 4px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em;">Nueva consulta web</p>
-        </div>
-        
-        <div style="padding: 24px; background: #FFFFFF;">
-          <h3 style="color: #0B1B2E; margin-top: 0; font-size: 18px; border-bottom: 1px solid #EEE; padding-bottom: 8px;">Detalles del interesado:</h3>
-          
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 15px;">
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; width: 140px; font-weight: 600;">Origen:</td>
-              <td style="padding: 8px 0; color: #0B1B2E; font-weight: 700;">${formulario}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Nombre:</td>
-              <td style="padding: 8px 0; color: #0B1B2E; font-weight: 700;">${nombre}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Correo:</td>
-              <td style="padding: 8px 0;"><a href="mailto:${correo}" style="color: #8F5320; font-weight: 600;">${correo}</a></td>
-            </tr>
-            ${contactoTel ? `
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Teléfono / WhatsApp:</td>
-              <td style="padding: 8px 0;"><a href="https://wa.me/${contactoTel.replace(/[^0-9]/g, '')}" style="color: #1F5A32; font-weight: 600;">${contactoTel}</a></td>
-            </tr>` : ''}
-            ${lugar ? `
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Ciudad / País:</td>
-              <td style="padding: 8px 0; color: #0B1B2E;">${lugar}</td>
-            </tr>` : ''}
-            ${situacion ? `
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Situación previa:</td>
-              <td style="padding: 8px 0; color: #0B1B2E;">${situacion}</td>
-            </tr>` : ''}
-            ${area ? `
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Área de interés:</td>
-              <td style="padding: 8px 0; color: #0B1B2E;">${area}</td>
-            </tr>` : ''}
-            ${carrerasSugeridas ? `
-            <tr>
-              <td style="padding: 8px 0; color: #4F5B66; font-weight: 600;">Carreras sugeridas:</td>
-              <td style="padding: 8px 0; color: #0B1B2E; font-weight: 600;">${carrerasSugeridas}</td>
-            </tr>` : ''}
-          </table>
-
-          ${mensaje ? `
-          <div style="background: #F7F4EE; padding: 16px; border-radius: 6px; border-left: 3px solid #C98A4B; margin-top: 14px;">
-            <p style="margin: 0 0 6px; font-weight: 700; font-size: 13px; text-transform: uppercase; color: #8F5320;">Mensaje del interesado:</p>
-            <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #14202E; white-space: pre-wrap;">${mensaje}</p>
-          </div>` : ''}
-
-          ${pagina ? `<p style="margin-top: 24px; font-size: 12px; color: #8A94A0;">Enviado desde: <a href="${pagina}" style="color: #8A94A0;">${pagina}</a></p>` : ''}
-        </div>
-      </div>
-    `;
-
-    const { data, error: resendError } = await resend.emails.send({
-      from: remitente,
-      to: [destinatario],
-      replyTo: correo,
-      subject: asunto,
-      html: htmlContenido
-    });
-
-    if (resendError) {
-      console.error('Error enviando con Resend:', resendError);
-      return new Response(JSON.stringify({ error: resendError.message }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    return new Response(JSON.stringify({ success: true, id: data?.id }), {
+    return new Response(JSON.stringify({
+      success: true,
+      fgrec: fgrecRespuesta ? {
+        conectado: true,
+        leadRef: fgrecRespuesta.leadRef,
+        codigo: fgrecRespuesta.codigo,
+        whatsapp: fgrecRespuesta.whatsapp,
+        via: fgrecRespuesta.via
+      } : { conectado: false },
+      email: {
+        internoEnviado: resendInternoEnviado,
+        internoId: resendInternoId,
+        postulanteEnviado: resendPostulanteEnviado,
+        postulanteId: resendPostulanteId
+      }
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err: any) {
     console.error('Excepción en /api/formulario:', err);
-    return new Response(JSON.stringify({ error: err.message || 'Error del servidor' }), {
+    return new Response(JSON.stringify({ error: 'Ocurrió un error inesperado al procesar tu solicitud. Por favor intenta más tarde o comunícate por WhatsApp.' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
