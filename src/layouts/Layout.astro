@@ -2,6 +2,7 @@
 import sitio from '../datos/sitio.json';
 import { resolverImagen } from '../lib/imagen';
 import { ClientRouter } from 'astro:transitions';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title?: string;
@@ -361,5 +362,6 @@ const jsonLd = {
     });
   </script>
   <slot name="extraScripts" />
+  <SpeedInsights />
 </body>
 </html>
