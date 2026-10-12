@@ -94,14 +94,42 @@ import Layout from "../layouts/Layout.astro";
           <p class="nota" data-resumen></p>
         </div>
         <form novalidate data-formulario class="formulario--evaluar">
+          <input type="hidden" name="tipo" value="precalificador" />
           <div class="grilla-formulario">
             <div class="campo">
               <label for="pc-nombre">Nombre y apellido completo</label>
               <input id="pc-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" placeholder="Ej: María José Fernández" required>
             </div>
             <div class="campo">
+              <label for="pc-pais">País de residencia</label>
+              <select id="pc-pais" name="pais" required>
+                <option value="" disabled selected>Selecciona tu país</option>
+                <option value="EC">Ecuador</option>
+                <option value="CO">Colombia</option>
+                <option value="PE">Perú</option>
+                <option value="BO">Bolivia</option>
+                <option value="AR">Argentina</option>
+                <option value="CL">Chile</option>
+                <option value="MX">México</option>
+                <option value="PY">Paraguay</option>
+                <option value="UY">Uruguay</option>
+                <option value="PA">Panamá</option>
+                <option value="CR">Costa Rica</option>
+                <option value="DO">República Dominicana</option>
+                <option value="ES">España</option>
+                <option value="US">Estados Unidos</option>
+                <option value="OT">Otro país</option>
+              </select>
+            </div>
+          </div>
+          <div class="grilla-formulario">
+            <div class="campo">
               <label for="pc-whatsapp">WhatsApp (con código de país)</label>
               <input id="pc-whatsapp" name="whatsapp" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required>
+            </div>
+            <div class="campo">
+              <label for="pc-ciudad">Ciudad (opcional)</label>
+              <input id="pc-ciudad" name="ciudad" type="text" autocomplete="address-level2" maxlength="80" placeholder="Ej: Quito, Guayaquil, Bogotá">
             </div>
           </div>
           <div class="campo">
@@ -129,15 +157,22 @@ import Layout from "../layouts/Layout.astro";
 
       <section data-paso="4" class="precalificador__vista precalificador__resultado" hidden>
         <div class="icono-exito" aria-hidden="true">✓</div>
-        <h3 tabindex="-1">¡Listo! Tu caso ya fue precalificado.</h3>
+        <h3 tabindex="-1" data-resultado-titulo>¡Listo! Tu caso ya fue precalificado.</h3>
+        
+        <div class="ticket-resultado" data-ticket-resultado hidden style="background: #F7F4EE; border: 1px solid #E3DCCF; border-left: 4px solid #C98A4B; border-radius: 6px; padding: 14px 18px; margin: 16px 0; text-align: left;">
+          <p style="margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #8F5320; font-weight: 700;">Código de referencia:</p>
+          <p style="margin: 4px 0 0; font-size: 22px; font-weight: 800; color: #0B1B2E; letter-spacing: 0.08em;" data-ticket-codigo></p>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #4F5B66;" data-ticket-via></p>
+        </div>
+
         <p class="entrada" data-intro></p>
         <div class="resultado-carreras">
           <ul class="lista-enlaces lista-enlaces--tarjetas" data-resultado></ul>
         </div>
         <p class="nota nota-destacada" data-nota-envio></p>
-        <div class="fila fila--centrada">
-          <a class="boton boton--oscuro boton--grande" href="/contacto/">Hablar ahora con un asesor</a>
-          <a class="boton boton--contorno boton--grande" href="/carreras/">Explorar todas las carreras</a>
+        <div class="fila fila--centrada" data-acciones-resultado>
+          <a class="boton boton--oscuro boton--grande" data-accion-asesor href="/contacto/">Hablar con un asesor</a>
+          <a class="boton boton--contorno boton--grande" data-accion-carreras href="/carreras/">Ver carreras</a>
         </div>
         <div class="fila fila--centrada"><button type="button" class="boton-texto" data-volver="1">↺ Realizar otra evaluación</button></div>
       </section>

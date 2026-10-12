@@ -266,6 +266,91 @@ window.iniciarSitio = function () {
     });
   })();
 
+  // ---------- Atribución de tráfico (localStorage, 30 días) ----------
+  var CLAVE_ATRIBUCION = 'fgrec_attribution';
+  var DIAS_VIGENCIA = 30;
+
+  function registrarAtribucion() {
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var ahora = new Date().toISOString();
+      var toqueActual = {
+        utm_source: urlParams.get('utm_source') || '',
+        utm_medium: urlParams.get('utm_medium') || '',
+        utm_campaign: urlParams.get('utm_campaign') || '',
+        utm_content: urlParams.get('utm_content') || '',
+        utm_term: urlParams.get('utm_term') || '',
+        gclid: urlParams.get('gclid') || '',
+        fbclid: urlParams.get('fbclid') || '',
+        referrer: document.referrer || '',
+        landing_path: window.location.pathname,
+        at: ahora
+      };
+
+      var raw = localStorage.getItem(CLAVE_ATRIBUCION);
+      var guardado = null;
+      if (raw) {
+        try {
+          guardado = JSON.parse(raw);
+          // Verificar expiración de 30 días
+          if (guardado.primerToque && guardado.primerToque.at) {
+            var diffMs = Date.now() - new Date(guardado.primerToque.at).getTime();
+            if (diffMs > DIAS_VIGENCIA * 24 * 60 * 60 * 1000) {
+              guardado = null;
+            }
+          }
+        } catch (_) {
+          guardado = null;
+        }
+      }
+
+      var tieneParams = Boolean(
+        toqueActual.utm_source || toqueActual.utm_medium || toqueActual.utm_campaign ||
+        toqueActual.gclid || toqueActual.fbclid
+      );
+
+      if (!guardado) {
+        guardado = {
+          primerToque: toqueActual,
+          ultimoToque: toqueActual
+        };
+      } else if (tieneParams || (document.referrer && document.referrer.indexOf(window.location.hostname) === -1)) {
+        guardado.ultimoToque = toqueActual;
+      }
+
+      localStorage.setItem(CLAVE_ATRIBUCION, JSON.stringify(guardado));
+    } catch (_) {}
+  }
+
+  function obtenerAtribucion() {
+    try {
+      var raw = localStorage.getItem(CLAVE_ATRIBUCION);
+      if (raw) {
+        var obj = JSON.parse(raw);
+        return {
+          pagina: window.location.pathname,
+          primerToque: obj.primerToque,
+          ultimoToque: obj.ultimoToque
+        };
+      }
+    } catch (_) {}
+    return {
+      pagina: window.location.pathname,
+      primerToque: {
+        referrer: document.referrer || '',
+        landing_path: window.location.pathname,
+        at: new Date().toISOString()
+      },
+      ultimoToque: {
+        referrer: document.referrer || '',
+        landing_path: window.location.pathname,
+        at: new Date().toISOString()
+      }
+    };
+  }
+
+  registrarAtribucion();
+
   // ---------- Envío de formularios ----------
   // Si sitio.json tiene un destino, los datos se envían ahí. Si no, se arma un correo.
   function enviar(destino, datos) {
@@ -275,7 +360,7 @@ window.iniciarSitio = function () {
       body: JSON.stringify(datos)
     }).then(function (r) {
       if (!r.ok) { throw new Error('Respuesta ' + r.status); }
-      return r;
+      return r.json();
     });
   }
   function enlaceCorreo(correo, asunto, datos) {
@@ -304,17 +389,26 @@ window.iniciarSitio = function () {
       if (f.web.value) { return; }
       if (f.nombre.value.trim().length < 3) { return fallar('Escribe tu nombre completo.', f.nombre); }
       if (!correoValido(f.correo.value.trim())) { return fallar('Revisa tu correo: parece incompleto.', f.correo); }
-      if (f.lugar.value.trim().length < 2) { return fallar('Escribe tu ciudad o país.', f.lugar); }
+      if (f.pais && !f.pais.value) { return fallar('Por favor selecciona tu país de residencia.', f.pais); }
+      if (f.lugar && f.lugar.value.trim().length < 2) { return fallar('Escribe tu ciudad o país.', f.lugar); }
       if (f.telefono.value.replace(/\D/g, '').length < 8) { return fallar('Escribe tu teléfono con el código de país. Ejemplo: +593 99 123 4567', f.telefono); }
       if (!f.acepto.checked) { return fallar('Para enviar, marca la casilla de aceptación.', f.acepto); }
+      
       var datos = {
         formulario: 'Contacto',
         nombre: f.nombre.value.trim(),
         correo: f.correo.value.trim(),
-        lugar: f.lugar.value.trim(),
+        pais: f.pais ? f.pais.value : '',
+        ciudad: f.ciudad ? f.ciudad.value.trim() : (f.lugar ? f.lugar.value.trim() : ''),
         telefono: f.telefono.value.trim(),
         mensaje: f.mensaje.value.trim(),
-        pagina: window.location.href
+        pagina: window.location.href,
+        consentimiento: {
+          aceptado: true,
+          version: 'proteccion-de-datos-2026-10',
+          at: new Date().toISOString()
+        },
+        origen: obtenerAtribucion()
       };
       var destino = form.getAttribute('data-destino');
       if (!destino) {
@@ -325,12 +419,29 @@ window.iniciarSitio = function () {
       }
       boton.disabled = true;
       boton.textContent = 'Enviando…';
-      enviar(destino, datos).then(function () {
+      enviar(destino, datos).then(function (res) {
         form.reset();
-        exito.textContent = 'Gracias. Recibimos tu consulta y un asesor te va a escribir.';
+        var codigo = res && res.fgrec && res.fgrec.codigo;
+        if (codigo) {
+          exito.textContent = 'Gracias. Ya recibimos tu consulta (Ref. ' + codigo + '). Un asesor te escribirá a la brevedad.';
+        } else {
+          exito.textContent = 'Gracias. Recibimos tu consulta y un asesor te va a escribir.';
+        }
         exito.hidden = false;
-      }).catch(function () {
-        fallar('No pudimos enviar tu consulta. Inténtalo de nuevo en un momento o escríbenos a ' + form.getAttribute('data-correo') + '.');
+      }).catch(function (err) {
+        error.innerHTML = '';
+        var p = document.createElement('span');
+        p.textContent = 'Tuvimos un inconveniente al registrar tu consulta por este medio. Puedes escribirnos directamente por WhatsApp: ';
+        var a = document.createElement('a');
+        a.href = 'https://wa.me/593963017631?text=' + encodeURIComponent('Hola, intenté enviar una consulta desde la web pero no pude completarla.');
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.style.textDecoration = 'underline';
+        a.style.fontWeight = '700';
+        a.textContent = 'Escribir por WhatsApp';
+        p.appendChild(a);
+        error.appendChild(p);
+        error.hidden = false;
       }).then(function () {
         boton.disabled = false;
         boton.textContent = 'Enviar';
@@ -345,10 +456,10 @@ window.iniciarSitio = function () {
     if (!caja || !datos) { return; }
 
     var SITUACIONES = [
-      { texto: 'Tengo un título técnico o tecnológico', niveles: ['Ciclo'] },
-      { texto: 'Empecé una carrera y no la terminé', niveles: ['Licenciatura', 'Tecnicatura'] },
-      { texto: 'Tengo un título universitario y quiero otro', niveles: ['Maestr', 'Especializ', 'Doctorado', 'Profesorado'] },
-      { texto: 'Terminé el bachillerato', niveles: ['Licenciatura', 'Tecnicatura'] }
+      { clave: 'tecnico_tecnologo', texto: 'Tengo un título técnico o tecnológico', niveles: ['Ciclo'] },
+      { clave: 'incompleta', texto: 'Empecé una carrera y no la terminé', niveles: ['Licenciatura', 'Tecnicatura'] },
+      { clave: 'titulo', texto: 'Tengo un título universitario y quiero otro', niveles: ['Maestr', 'Especializ', 'Doctorado', 'Profesorado'] },
+      { clave: 'bachillerato', texto: 'Terminé el bachillerato', niveles: ['Licenciatura', 'Tecnicatura'] }
     ];
     var MAX = 4;
     var estado = { situacion: null, area: null };
@@ -412,7 +523,7 @@ window.iniciarSitio = function () {
         .slice(0, MAX);
     }
 
-    function resultado(carreras, nota) {
+    function resultado(carreras, nota, infoFgrec) {
       var lista = $('[data-resultado]', caja);
       lista.textContent = '';
       $('[data-intro]', caja).textContent = carreras.length
@@ -426,9 +537,51 @@ window.iniciarSitio = function () {
         li.appendChild(a);
         lista.appendChild(li);
       });
+
       var notaEl = $('[data-nota-envio]', caja);
       notaEl.textContent = '';
-      if (typeof nota === 'string') { notaEl.textContent = nota; } else { notaEl.appendChild(nota); }
+      if (typeof nota === 'string') { notaEl.textContent = nota; } else if (nota) { notaEl.appendChild(nota); }
+
+      // Manejo de dos estados (FGREC conectado vs respaldo)
+      var ticketBox = $('[data-ticket-resultado]', caja);
+      var ticketCod = $('[data-ticket-codigo]', caja);
+      var ticketVia = $('[data-ticket-via]', caja);
+      var btnAsesor = $('[data-accion-asesor]', caja);
+      var tituloResultado = $('[data-resultado-titulo]', caja);
+
+      var VIAS_TEXTO = {
+        'LICENCIATURA': 'Vía sugerida: Licenciatura completa',
+        'RECONOCIMIENTO': 'Vía sugerida: Evaluación de estudios previos',
+        'CCC': 'Vía sugerida: Ciclo de Licenciatura (CCC)',
+        'REVISION_HUMANA': 'Vía sugerida: Un asesor académico revisará tu caso en detalle'
+      };
+
+      if (infoFgrec && infoFgrec.conectado && infoFgrec.codigo) {
+        if (tituloResultado) tituloResultado.textContent = '¡Ya tenemos tu información!';
+        if (ticketBox) ticketBox.hidden = false;
+        if (ticketCod) ticketCod.textContent = infoFgrec.codigo;
+        if (ticketVia) {
+          ticketVia.textContent = VIAS_TEXTO[infoFgrec.via] || (infoFgrec.via ? 'Vía: ' + infoFgrec.via : 'Evaluación preliminar registrada');
+        }
+
+        if (btnAsesor) {
+          var numWa = (infoFgrec.whatsapp || '593963017631').replace(/\D/g, '');
+          var textoWa = encodeURIComponent('Hola, completé el precalificador (ref. ' + infoFgrec.codigo + ')');
+          btnAsesor.href = 'https://wa.me/' + numWa + '?text=' + textoWa;
+          btnAsesor.textContent = 'Hablar con un asesor por WhatsApp';
+          btnAsesor.target = '_blank';
+          btnAsesor.rel = 'noopener noreferrer';
+        }
+      } else {
+        if (tituloResultado) tituloResultado.textContent = '¡Listo! Tu caso ya fue precalificado.';
+        if (ticketBox) ticketBox.hidden = true;
+        if (btnAsesor) {
+          btnAsesor.href = '/contacto/';
+          btnAsesor.textContent = 'Hablar con un asesor';
+          btnAsesor.removeAttribute('target');
+        }
+      }
+
       mostrar(4);
     }
 
@@ -443,25 +596,39 @@ window.iniciarSitio = function () {
       var f = form.elements;
       if (f.web.value) { return; }
       var nombre = f.nombre.value.trim();
+      var pais = f.pais ? f.pais.value : '';
+      var ciudad = f.ciudad ? f.ciudad.value.trim() : '';
       var whatsapp = f.whatsapp.value.trim();
       var correo = f.correo.value.trim();
       if (nombre.length < 3) { return fallar('Escribe tu nombre y apellido.', f.nombre); }
+      if (!pais) { return fallar('Por favor selecciona tu país de residencia.', f.pais); }
       if (whatsapp.replace(/\D/g, '').length < 8) { return fallar('Escribe tu WhatsApp con el código de país. Ejemplo: +593 99 123 4567', f.whatsapp); }
       if (!correoValido(correo)) { return fallar('Revisa tu correo: parece incompleto.', f.correo); }
       if (!f.acepto.checked) { return fallar('Para enviar, marca la casilla de aceptación.', f.acepto); }
 
       var lista = sugeridas();
+      var situacionSeleccionada = SITUACIONES[estado.situacion];
       var envio = {
+        tipo: 'precalificador',
         formulario: 'Evaluar mis estudios',
         nombre: nombre,
+        pais: pais,
+        ciudad: ciudad,
         whatsapp: whatsapp,
         correo: correo,
-        situacion: SITUACIONES[estado.situacion].texto,
+        situacion: situacionSeleccionada ? situacionSeleccionada.clave : '',
+        situacionTexto: situacionSeleccionada ? situacionSeleccionada.texto : '',
         area: estado.area,
-        carrerasSugeridas: lista.map(function (c) { return c.n; }).join(' | ')
+        carrerasSugeridas: lista.map(function (c) { return c.n; }).join(' | '),
+        consentimiento: {
+          aceptado: true,
+          version: 'proteccion-de-datos-2026-10',
+          at: new Date().toISOString()
+        },
+        origen: obtenerAtribucion()
       };
       var destino = caja.getAttribute('data-destino');
-      var notaFinal = 'La universidad confirma el ingreso después de revisar tu documentación. Un asesor te escribe, o puedes avanzar ahora:';
+      var notaFinal = 'La universidad confirma el ingreso después de revisar tu documentación oficial. Puedes avanzar ahora con un asesor:';
 
       if (!destino) {
         var p = document.createElement('span');
@@ -471,15 +638,27 @@ window.iniciarSitio = function () {
         a.textContent = 'enviar mi consulta por correo';
         p.appendChild(a);
         p.appendChild(document.createTextNode('. La universidad confirma el ingreso después de revisar tu documentación.'));
-        resultado(lista, p);
+        resultado(lista, p, null);
         return;
       }
       boton.disabled = true;
       boton.textContent = 'Enviando…';
-      enviar(destino, envio).then(function () {
-        resultado(lista, notaFinal);
+      enviar(destino, envio).then(function (res) {
+        resultado(lista, notaFinal, res ? res.fgrec : null);
       }).catch(function () {
-        fallar('No pudimos enviar tu consulta. Inténtalo de nuevo en un momento.');
+        error.innerHTML = '';
+        var p = document.createElement('span');
+        p.textContent = 'Tuvimos un inconveniente al enviar tu evaluación por el formulario. Puedes consultar directamente a un asesor por WhatsApp: ';
+        var a = document.createElement('a');
+        a.href = 'https://wa.me/593963017631?text=' + encodeURIComponent('Hola, completé mis datos en el precalificador pero tuve un error al enviar el formulario.');
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.style.textDecoration = 'underline';
+        a.style.fontWeight = '700';
+        a.textContent = 'Hablar por WhatsApp';
+        p.appendChild(a);
+        error.appendChild(p);
+        error.hidden = false;
       }).then(function () {
         boton.disabled = false;
         boton.textContent = 'Enviar y ver mis opciones';

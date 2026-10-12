@@ -2,10 +2,32 @@
 import sitio from '../datos/sitio.json';
 ---
 <form class="formulario" novalidate data-formulario-contacto data-destino={sitio.formularios.destino} data-correo={sitio.contacto.correo}>
+  <input type="hidden" name="tipo" value="contacto" />
   <div class="campo"><label for="ct-nombre">Nombre completo</label><input id="ct-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" required /></div>
   <div class="campo"><label for="ct-correo">Correo</label><input id="ct-correo" name="correo" type="email" autocomplete="email" maxlength="100" required /></div>
-  <div class="campo"><label for="ct-lugar">Ciudad / País</label><input id="ct-lugar" name="lugar" type="text" autocomplete="address-level2" maxlength="80" required /></div>
-  <div class="campo"><label for="ct-telefono">Teléfono, con código de país</label><input id="ct-telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required /></div>
+  <div class="campo">
+    <label for="ct-pais">País de residencia</label>
+    <select id="ct-pais" name="pais" required>
+      <option value="" disabled selected>Selecciona tu país</option>
+      <option value="EC">Ecuador</option>
+      <option value="CO">Colombia</option>
+      <option value="PE">Perú</option>
+      <option value="BO">Bolivia</option>
+      <option value="AR">Argentina</option>
+      <option value="CL">Chile</option>
+      <option value="MX">México</option>
+      <option value="PY">Paraguay</option>
+      <option value="UY">Uruguay</option>
+      <option value="PA">Panamá</option>
+      <option value="CR">Costa Rica</option>
+      <option value="DO">República Dominicana</option>
+      <option value="ES">España</option>
+      <option value="US">Estados Unidos</option>
+      <option value="OT">Otro país</option>
+    </select>
+  </div>
+  <div class="campo"><label for="ct-ciudad">Ciudad (opcional)</label><input id="ct-ciudad" name="ciudad" type="text" autocomplete="address-level2" maxlength="80" placeholder="Ej: Quito, Guayaquil, Bogotá" /></div>
+  <div class="campo"><label for="ct-telefono">Teléfono / WhatsApp, con código de país</label><input id="ct-telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+593 99 123 4567" maxlength="24" required /></div>
   <div class="campo"><label for="ct-mensaje">Mensaje</label><textarea id="ct-mensaje" name="mensaje" rows="5" maxlength="2000"></textarea></div>
   <div class="campo campo--oculto" aria-hidden="true"><label for="ct-web">No completar</label><input id="ct-web" name="web" type="text" tabindex="-1" autocomplete="off" /></div>
   <label class="acepto"><input type="checkbox" name="acepto" required /><span>Acepto que la Fundación use estos datos para responder mi consulta. <a href="/proteccion-de-datos/" target="_blank">Ver política de protección de datos</a></span></label>
