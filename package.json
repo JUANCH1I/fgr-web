@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview --host 0.0.0.0",
     "start": "HOST=0.0.0.0 PORT=4321 node dist/server/entry.mjs",
+    "test": "node --experimental-strip-types --test test/**/*.test.ts",
     "astro": "astro"
   },
   "dependencies": {
