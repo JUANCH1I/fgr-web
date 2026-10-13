@@ -248,6 +248,62 @@ try {
 
         <!-- Columna lateral (derecha) -->
         <div class="portal-dashboard-aside">
+          <!-- Tarjeta Destacada: Tu Asesor Institucional Asignado -->
+          <div class="tarjeta" style="background: #FFFFFF; border-top: 4px solid var(--portal-cobre); box-shadow: 0 4px 16px rgba(11, 27, 46, 0.06);">
+            <p class="antetitulo" style="margin-bottom: 6px;">Asesoría Personalizada</p>
+            <h3 style="font-size: 21px; color: var(--portal-azul); margin-bottom: 12px;">
+              Tu Asesor Asignado
+            </h3>
+
+            {asesora?.nombre ? (
+              <div>
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: var(--crema, #F7F4EE); padding: 14px 16px; border-radius: var(--portal-radio); border: 1px solid var(--portal-borde);">
+                  <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--portal-azul); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; font-family: var(--serif);">
+                    {asesora.nombre.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <strong style="display: block; font-size: 17px; color: var(--portal-azul); line-height: 1.2;">
+                      {asesora.nombre}
+                    </strong>
+                    <span style="font-size: 13px; color: var(--portal-cobre-texto); font-weight: 600;">
+                      Admisiones Institucionales FGREC
+                    </span>
+                  </div>
+                </div>
+
+                <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 16px;">
+                  Tu asesora revisa tu expediente académico, valida tus requisitos ante la universidad y te guía en cada paso del proceso.
+                </p>
+
+                {whatsappHref && (
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--acento" style="width: 100%; display: flex; gap: 8px;">
+                    <span>Hablar con {asesora.nombre.split(' ')[0]}</span>
+                    <span aria-hidden="true">→</span>
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div>
+                <div style="background: var(--crema, #F7F4EE); padding: 14px 16px; border-radius: var(--portal-radio); border: 1px solid var(--portal-borde); margin-bottom: 14px;">
+                  <strong style="display: block; font-size: 16px; color: var(--portal-azul); margin-bottom: 2px;">
+                    Equipo de Admisiones FGREC
+                  </strong>
+                  <span style="font-size: 13px; color: var(--portal-mutado);">
+                    Asignación en curso
+                  </span>
+                </div>
+                <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 16px;">
+                  Tu expediente está siendo asignado a una asesora institucional para acompañarte en tu postulación.
+                </p>
+                {whatsappHref && (
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--oscuro" style="width: 100%;">
+                    Contactar mesa de admisiones
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+
           <!-- Tarjeta de Acompañamiento Institucional (Rol de la Fundación) -->
           <div class="tarjeta" style="background: var(--crema-2, #F3EBDD); border-color: #DFD5C3;">
             <p class="antetitulo" style="margin-bottom: 6px;">Acompañamiento FGREC</p>
@@ -270,26 +326,18 @@ try {
             </a>
           </div>
 
-          <!-- Canales de contacto directo -->
+          <!-- Canales de contacto directo y sede -->
           <div class="tarjeta" style="background: #FFFFFF;">
-            <p class="antetitulo" style="margin-bottom: 6px;">Atención a postulantes</p>
-            <h3 style="font-size: 20px; color: var(--portal-azul); margin-bottom: 8px;">
-              ¿Necesitas ayuda?
+            <p class="antetitulo" style="margin-bottom: 6px;">Sede y Soporte</p>
+            <h3 style="font-size: 18px; color: var(--portal-azul); margin-bottom: 6px;">
+              Oficina Quito, Ecuador
             </h3>
-            <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 16px;">
-              Si tienes preguntas sobre los requisitos o el formato de tus archivos, contáctanos:
+            <p style="font-size: 13px; color: var(--portal-mutado); line-height: 1.45; margin-bottom: 14px;">
+              Av. 12 de Octubre y Lincoln, Edificio Torre 1492, Of. 902.
             </p>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              {whatsappHref && (
-                <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--oscuro" style="width: 100%;">
-                  Escribir a un asesor
-                </a>
-              )}
-              <a href="/contacto/" target="_blank" rel="noopener" class="boton boton--contorno" style="width: 100%;">
-                Ver datos de contacto y sede
-              </a>
-            </div>
+            <a href="/contacto/" target="_blank" rel="noopener" class="enlace-flecha" style="font-size: 14px;">
+              Ver ubicación y horarios <span aria-hidden="true">→</span>
+            </a>
           </div>
         </div>
       </div>

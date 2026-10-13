@@ -59,6 +59,22 @@ if (consentimientoPendiente && respuestaDocs.ok) {
     textoConsentimiento = respCons.data.textos[0];
   }
 }
+
+// 3. Consultar datos de la postulación para obtener el asesor asignado
+let asesoraAsignada: { nombre: string; whatsapp?: string | null } | null = null;
+try {
+  const respPostulacion = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'postulacion',
+    sesion: sesionToken,
+    contexto
+  });
+  if (respPostulacion.ok && respPostulacion.data?.asesora) {
+    asesoraAsignada = respPostulacion.data.asesora;
+  }
+} catch {
+  // Asesoría fallback
+}
 ---
 
 <PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
@@ -112,6 +128,24 @@ if (consentimientoPendiente && respuestaDocs.ok) {
         Carga los documentos solicitados para la evaluación académica de tu expediente. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
       </p>
 
+      {asesoraAsignada?.nombre && (
+        <div style="background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--portal-azul); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0;">
+              {asesoraAsignada.nombre.charAt(0).toUpperCase()}
+            </div>
+            <span style="font-size: 14px; color: var(--portal-texto);">
+              Tu asesora asignada para este expediente es <strong style="color: var(--portal-azul);">{asesoraAsignada.nombre}</strong>.
+            </span>
+          </div>
+          {whatsappHref && (
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="enlace-flecha" style="font-size: 13px;">
+              Consultar con mi asesora <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </div>
+      )}
+
       <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
       <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
 
@@ -155,96 +189,105 @@ if (consentimientoPendiente && respuestaDocs.ok) {
             No hay requisitos documentales pendientes para esta vía.
           </div>
         ) : (
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            {requisitos.map((req) => {
-              const vista = presentarEstadoDocumento(req);
-              const colorDetalle = (req.estado === 'OBSERVADO' || req.estado === 'REEMPLAZO_SOLICITADO')
-                ? 'var(--portal-rojo)'
-                : 'var(--portal-mutado)';
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              {requisitos.map((req) => {
+                const vista = presentarEstadoDocumento(req);
+                const colorDetalle = (req.estado === 'OBSERVADO' || req.estado === 'REEMPLAZO_SOLICITADO')
+                  ? 'var(--portal-rojo)'
+                  : 'var(--portal-mutado)';
 
-              return (
-                <div
-                  class="requisito-item"
-                  data-requisito={req.codigo}
-                  style="border: 1px solid var(--portal-borde); border-radius: 10px; padding: 1.25rem; background: #fff; display: flex; flex-direction: column; gap: 0.75rem;"
-                >
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
-                    <div>
-                      <h3 style="font-size: 1rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.25rem 0;">
-                        {req.nombre}
-                      </h3>
-                      {req.obligatorio ? (
-                        <span style="font-size: 0.6875rem; font-weight: 700; color: var(--portal-dorado); text-transform: uppercase;">
-                          Obligatorio
-                        </span>
-                      ) : (
-                        <span style="font-size: 0.6875rem; color: var(--portal-mutado); text-transform: uppercase;">
-                          Opcional
-                        </span>
-                      )}
+                return (
+                  <div
+                    class="requisito-item"
+                    data-requisito={req.codigo}
+                    style="border: 1.5px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 20px 24px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 6px rgba(11, 27, 46, 0.03);"
+                  >
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
+                      <div>
+                        <h3 style="font-size: 18px; font-weight: 700; color: var(--portal-azul); margin: 0 0 4px 0; line-height: 1.25;">
+                          {req.nombre}
+                        </h3>
+                        {req.obligatorio ? (
+                          <span style="font-size: 11px; font-weight: 800; color: var(--portal-cobre-texto); text-transform: uppercase; letter-spacing: 0.08em; background: var(--crema-2, #F3EBDD); padding: 2px 8px; border-radius: 3px; display: inline-block;">
+                            Obligatorio para admisión
+                          </span>
+                        ) : (
+                          <span style="font-size: 11px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; background: #F1F5F9; padding: 2px 8px; border-radius: 3px; display: inline-block;">
+                            Documento opcional
+                          </span>
+                        )}
+                      </div>
+
+                      <!-- Badge de estado -->
+                      <div>
+                        {req.estado === 'PENDIENTE' && (
+                          <span class="badge-acento" style="background: var(--crema-2, #F3EBDD); color: var(--portal-cobre-texto); border-color: #DFD5C3;">
+                            ○ Pendiente de carga
+                          </span>
+                        )}
+                        {req.estado === 'RECIBIDO' && (
+                          <span class="badge-acento" style="background: #E8F0FE; color: #174EA6; border-color: #D2E3FC;">
+                            ⏳ Recibido · En revisión
+                          </span>
+                        )}
+                        {req.estado === 'VALIDADO' && (
+                          <span class="badge-acento" style="background: var(--portal-verde-fondo); color: var(--portal-verde); border-color: #C4DEC8;">
+                            ✓ Validado por admisiones
+                          </span>
+                        )}
+                        {req.estado === 'OBSERVADO' && (
+                          <span class="badge-acento" style="background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-color: #F6DFB3;">
+                            ⚠️ Observado
+                          </span>
+                        )}
+                        {req.estado === 'REEMPLAZO_SOLICITADO' && (
+                          <span class="badge-acento" style="background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-color: #F5C2C0;">
+                            ⚠️ Reemplazo solicitado
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <!-- Badge de estado -->
-                    <div>
-                      {req.estado === 'PENDIENTE' && (
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: #F1F5F9; color: #475569; border-radius: 9999px;">
-                          ○ Pendiente
+                    <!-- Detalle o motivo con aviso destacado -->
+                    {vista.detalle && (
+                      <div class="nota-destacada" style={`font-size: 14px; color: ${colorDetalle}; line-height: 1.45; padding: 10px 14px; margin: 2px 0;`}>
+                        {vista.detalle}
+                      </div>
+                    )}
+
+                    <!-- Zona de acción para cargar o reemplazar archivo -->
+                    {vista.permiteSubida && (
+                      <div style="margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--portal-borde); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <label
+                          class="boton boton--acento btn-cargar-archivo"
+                          style="cursor: pointer; width: auto; font-size: 15px; min-height: 44px; padding: 10px 20px; display: inline-flex;"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                          </svg>
+                          <span>{vista.textoBoton === 'Reemplazar' ? 'Subir reemplazo' : 'Cargar archivo (PDF o foto)'}</span>
+                          <input
+                            type="file"
+                            class="input-file-documento"
+                            data-requisito={req.codigo}
+                            accept="image/jpeg,image/png,application/pdf"
+                            style="display: none;"
+                          />
+                        </label>
+                        <span style="font-size: 13px; color: var(--portal-mutado);">
+                          PDF, JPG o PNG · Hasta 10 MB
                         </span>
-                      )}
-                      {req.estado === 'RECIBIDO' && (
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: #EFF6FF; color: #1D4ED8; border-radius: 9999px;">
-                          ⏳ Recibido, en revisión
-                        </span>
-                      )}
-                      {req.estado === 'VALIDADO' && (
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-verde-fondo); color: var(--portal-verde); border-radius: 9999px;">
-                          ✓ Validado
-                        </span>
-                      )}
-                      {req.estado === 'OBSERVADO' && (
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-radius: 9999px;">
-                          ⚠️ Observado
-                        </span>
-                      )}
-                      {req.estado === 'REEMPLAZO_SOLICITADO' && (
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-radius: 9999px;">
-                          ⚠️ Reemplazo solicitado
-                        </span>
-                      )}
-                    </div>
+                        <span class="estado-subida" style="font-size: 14px; font-weight: 700; color: var(--portal-azul); display: none;"></span>
+                      </div>
+                    )}
                   </div>
-
-                  <!-- Detalle o motivo con color dinámico corregido -->
-                  {vista.detalle && (
-                    <div style={`font-size: 0.8125rem; color: ${colorDetalle}; line-height: 1.4;`}>
-                      {vista.detalle}
-                    </div>
-                  )}
-
-                  <!-- Botón de acción para cargar o reemplazar -->
-                  {vista.permiteSubida && (
-                    <div style="margin-top: 0.5rem;">
-                      <label
-                        class="portal-btn portal-btn--outline btn-cargar-archivo"
-                        style="cursor: pointer; width: auto; display: inline-flex; font-size: 0.875rem; padding: 0.5rem 1rem;"
-                      >
-                        <span>{vista.textoBoton === 'Reemplazar' ? 'Subir reemplazo' : 'Cargar archivo'}</span>
-                        <input
-                          type="file"
-                          class="input-file-documento"
-                          data-requisito={req.codigo}
-                          accept="image/jpeg,image/png,application/pdf"
-                          style="display: none;"
-                        />
-                      </label>
-                      <span class="estado-subida" style="margin-left: 0.75rem; font-size: 0.8125rem; color: var(--portal-mutado); display: none;"></span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )}
