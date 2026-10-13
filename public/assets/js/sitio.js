@@ -516,9 +516,10 @@ window.iniciarSitio = function () {
     });
 
     function sugeridas() {
-      var niveles = SITUACIONES[estado.situacion].niveles;
+      var sit = SITUACIONES[estado.situacion];
+      var niveles = sit ? sit.niveles : ['Licenciatura', 'Ciclo'];
       return datos.carreras
-        .filter(function (c) { return c.a === estado.area && niveles.some(function (n) { return c.v.indexOf(n) === 0; }); })
+        .filter(function (c) { return (!estado.area || c.a === estado.area) && niveles.some(function (n) { return c.v.indexOf(n) === 0; }); })
         .sort(function (a, b) { return a.o - b.o; })
         .slice(0, MAX);
     }
@@ -604,7 +605,14 @@ window.iniciarSitio = function () {
       if (!pais) { return fallar('Por favor selecciona tu país de residencia.', f.pais); }
       if (whatsapp.replace(/\D/g, '').length < 8) { return fallar('Escribe tu WhatsApp con el código de país. Ejemplo: +593 99 123 4567', f.whatsapp); }
       if (!correoValido(correo)) { return fallar('Revisa tu correo: parece incompleto.', f.correo); }
-      if (!f.acepto.checked) { return fallar('Para enviar, marca la casilla de aceptación.', f.acepto); }
+      if (estado.situacion === null || estado.situacion === undefined || !SITUACIONES[estado.situacion]) {
+        mostrar(1);
+        return fallar('Por favor selecciona primero tu situación académica.', null);
+      }
+      if (!estado.area) {
+        mostrar(2);
+        return fallar('Por favor selecciona tu área de interés.', null);
+      }
 
       var lista = sugeridas();
       var situacionSeleccionada = SITUACIONES[estado.situacion];
