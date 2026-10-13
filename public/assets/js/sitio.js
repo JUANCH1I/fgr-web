@@ -369,6 +369,65 @@ window.iniciarSitio = function () {
   }
   function correoValido(texto) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(texto); }
 
+  var PREFIJOS_PAIS = {
+    EC: { prefijo: '+593', ejemplo: '+593 99 123 4567' },
+    CO: { prefijo: '+57', ejemplo: '+57 300 123 4567' },
+    PE: { prefijo: '+51', ejemplo: '+51 912 345 678' },
+    BO: { prefijo: '+591', ejemplo: '+591 7123 4567' },
+    AR: { prefijo: '+54', ejemplo: '+54 9 11 1234 5678' },
+    CL: { prefijo: '+56', ejemplo: '+56 9 1234 5678' },
+    MX: { prefijo: '+52', ejemplo: '+52 55 1234 5678' },
+    PY: { prefijo: '+595', ejemplo: '+595 981 123456' },
+    UY: { prefijo: '+598', ejemplo: '+598 99 123 456' },
+    PA: { prefijo: '+507', ejemplo: '+507 6123 4567' },
+    CR: { prefijo: '+506', ejemplo: '+506 8123 4567' },
+    DO: { prefijo: '+1', ejemplo: '+1 809 123 4567' },
+    ES: { prefijo: '+34', ejemplo: '+34 612 345 678' },
+    US: { prefijo: '+1', ejemplo: '+1 202 555 0123' },
+    OT: { prefijo: '+', ejemplo: '+...' }
+  };
+
+  function vincularPaisTelefono(selectPais, inputTel) {
+    if (!selectPais || !inputTel) { return; }
+    function actualizarPrefijo(soloSiVacio) {
+      var codigo = selectPais.value;
+      var info = PREFIJOS_PAIS[codigo];
+      if (!info) { return; }
+      if (info.ejemplo) {
+        inputTel.setAttribute('placeholder', info.ejemplo);
+      }
+      var valorActual = inputTel.value.trim();
+      if (!valorActual || valorActual === '+') {
+        inputTel.value = info.prefijo + ' ';
+        return;
+      }
+      if (soloSiVacio) { return; }
+
+      var matchPrefijo = valorActual.match(/^\+(\d{1,4})\s*(.*)$/);
+      if (matchPrefijo) {
+        var resto = matchPrefijo[2];
+        inputTel.value = info.prefijo + (resto ? ' ' + resto : ' ');
+      } else {
+        inputTel.value = info.prefijo + ' ' + valorActual;
+      }
+    }
+
+    selectPais.addEventListener('change', function () {
+      actualizarPrefijo(false);
+    });
+
+    inputTel.addEventListener('focus', function () {
+      if (/^\+\d{1,4}\s*$/.test(inputTel.value)) {
+        var len = inputTel.value.length;
+        inputTel.setSelectionRange(len, len);
+      }
+    });
+
+    if (selectPais.value) {
+      actualizarPrefijo(true);
+    }
+  }
+
   // ---------- Formulario de contacto ----------
   (function () {
     var form = $('[data-formulario-contacto]');
@@ -376,6 +435,9 @@ window.iniciarSitio = function () {
     var error = $('[data-error]', form);
     var exito = $('[data-exito]', form);
     var boton = $('[data-enviar]', form);
+    var selectPais = $('select[name="pais"]', form);
+    var inputTel = $('input[name="telefono"]', form);
+    vincularPaisTelefono(selectPais, inputTel);
     function fallar(texto, campo) {
       error.textContent = texto;
       error.hidden = false;
@@ -466,6 +528,9 @@ window.iniciarSitio = function () {
     var form = $('[data-formulario]', caja);
     var error = $('[data-error]', caja);
     var boton = $('[data-enviar]', caja);
+    var selectPais = $('select[name="pais"]', form);
+    var inputWa = $('input[name="whatsapp"]', form);
+    vincularPaisTelefono(selectPais, inputWa);
 
     function mostrar(paso) {
       $$('[data-paso]', caja).forEach(function (s) {
@@ -518,18 +583,37 @@ window.iniciarSitio = function () {
     function sugeridas() {
       var sit = SITUACIONES[estado.situacion];
       var niveles = sit ? sit.niveles : ['Licenciatura', 'Ciclo'];
-      return datos.carreras
+      var exactas = datos.carreras
         .filter(function (c) { return (!estado.area || c.a === estado.area) && niveles.some(function (n) { return c.v.indexOf(n) === 0; }); })
         .sort(function (a, b) { return a.o - b.o; })
         .slice(0, MAX);
+      if (exactas.length > 0) {
+        return { lista: exactas, directa: true };
+      }
+      // Fallback 1: Si no hay cruce exacto de nivel, mostrar carreras del área elegida
+      var porArea = datos.carreras
+        .filter(function (c) { return (!estado.area || c.a === estado.area); })
+        .sort(function (a, b) { return a.o - b.o; })
+        .slice(0, MAX);
+      if (porArea.length > 0) {
+        return { lista: porArea, directa: false };
+      }
+      // Fallback 2: Carreras afines al nivel en otras áreas
+      var porNivel = datos.carreras
+        .filter(function (c) { return niveles.some(function (n) { return c.v.indexOf(n) === 0; }); })
+        .sort(function (a, b) { return a.o - b.o; })
+        .slice(0, MAX);
+      return { lista: porNivel, directa: false };
     }
 
-    function resultado(carreras, nota, infoFgrec) {
+    function resultado(sugerenciasObj, nota, infoFgrec) {
+      var carreras = Array.isArray(sugerenciasObj) ? sugerenciasObj : (sugerenciasObj.lista || []);
+      var directa = Array.isArray(sugerenciasObj) ? (carreras.length > 0) : sugerenciasObj.directa;
       var lista = $('[data-resultado]', caja);
       lista.textContent = '';
-      $('[data-intro]', caja).textContent = carreras.length
-        ? 'Según lo que nos contaste, estas carreras pueden aplicar a tu caso:'
-        : 'No hay una carrera directa en esa área para tu situación. Un asesor revisa alternativas contigo.';
+      $('[data-intro]', caja).textContent = directa
+        ? 'Según lo que nos contaste, estas carreras aplican a tu perfil:'
+        : '¡Registro completado! Las opciones en esta área requieren una revisión individual de tus antecedentes académicos. Un asesor se comunicará contigo para analizar posibilidades. Puedes explorar estas carreras del área:';
       carreras.forEach(function (c) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -567,7 +651,7 @@ window.iniciarSitio = function () {
 
         if (btnAsesor) {
           var numWa = (infoFgrec.whatsapp || '593963017631').replace(/\D/g, '');
-          var textoWa = encodeURIComponent('Hola, completé el precalificador (ref. ' + infoFgrec.codigo + ')');
+          var textoWa = encodeURIComponent('Hola, completé el precalificador (ref. ' + infoFgrec.codigo + ') y quiero consultar mis opciones.');
           btnAsesor.href = 'https://wa.me/' + numWa + '?text=' + textoWa;
           btnAsesor.textContent = 'Hablar con un asesor por WhatsApp';
           btnAsesor.target = '_blank';
@@ -577,9 +661,12 @@ window.iniciarSitio = function () {
         if (tituloResultado) tituloResultado.textContent = '¡Listo! Tu caso ya fue precalificado.';
         if (ticketBox) ticketBox.hidden = true;
         if (btnAsesor) {
-          btnAsesor.href = '/contacto/';
-          btnAsesor.textContent = 'Hablar con un asesor';
-          btnAsesor.removeAttribute('target');
+          var numWaDef = '593963017631';
+          var textoWaDef = encodeURIComponent('Hola, completé la evaluación de mis estudios en la web y quiero consultar con un asesor mis opciones.');
+          btnAsesor.href = 'https://wa.me/' + numWaDef + '?text=' + textoWaDef;
+          btnAsesor.textContent = 'Hablar con un asesor por WhatsApp';
+          btnAsesor.target = '_blank';
+          btnAsesor.rel = 'noopener noreferrer';
         }
       }
 
@@ -614,7 +701,8 @@ window.iniciarSitio = function () {
         return fallar('Por favor selecciona tu área de interés.', null);
       }
 
-      var lista = sugeridas();
+      var sugerencias = sugeridas();
+      var lista = sugerencias.lista;
       var situacionSeleccionada = SITUACIONES[estado.situacion];
       var envio = {
         tipo: 'precalificador',
@@ -627,7 +715,7 @@ window.iniciarSitio = function () {
         situacion: situacionSeleccionada ? situacionSeleccionada.clave : '',
         situacionTexto: situacionSeleccionada ? situacionSeleccionada.texto : '',
         area: estado.area,
-        carrerasSugeridas: lista.map(function (c) { return c.n; }).join(' | '),
+        carrerasSugeridas: lista.map(function (c) { return c.n; }).join(' | ') + (sugerencias.directa ? '' : ' [carreras afines del área]'),
         consentimiento: {
           aceptado: true,
           version: 'proteccion-de-datos-2026-10',
@@ -646,13 +734,13 @@ window.iniciarSitio = function () {
         a.textContent = 'enviar mi consulta por correo';
         p.appendChild(a);
         p.appendChild(document.createTextNode('. La universidad confirma el ingreso después de revisar tu documentación.'));
-        resultado(lista, p, null);
+        resultado(sugerencias, p, null);
         return;
       }
       boton.disabled = true;
       boton.textContent = 'Enviando…';
       enviar(destino, envio).then(function (res) {
-        resultado(lista, notaFinal, res ? res.fgrec : null);
+        resultado(sugerencias, notaFinal, res ? res.fgrec : null);
       }).catch(function () {
         error.innerHTML = '';
         var p = document.createElement('span');
