@@ -1,0 +1,90 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  COOKIE_SESION_NOMBRE,
+  opcionesCookieSegura,
+  maxAgeDesdeIso,
+  obtenerVariableEntorno
+} from '../../lib/fgrec-portal.ts';
+
+const token = Astro.url.searchParams.get('t')?.trim();
+
+if (!token) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const contexto = extraerContextoVisitante(Astro.request);
+
+// Canjear el token en FGREC
+const respuesta = await llamarFGRECPortal({
+  metodo: 'POST',
+  rutaRelativa: 'acceso/enlace',
+  cuerpo: { token },
+  contexto
+});
+
+let errorEnlace = false;
+let statusError = respuesta.status;
+let tituloError = 'Enlace no disponible';
+let mensajeError = 'El enlace de acceso no es válido o ha vencido. Recuerda que los enlaces tienen una vigencia de 14 días.';
+
+if (!respuesta.ok || !respuesta.data) {
+  errorEnlace = true;
+  if (statusError === 404) {
+    mensajeError = 'Este enlace de acceso ha expirado o ya no está disponible. Puedes ingresar indicando tu correo o solicitar uno nuevo.';
+  } else if (statusError === 429) {
+    tituloError = 'Demasiados intentos';
+    mensajeError = 'Has realizado demasiados intentos en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.';
+  } else {
+    tituloError = 'Servicio no disponible';
+    mensajeError = 'El servicio no está disponible; intenta de nuevo en unos minutos o contáctanos por WhatsApp.';
+  }
+} else {
+  const { sesion, proposito, expira } = respuesta.data;
+
+  // Vigencia de la cookie atada a la expiración del enlace devuelta por FGREC
+  const maxAge = maxAgeDesdeIso(expira, 24 * 60 * 60);
+  Astro.cookies.set(COOKIE_SESION_NOMBRE, sesion, opcionesCookieSegura(maxAge));
+
+  if (proposito === 'precalificador') {
+    // Nivel 1 permite usar el precalificador directamente
+    return Astro.redirect('/mi-postulacion/precalificador', 302);
+  }
+
+  // Si el propósito es documentos o agenda, se requiere nivel 2.
+  // No enviamos código automáticamente: llevamos a /codigo con botón claro para solicitarlo
+  return Astro.redirect('/mi-postulacion/codigo', 302);
+}
+
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20mi%20enlace%20de%20acceso%20al%20portal%20no%20está%20disponible.`
+  : null;
+---
+
+<PortalLayout title={`${tituloError} | Portal del Postulante`}>
+  <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+      {statusError === 429 ? '⏳' : (statusError === 404 ? '⚠️' : '🔧')}
+    </div>
+    <h1 class="portal-title">{tituloError}</h1>
+    <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+      {mensajeError}
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 360px; margin: 0 auto;">
+      <a href="/mi-postulacion/ingresar" class="portal-btn portal-btn--primary">
+        Ingresar con correo o teléfono
+      </a>
+      {whatsappHref && (
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--outline">
+          Hablar con un asesor por WhatsApp
+        </a>
+      )}
+    </div>
+  </div>
+</PortalLayout>

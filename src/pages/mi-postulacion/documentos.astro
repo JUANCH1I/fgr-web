@@ -1,0 +1,476 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  COOKIE_SESION_NOMBRE,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  borrarSesionYContacto,
+  obtenerVariableEntorno
+} from '../../lib/fgrec-portal.ts';
+import { presentarEstadoDocumento, type RequisitoUI } from '../../lib/portal-pure.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+
+if (!sesionToken) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const contexto = extraerContextoVisitante(Astro.request);
+
+// 1. Obtener listado de requisitos y estado documental
+const respuestaDocs = await llamarFGRECPortal({
+  metodo: 'GET',
+  rutaRelativa: 'documentos',
+  sesion: sesionToken,
+  contexto
+});
+
+if (respuestaDocs.status === 401) {
+  borrarSesionYContacto(Astro.cookies);
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+if (respuestaDocs.status === 403) {
+  return Astro.redirect('/mi-postulacion/codigo', 302);
+}
+
+const statusError = !respuestaDocs.ok ? respuestaDocs.status : null;
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20tengo%20una%20consulta%20sobre%20la%20documentación%20de%20mi%20postulación.`
+  : null;
+
+const docsData = respuestaDocs.data || {};
+const consentimientoPendiente = Boolean(docsData.consentimientoPendiente);
+const requisitos: RequisitoUI[] = Array.isArray(docsData.requisitos) ? docsData.requisitos : [];
+
+// 2. Si el consentimiento está pendiente, traer los textos
+let textoConsentimiento: any = null;
+if (consentimientoPendiente && respuestaDocs.ok) {
+  const respCons = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'consentimientos',
+    sesion: sesionToken,
+    contexto
+  });
+  if (respCons.ok && respCons.data?.textos?.length > 0) {
+    textoConsentimiento = respCons.data.textos[0];
+  }
+}
+---
+
+<PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
+  {statusError === 429 ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem;">⏳</div>
+      <h1 class="portal-title">Demasiados intentos</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Hablar con un asesor por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : statusError !== null ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+      <h1 class="portal-title">Servicio no disponible</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        El servicio no está disponible; intenta de nuevo en unos minutos. Si necesitas enviar tus documentos con urgencia, puedes coordinar la entrega por WhatsApp.
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Contactar por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class="portal-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div>
+          <a href="/mi-postulacion" style="font-size: 0.8125rem; font-weight: 600; color: var(--portal-mutado); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem;">
+            ← Volver al inicio
+          </a>
+          <h1 class="portal-title">Documentación requerida</h1>
+        </div>
+        {whatsappHref && (
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn-sm portal-btn-sm--wa">
+            Enviar por WhatsApp
+          </a>
+        )}
+      </div>
+      <p class="portal-desc">
+        Carga los documentos solicitados para la evaluación académica de tu expediente. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
+      </p>
+
+      <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
+      <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
+
+      <!-- Bloque de consentimiento pendiente -->
+      {consentimientoPendiente && textoConsentimiento && (
+        <div id="bloqueConsentimiento" style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.25rem;">📝</span>
+            <h2 style="font-size: 1rem; font-weight: 700; color: #92400E; margin: 0;">
+              Consentimiento para tratamiento de datos y transferencia académica
+            </h2>
+          </div>
+
+          {textoConsentimiento.borrador && (
+            <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; background: #FEF3C7; color: #B45309; display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.75rem; border: 1px solid #FDE68A;">
+              Borrador institucional ({textoConsentimiento.version})
+            </div>
+          )}
+
+          <div style="font-size: 0.875rem; color: #78350F; line-height: 1.5; white-space: pre-wrap; max-height: 180px; overflow-y: auto; background: #fff; padding: 0.75rem; border-radius: 6px; border: 1px solid #FDE68A; margin-bottom: 1rem;">
+            {textoConsentimiento.texto}
+          </div>
+
+          <button
+            type="button"
+            id="btnAceptarConsentimiento"
+            data-codigo={textoConsentimiento.codigo}
+            data-version={textoConsentimiento.version}
+            class="portal-btn portal-btn--gold"
+          >
+            Acepto el consentimiento y habilitar la carga
+          </button>
+        </div>
+      )}
+
+      <!-- Listado de requisitos -->
+      <div id="listaRequisitos" style={consentimientoPendiente ? 'opacity: 0.5; pointer-events: none;' : ''}>
+        {requisitos.length === 0 ? (
+          <div style="text-align: center; padding: 2rem; color: var(--portal-mutado);">
+            No hay requisitos documentales pendientes para esta vía.
+          </div>
+        ) : (
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {requisitos.map((req) => {
+              const vista = presentarEstadoDocumento(req);
+              const colorDetalle = (req.estado === 'OBSERVADO' || req.estado === 'REEMPLAZO_SOLICITADO')
+                ? 'var(--portal-rojo)'
+                : 'var(--portal-mutado)';
+
+              return (
+                <div
+                  class="requisito-item"
+                  data-requisito={req.codigo}
+                  style="border: 1px solid var(--portal-borde); border-radius: 10px; padding: 1.25rem; background: #fff; display: flex; flex-direction: column; gap: 0.75rem;"
+                >
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.25rem 0;">
+                        {req.nombre}
+                      </h3>
+                      {req.obligatorio ? (
+                        <span style="font-size: 0.6875rem; font-weight: 700; color: var(--portal-dorado); text-transform: uppercase;">
+                          Obligatorio
+                        </span>
+                      ) : (
+                        <span style="font-size: 0.6875rem; color: var(--portal-mutado); text-transform: uppercase;">
+                          Opcional
+                        </span>
+                      )}
+                    </div>
+
+                    <!-- Badge de estado -->
+                    <div>
+                      {req.estado === 'PENDIENTE' && (
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: #F1F5F9; color: #475569; border-radius: 9999px;">
+                          ○ Pendiente
+                        </span>
+                      )}
+                      {req.estado === 'RECIBIDO' && (
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: #EFF6FF; color: #1D4ED8; border-radius: 9999px;">
+                          ⏳ Recibido, en revisión
+                        </span>
+                      )}
+                      {req.estado === 'VALIDADO' && (
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-verde-fondo); color: var(--portal-verde); border-radius: 9999px;">
+                          ✓ Validado
+                        </span>
+                      )}
+                      {req.estado === 'OBSERVADO' && (
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-radius: 9999px;">
+                          ⚠️ Observado
+                        </span>
+                      )}
+                      {req.estado === 'REEMPLAZO_SOLICITADO' && (
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-radius: 9999px;">
+                          ⚠️ Reemplazo solicitado
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <!-- Detalle o motivo con color dinámico corregido -->
+                  {vista.detalle && (
+                    <div style={`font-size: 0.8125rem; color: ${colorDetalle}; line-height: 1.4;`}>
+                      {vista.detalle}
+                    </div>
+                  )}
+
+                  <!-- Botón de acción para cargar o reemplazar -->
+                  {vista.permiteSubida && (
+                    <div style="margin-top: 0.5rem;">
+                      <label
+                        class="portal-btn portal-btn--outline btn-cargar-archivo"
+                        style="cursor: pointer; width: auto; display: inline-flex; font-size: 0.875rem; padding: 0.5rem 1rem;"
+                      >
+                        <span>{vista.textoBoton === 'Reemplazar' ? 'Subir reemplazo' : 'Cargar archivo'}</span>
+                        <input
+                          type="file"
+                          class="input-file-documento"
+                          data-requisito={req.codigo}
+                          accept="image/jpeg,image/png,application/pdf"
+                          style="display: none;"
+                        />
+                      </label>
+                      <span class="estado-subida" style="margin-left: 0.75rem; font-size: 0.8125rem; color: var(--portal-mutado); display: none;"></span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+
+  <div class="portal-card" style="font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
+    <p style="margin: 0 0 0.5rem 0;">
+      <strong>¿Problemas al tomar la foto o con el formato?</strong>
+    </p>
+    <p style="margin: 0;">
+      Asegúrate de que la foto tenga buena luz, sin reflejos y con los bordes del documento visibles.
+      Si estás en un iPhone, las imágenes HEIC se convierten a formato compatible. En caso de interrupciones,
+      también puedes coordinar la entrega con tu asesora mediante el WhatsApp oficial de la Fundación.
+    </p>
+  </div>
+</PortalLayout>
+
+<script>
+  import { validarArchivoCliente, mensajeErrorSubida } from '../../lib/portal-pure.ts';
+
+  const alertaError = document.getElementById('alertaError') as HTMLDivElement | null;
+  const alertaExito = document.getElementById('alertaExito') as HTMLDivElement | null;
+  const btnAceptarConsentimiento = document.getElementById('btnAceptarConsentimiento') as HTMLButtonElement | null;
+  const listaRequisitos = document.getElementById('listaRequisitos') as HTMLDivElement | null;
+  const bloqueConsentimiento = document.getElementById('bloqueConsentimiento') as HTMLDivElement | null;
+
+  function mostrarError(msg: string) {
+    if (alertaExito) alertaExito.style.display = 'none';
+    if (!alertaError) return;
+    alertaError.textContent = msg;
+    alertaError.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function mostrarExito(msg: string) {
+    if (alertaError) alertaError.style.display = 'none';
+    if (!alertaExito) return;
+    alertaExito.textContent = msg;
+    alertaExito.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  btnAceptarConsentimiento?.addEventListener('click', async () => {
+    const codigo = btnAceptarConsentimiento.getAttribute('data-codigo');
+    const version = btnAceptarConsentimiento.getAttribute('data-version');
+    btnAceptarConsentimiento.disabled = true;
+    btnAceptarConsentimiento.textContent = 'Registrando aceptación...';
+
+    try {
+      const res = await fetch('/api/portal/consentimiento', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FGREC-Portal': '1'
+        },
+        body: JSON.stringify({ codigo, version })
+      });
+
+      if (res.status === 401) {
+        window.location.href = '/mi-postulacion/ingresar';
+        return;
+      }
+
+      if (res.ok) {
+        mostrarExito('Consentimiento registrado con éxito. Ya puedes cargar tus documentos.');
+        if (bloqueConsentimiento) bloqueConsentimiento.style.display = 'none';
+        if (listaRequisitos) {
+          listaRequisitos.style.opacity = '1';
+          listaRequisitos.style.pointerEvents = 'auto';
+        }
+      } else {
+        const data = await res.json();
+        mostrarError(data.message || 'No se pudo registrar el consentimiento.');
+        btnAceptarConsentimiento.disabled = false;
+        btnAceptarConsentimiento.textContent = 'Acepto el consentimiento y habilitar la carga';
+      }
+    } catch {
+      mostrarError('Error de conexión al registrar consentimiento.');
+      btnAceptarConsentimiento.disabled = false;
+    }
+  });
+
+  async function convertirHeicAJpeg(file: File): Promise<File | null> {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            URL.revokeObjectURL(url);
+            resolve(null);
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((blob) => {
+            URL.revokeObjectURL(url);
+            if (!blob) {
+              resolve(null);
+              return;
+            }
+            const nuevoNombre = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
+            const nuevoFile = new File([blob], nuevoNombre, { type: 'image/jpeg' });
+            resolve(nuevoFile);
+          }, 'image/jpeg', 0.9);
+        } catch {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(null);
+      };
+      img.src = url;
+    });
+  }
+
+  const inputsFile = document.querySelectorAll('.input-file-documento');
+  inputsFile.forEach((inputEl) => {
+    inputEl.addEventListener('change', async (e) => {
+      const target = e.target as HTMLInputElement;
+      const fileList = target.files;
+      if (!fileList || fileList.length === 0) return;
+
+      let file = fileList[0];
+      const requisito = target.getAttribute('data-requisito');
+      const contenedor = target.closest('.requisito-item');
+      const estadoSpan = contenedor?.querySelector('.estado-subida') as HTMLElement | null;
+
+      function setEstado(texto: string, cargando: boolean = false) {
+        if (!estadoSpan) return;
+        estadoSpan.textContent = texto;
+        estadoSpan.style.display = 'inline';
+        if (cargando) {
+          estadoSpan.style.color = 'var(--portal-azul)';
+        }
+      }
+
+      // 1. Validar en cliente
+      const validacion = validarArchivoCliente(file);
+      if (!validacion.valido) {
+        if (validacion.esHeic) {
+          setEstado('Convirtiendo foto a JPEG...', true);
+          const convertido = await convertirHeicAJpeg(file);
+          if (convertido) {
+            file = convertido;
+          } else {
+            mostrarError('Tu teléfono tomó la foto en formato HEIC y no fue posible convertirla automáticamente. Por favor toma una foto en formato JPG o selecciona otro archivo.');
+            setEstado('', false);
+            target.value = '';
+            return;
+          }
+        } else {
+          mostrarError(validacion.error || 'Archivo no válido.');
+          setEstado('', false);
+          target.value = '';
+          return;
+        }
+      }
+
+      setEstado('Autorizando carga...', true);
+
+      try {
+        // 2. Pedir token de subida de un solo uso
+        const authRes = await fetch('/api/portal/subida-autorizar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-FGREC-Portal': '1'
+          },
+          body: JSON.stringify({
+            requisito,
+            nombreArchivo: file.name,
+            tipo: validacion.tipoMime || file.type,
+            tamano: file.size
+          })
+        });
+
+        if (authRes.status === 401) {
+          window.location.href = '/mi-postulacion/ingresar';
+          return;
+        }
+
+        const authData = await authRes.json();
+        if (!authRes.ok || !authData.token || !authData.url) {
+          mostrarError(authData.message || 'No fue posible autorizar la subida del documento.');
+          setEstado('Error de autorización', false);
+          target.value = '';
+          return;
+        }
+
+        setEstado('Subiendo archivo a FGREC...', true);
+
+        // 3. Subir archivo crudo directo a FGREC con el token
+        // Browser calcula Content-Length automáticamente
+        const uploadRes = await fetch(authData.url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authData.token}`,
+            'Content-Type': authData.tipo
+          },
+          body: file
+        });
+
+        if (uploadRes.status === 202) {
+          setEstado('✓ Documento recibido', false);
+          mostrarExito(`¡${file.name} recibido con éxito! El documento está en revisión preliminar.`);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1200);
+        } else {
+          let errData: any = {};
+          try {
+            errData = await uploadRes.json();
+          } catch {}
+          const errorMsg = mensajeErrorSubida(uploadRes.status, errData.code, errData.message);
+          mostrarError(errorMsg);
+          setEstado('Rechazado', false);
+          target.value = '';
+        }
+      } catch (err: any) {
+        mostrarError('Error de red durante la carga del archivo. Vuelve a seleccionar el archivo para intentar de nuevo.');
+        setEstado('Error de subida', false);
+        target.value = '';
+      }
+    });
+  });
+</script>

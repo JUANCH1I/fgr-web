@@ -1,0 +1,58 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import { COOKIE_SESION_NOMBRE } from '../../lib/fgrec-portal.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+
+if (!sesionToken) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+---
+
+<PortalLayout title="Cerrar sesión | Portal del Postulante" autenticado={true}>
+  <div class="portal-card" style="text-align: center; padding: 2.5rem 1.5rem;">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔒</div>
+    <h1 class="portal-title">¿Deseas cerrar tu sesión?</h1>
+    <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.75rem auto;">
+      Al salir se cerrará tu acceso activo en este dispositivo. Para volver a ingresar, podrás solicitar un nuevo código de verificación con tus datos registrados.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 320px; margin: 0 auto;">
+      <button
+        type="button"
+        id="btnConfirmarSalir"
+        class="portal-btn portal-btn--primary"
+      >
+        Cerrar sesión
+      </button>
+
+      <a
+        href="/mi-postulacion"
+        class="portal-btn portal-btn--outline"
+        style="text-decoration: none;"
+      >
+        Volver a mi postulación
+      </a>
+    </div>
+  </div>
+</PortalLayout>
+
+<script>
+  const btn = document.getElementById('btnConfirmarSalir');
+  btn?.addEventListener('click', async () => {
+    btn.setAttribute('disabled', 'true');
+    btn.textContent = 'Cerrando sesión...';
+    try {
+      await fetch('/api/portal/salir', {
+        method: 'POST',
+        headers: {
+          'X-FGREC-Portal': '1'
+        }
+      });
+    } finally {
+      window.location.href = '/mi-postulacion/ingresar';
+    }
+  });
+</script>

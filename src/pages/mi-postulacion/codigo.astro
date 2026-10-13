@@ -1,0 +1,244 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  COOKIE_SESION_NOMBRE,
+  COOKIE_CONTACTO_NOMBRE,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  borrarSesionYContacto
+} from '../../lib/fgrec-portal.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+const contactoPendiente = Astro.cookies.get(COOKIE_CONTACTO_NOMBRE)?.value;
+
+if (!sesionToken && !contactoPendiente) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+let infoDestino = 'tu correo electrónico registrado';
+let nombrePila = '';
+
+if (sesionToken) {
+  const contexto = extraerContextoVisitante(Astro.request);
+  const resp = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'precalificador/contexto',
+    sesion: sesionToken,
+    contexto
+  });
+
+  if (resp.status === 401) {
+    borrarSesionYContacto(Astro.cookies);
+    return Astro.redirect('/mi-postulacion/ingresar', 302);
+  }
+
+  if (resp.ok && resp.data) {
+    if (resp.data.nombre) nombrePila = resp.data.nombre;
+  }
+} else if (contactoPendiente) {
+  infoDestino = contactoPendiente;
+}
+---
+
+<PortalLayout title="Verificar código | Portal del Postulante">
+  <div class="portal-card" style="max-width: 480px; margin: 0 auto;">
+    <h1 class="portal-title">
+      {nombrePila ? `Hola, ${nombrePila}` : 'Código de verificación'}
+    </h1>
+    <p class="portal-desc">
+      Para acceder a tu postulación y documentos, ingresa el código de 6 dígitos enviado a {infoDestino}.
+    </p>
+
+    <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
+    <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
+
+    <form id="formCodigo">
+      <div class="portal-input-group" style="text-align: center;">
+        <input
+          type="text"
+          id="codigoInput"
+          name="codigo"
+          class="portal-input"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          placeholder="••••••"
+          autocomplete="one-time-code"
+          style="font-size: 2rem; letter-spacing: 0.35em; text-align: center; font-weight: 700; height: 3.5rem;"
+          required
+          autofocus
+        />
+        <span id="intentosTexto" style="display: block; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
+          Tienes hasta 5 intentos antes de que el código expire.
+        </span>
+      </div>
+
+      <button type="submit" id="btnVerificar" class="portal-btn portal-btn--primary">
+        Verificar código
+      </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--portal-borde); padding-top: 1.25rem;">
+      <p style="font-size: 0.875rem; color: var(--portal-mutado); margin-bottom: 0.75rem;">
+        ¿Aún no lo tienes o venció el código anterior?
+      </p>
+      <button
+        type="button"
+        id="btnReenviar"
+        class="portal-btn portal-btn--outline"
+        style="width: auto; padding: 0.625rem 1.25rem; font-size: 0.875rem;"
+      >
+        Enviar código
+      </button>
+      <div id="temporizadorReenvio" style="display: none; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
+        Podrás solicitar un nuevo código en <span id="segundosRestantes">60</span> s.
+      </div>
+    </div>
+  </div>
+</PortalLayout>
+
+<script>
+  const form = document.getElementById('formCodigo') as HTMLFormElement | null;
+  const codigoInput = document.getElementById('codigoInput') as HTMLInputElement | null;
+  const btnVerificar = document.getElementById('btnVerificar') as HTMLButtonElement | null;
+  const btnReenviar = document.getElementById('btnReenviar') as HTMLButtonElement | null;
+  const alertaError = document.getElementById('alertaError') as HTMLDivElement | null;
+  const alertaExito = document.getElementById('alertaExito') as HTMLDivElement | null;
+  const intentosTexto = document.getElementById('intentosTexto') as HTMLElement | null;
+  const temporizadorReenvio = document.getElementById('temporizadorReenvio') as HTMLDivElement | null;
+  const segundosRestantes = document.getElementById('segundosRestantes') as HTMLElement | null;
+
+  function mostrarError(msg: string) {
+    if (alertaExito) alertaExito.style.display = 'none';
+    if (!alertaError) return;
+    alertaError.textContent = msg;
+    alertaError.style.display = 'block';
+  }
+
+  function mostrarExito(msg: string) {
+    if (alertaError) alertaError.style.display = 'none';
+    if (!alertaExito) return;
+    alertaExito.textContent = msg;
+    alertaExito.style.display = 'block';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (alertaError) alertaError.style.display = 'none';
+
+    const codigo = (codigoInput?.value || '').replace(/\D/g, '');
+    if (codigo.length !== 6) {
+      mostrarError('Por favor ingresa los 6 dígitos del código.');
+      return;
+    }
+
+    if (btnVerificar) {
+      btnVerificar.disabled = true;
+      btnVerificar.textContent = 'Verificando...';
+    }
+
+    try {
+      const res = await fetch('/api/portal/verificar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FGREC-Portal': '1'
+        },
+        body: JSON.stringify({ codigo })
+      });
+
+      if (res.status === 401) {
+        window.location.href = '/mi-postulacion/ingresar';
+        return;
+      }
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        mostrarExito('¡Código verificado con éxito! Redirigiendo...');
+        setTimeout(() => {
+          if (data.siguiente === 'documentos') {
+            window.location.href = '/mi-postulacion/documentos';
+          } else if (data.siguiente === 'precalificador') {
+            window.location.href = '/mi-postulacion/precalificador';
+          } else {
+            window.location.href = '/mi-postulacion';
+          }
+        }, 200);
+      } else {
+        if (data.intentosRestantes !== undefined && intentosTexto) {
+          intentosTexto.textContent = `Intentos restantes: ${data.intentosRestantes}`;
+          intentosTexto.style.color = 'var(--portal-rojo)';
+        }
+        mostrarError(data.message || 'Código incorrecto o vencido.');
+        if (btnVerificar) {
+          btnVerificar.disabled = false;
+          btnVerificar.textContent = 'Verificar código';
+        }
+      }
+    } catch {
+      mostrarError('Error de comunicación. Intenta nuevamente.');
+      if (btnVerificar) {
+        btnVerificar.disabled = false;
+        btnVerificar.textContent = 'Verificar código';
+      }
+    }
+  });
+
+  // Temporizador de reenvío
+  let timer: any = null;
+  function iniciarCuentaRegresiva(segundos: number) {
+    if (!btnReenviar || !temporizadorReenvio || !segundosRestantes) return;
+    btnReenviar.disabled = true;
+    temporizadorReenvio.style.display = 'block';
+    let restante = segundos;
+    segundosRestantes.textContent = String(restante);
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+      restante -= 1;
+      if (restante <= 0) {
+        clearInterval(timer);
+        btnReenviar.disabled = false;
+        temporizadorReenvio.style.display = 'none';
+      } else {
+        segundosRestantes.textContent = String(restante);
+      }
+    }, 1000);
+  }
+
+  btnReenviar?.addEventListener('click', async () => {
+    mostrarExito('Solicitando código...');
+    btnReenviar.disabled = true;
+
+    try {
+      const res = await fetch('/api/portal/codigo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FGREC-Portal': '1'
+        },
+        body: JSON.stringify({})
+      });
+
+      if (res.status === 401) {
+        window.location.href = '/mi-postulacion/ingresar';
+        return;
+      }
+
+      const data = await res.json();
+      if (res.status === 202 || res.ok) {
+        mostrarExito('Te enviamos un código de verificación. Revisa tu bandeja de entrada o spam.');
+        iniciarCuentaRegresiva(data.reenviarEn || 60);
+      } else {
+        mostrarError(data.message || 'No fue posible enviar el código en este momento.');
+        btnReenviar.disabled = false;
+      }
+    } catch {
+      mostrarError('Error al contactar al servidor.');
+      btnReenviar.disabled = false;
+    }
+  });
+</script>

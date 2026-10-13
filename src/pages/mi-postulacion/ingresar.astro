@@ -1,0 +1,106 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+---
+
+<PortalLayout title="Ingresar | Portal del Postulante">
+  <div class="portal-card">
+    <h1 class="portal-title">Ingreso al Portal</h1>
+    <p class="portal-desc">
+      Si ya iniciaste tu postulación con FGREC, escribe tu correo electrónico registrado o tu número de teléfono celular con código de país.
+    </p>
+
+    <div id="mensajeAlerta" class="portal-alert portal-alert--error" style="display: none;"></div>
+
+    <form id="formIngresar">
+      <div class="portal-input-group">
+        <label for="contactoInput" class="portal-label">Correo electrónico o celular con código de país</label>
+        <input
+          type="text"
+          id="contactoInput"
+          name="contacto"
+          class="portal-input"
+          placeholder="ejemplo@correo.com o +593991234567"
+          autocomplete="email"
+          required
+        />
+        <span style="display: block; font-size: 0.75rem; color: var(--portal-mutado); margin-top: 0.35rem;">
+          Si indicas un número de teléfono, asegúrate de incluir el signo + seguido del código de tu país.
+        </span>
+      </div>
+
+      <div style="margin-bottom: 1.25rem; font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
+        Por tu seguridad, si los datos coinciden con una postulación activa, te enviaremos un código temporal de verificación de 6 dígitos a tu correo electrónico registrado.
+      </div>
+
+      <button type="submit" id="btnEnviar" class="portal-btn portal-btn--primary">
+        Enviar código de acceso
+      </button>
+    </form>
+  </div>
+</PortalLayout>
+
+<script>
+  const form = document.getElementById('formIngresar') as HTMLFormElement | null;
+  const contactoInput = document.getElementById('contactoInput') as HTMLInputElement | null;
+  const btnEnviar = document.getElementById('btnEnviar') as HTMLButtonElement | null;
+  const alerta = document.getElementById('mensajeAlerta') as HTMLDivElement | null;
+
+  function mostrarError(msg: string) {
+    if (!alerta) return;
+    alerta.textContent = msg;
+    alerta.style.display = 'block';
+  }
+
+  function ocultarError() {
+    if (!alerta) return;
+    alerta.style.display = 'none';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    ocultarError();
+
+    const contacto = contactoInput?.value.trim() || '';
+    if (!contacto) {
+      mostrarError('Por favor ingresa tu correo o número telefónico.');
+      return;
+    }
+
+    if (btnEnviar) {
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = 'Enviando...';
+    }
+
+    try {
+      const res = await fetch('/api/portal/codigo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FGREC-Portal': '1'
+        },
+        body: JSON.stringify({ contacto })
+      });
+
+      const data = await res.json();
+
+      if (res.status === 202 || res.ok) {
+        // Redirigir a la pantalla de verificación del código
+        window.location.href = '/mi-postulacion/codigo';
+      } else {
+        mostrarError(data.message || 'No fue posible procesar la solicitud. Intenta de nuevo.');
+        if (btnEnviar) {
+          btnEnviar.disabled = false;
+          btnEnviar.textContent = 'Enviar código de acceso';
+        }
+      }
+    } catch {
+      mostrarError('Ocurrió un problema de conexión. Intenta de nuevo en unos momentos.');
+      if (btnEnviar) {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = 'Enviar código de acceso';
+      }
+    }
+  });
+</script>

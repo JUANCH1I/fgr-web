@@ -1,0 +1,304 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  COOKIE_SESION_NOMBRE,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  borrarSesionYContacto,
+  obtenerVariableEntorno
+} from '../../lib/fgrec-portal.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+
+if (!sesionToken) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const contexto = extraerContextoVisitante(Astro.request);
+
+const respuesta = await llamarFGRECPortal({
+  metodo: 'GET',
+  rutaRelativa: 'precalificador/contexto',
+  sesion: sesionToken,
+  contexto
+});
+
+if (respuesta.status === 401) {
+  borrarSesionYContacto(Astro.cookies);
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const statusError = !respuesta.ok ? respuesta.status : null;
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20tengo%20un%20inconveniente%20con%20el%20precalificador%20del%20portal.`
+  : null;
+
+const data = respuesta.data || {};
+const nombre = data.nombre || '';
+const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
+---
+
+<PortalLayout title="Precalificador | Portal del Postulante" autenticado={true}>
+  {statusError === 429 ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem;">⏳</div>
+      <h1 class="portal-title">Demasiados intentos</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Hablar con un asesor por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : statusError !== null ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+      <h1 class="portal-title">Servicio no disponible</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        El servicio no está disponible; intenta de nuevo en unos minutos. Si deseas avanzar, puedes contactar a tu asesora.
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Contactar por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class="portal-card">
+      <div style="margin-bottom: 1.25rem;">
+        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--portal-dorado); letter-spacing: 0.05em;">
+          Orientación académica
+        </span>
+        <h1 class="portal-title" style="margin-top: 0.25rem;">
+          {nombre ? `Hola, ${nombre}` : 'Precalificador de admisiones'}
+        </h1>
+        <p class="portal-desc">
+          Completa las siguientes preguntas breves para evaluar los antecedentes académicos y orientar la vía de admisión que corresponde a tu perfil.
+        </p>
+      </div>
+
+      <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
+
+      <div id="seccionFormulario">
+        <form id="formPrecalificador">
+          {faltan.includes('situacion') && (
+            <div class="portal-input-group">
+              <label for="inputSituacion" class="portal-label">¿Cuál es tu situación académica actual?</label>
+              <select id="inputSituacion" name="situacion" class="portal-select" required>
+                <option value="">Selecciona una opción...</option>
+                <option value="ESTUDIANTE_SECUNDARIA">Estudiante en último año de secundaria / bachillerato</option>
+                <option value="GRADUADO_SECUNDARIA">Graduado de secundaria / bachiller</option>
+                <option value="ESTUDIOS_SUPERIORES">Con estudios superiores o universitarios previos</option>
+              </select>
+            </div>
+          )}
+
+          {faltan.includes('bachillerato') && (
+            <div class="portal-input-group">
+              <label for="inputBachillerato" class="portal-label">¿Completaste el bachillerato o educación secundaria?</label>
+              <select id="inputBachillerato" name="bachillerato" class="portal-select" required>
+                <option value="">Selecciona una opción...</option>
+                <option value="SI">Sí, ya tengo mi título de bachiller / secundaria completa</option>
+                <option value="EN_CURSO">Estoy cursando el último año</option>
+                <option value="NO">No finalizado</option>
+              </select>
+            </div>
+          )}
+
+          {faltan.includes('estudiosPrevios') && (
+            <div class="portal-input-group">
+              <label class="portal-label">¿Iniciaste o realizaste estudios superiores (universitarios o técnicos) con anterioridad?</label>
+              <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                  <input type="radio" name="estudiosPrevios" value="true" required /> Sí
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                  <input type="radio" name="estudiosPrevios" value="false" required /> No
+                </label>
+              </div>
+            </div>
+          )}
+
+          <div id="bloqueEstudiosPrevios" style="display: none; padding-left: 0.75rem; border-left: 3px solid var(--portal-dorado); margin-bottom: 1.25rem;">
+            {faltan.includes('carreraPrevia') && (
+              <div class="portal-input-group">
+                <label for="inputCarreraPrevia" class="portal-label">Carrera o programa cursado previamente</label>
+                <input
+                  type="text"
+                  id="inputCarreraPrevia"
+                  name="carreraPrevia"
+                  class="portal-input"
+                  placeholder="Ej. Licenciatura en Enfermería, Tecnicatura, etc."
+                />
+              </div>
+            )}
+
+            {faltan.includes('finalizada') && (
+              <div class="portal-input-group">
+                <label class="portal-label">¿Te graduaste o finalizaste esa carrera previa?</label>
+                <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                  <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                    <input type="radio" name="finalizada" value="true" /> Sí, finalizada
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                    <input type="radio" name="finalizada" value="false" /> Incompleta / en curso
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {faltan.includes('duracionAnios') && (
+              <div class="portal-input-group">
+                <label for="inputDuracionAnios" class="portal-label">Duración oficial de los estudios previos (en años)</label>
+                <select id="inputDuracionAnios" name="duracionAnios" class="portal-select">
+                  <option value="">Selecciona...</option>
+                  <option value="1">1 año</option>
+                  <option value="2">2 años</option>
+                  <option value="3">3 años (tecnicatura / título intermedio)</option>
+                  <option value="4">4 años</option>
+                  <option value="5">5 o más años</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          {faltan.includes('areaInteres') && (
+            <div class="portal-input-group">
+              <label for="inputAreaInteres" class="portal-label">Carrera o área de interés en UGR</label>
+              <input
+                type="text"
+                id="inputAreaInteres"
+                name="areaInteres"
+                class="portal-input"
+                placeholder="Ej. Kinesiología, Psicopedagogía, Gestión Educativa..."
+              />
+            </div>
+          )}
+
+          <button type="submit" id="btnEnviarPrecalificador" class="portal-btn portal-btn--primary">
+            Enviar respuestas
+          </button>
+        </form>
+      </div>
+
+      <div id="seccionResultado" style="display: none; text-align: center; padding-top: 1rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎓</div>
+        <h2 id="resTitulo" class="portal-title"></h2>
+        <p id="resMensaje" style="font-size: 1rem; line-height: 1.5; color: var(--portal-texto); margin-bottom: 1rem;"></p>
+        
+        <div style="background: var(--portal-fondo); border: 1px solid var(--portal-borde); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; text-align: left; font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
+          <span style="font-weight: 700; color: var(--portal-azul); display: block; margin-bottom: 0.25rem;">Aviso institucional:</span>
+          <span id="resAdvertencia"></span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 320px; margin: 0 auto;">
+          <a href="/mi-postulacion" class="portal-btn portal-btn--primary">
+            Continuar a mi postulación
+          </a>
+        </div>
+      </div>
+    </div>
+  )}
+</PortalLayout>
+
+<script>
+  import { mensajeResultadoPrecalificador } from '../../lib/portal-pure.ts';
+
+  const form = document.getElementById('formPrecalificador') as HTMLFormElement | null;
+  const btnEnviar = document.getElementById('btnEnviarPrecalificador') as HTMLButtonElement | null;
+  const alertaError = document.getElementById('alertaError') as HTMLDivElement | null;
+  const seccionFormulario = document.getElementById('seccionFormulario') as HTMLDivElement | null;
+  const seccionResultado = document.getElementById('seccionResultado') as HTMLDivElement | null;
+  const resTitulo = document.getElementById('resTitulo') as HTMLElement | null;
+  const resMensaje = document.getElementById('resMensaje') as HTMLElement | null;
+  const resAdvertencia = document.getElementById('resAdvertencia') as HTMLElement | null;
+  const bloqueEstudiosPrevios = document.getElementById('bloqueEstudiosPrevios') as HTMLDivElement | null;
+
+  const radiosEstudios = document.querySelectorAll('input[name="estudiosPrevios"]');
+  radiosEstudios.forEach((radio) => {
+    radio.addEventListener('change', (e) => {
+      const val = (e.target as HTMLInputElement).value;
+      if (bloqueEstudiosPrevios) {
+        bloqueEstudiosPrevios.style.display = val === 'true' ? 'block' : 'none';
+      }
+    });
+  });
+
+  function mostrarError(msg: string) {
+    if (!alertaError) return;
+    alertaError.textContent = msg;
+    alertaError.style.display = 'block';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (alertaError) alertaError.style.display = 'none';
+
+    const formData = new FormData(form);
+    const precalificacion: Record<string, any> = {};
+
+    formData.forEach((value, key) => {
+      if (key === 'estudiosPrevios' || key === 'finalizada') {
+        precalificacion[key] = value === 'true';
+      } else if (key === 'duracionAnios') {
+        precalificacion[key] = value ? Number(value) : null;
+      } else {
+        precalificacion[key] = value;
+      }
+    });
+
+    if (btnEnviar) {
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = 'Enviando...';
+    }
+
+    try {
+      const res = await fetch('/api/portal/precalificador', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FGREC-Portal': '1'
+        },
+        body: JSON.stringify({ precalificacion })
+      });
+
+      if (res.status === 401) {
+        window.location.href = '/mi-postulacion/ingresar';
+        return;
+      }
+
+      const data = await res.json();
+
+      if (res.ok && data.via) {
+        const msj = mensajeResultadoPrecalificador(data.via, null);
+        if (resTitulo) resTitulo.textContent = msj.titulo;
+        if (resMensaje) resMensaje.textContent = msj.mensaje;
+        if (resAdvertencia) resAdvertencia.textContent = msj.advertencia;
+
+        if (seccionFormulario) seccionFormulario.style.display = 'none';
+        if (seccionResultado) seccionResultado.style.display = 'block';
+      } else {
+        mostrarError(data.message || 'Error al procesar las respuestas.');
+        if (btnEnviar) {
+          btnEnviar.disabled = false;
+          btnEnviar.textContent = 'Enviar respuestas';
+        }
+      }
+    } catch {
+      mostrarError('Ocurrió un error al enviar el formulario. Intenta nuevamente.');
+      if (btnEnviar) {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = 'Enviar respuestas';
+      }
+    }
+  });
+</script>
