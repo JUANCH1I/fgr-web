@@ -7,14 +7,17 @@ export default defineConfig({
   site: 'https://www.fgrec.org',
   output: 'static',
   adapter: vercel({
-    webAnalytics: { enabled: true }
+    webAnalytics: { enabled: false }
   }),
+  devToolbar: {
+    enabled: false
+  },
   build: {
     format: 'directory'
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404')
+      filter: (page) => !page.includes('/404') && !page.includes('/mi-postulacion')
     })
   ]
 });

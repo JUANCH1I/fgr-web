@@ -1,0 +1,395 @@
+---
+// Layout exclusivo para el Portal del Postulante (/mi-postulacion)
+// Aislado del sitio de marketing: CERO scripts de terceros, CERO analítica ni píxeles, CSP estricta y noindex.
+
+import { obtenerVariableEntorno } from '../lib/fgrec-portal.ts';
+
+interface Props {
+  title?: string;
+  autenticado?: boolean;
+}
+
+const {
+  title = 'Portal del Postulante | Fundación Gran Rosario',
+  autenticado = false
+} = Astro.props;
+
+// WhatsApp institucional configurado por variable de entorno
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20tengo%20una%20consulta%20sobre%20mi%20postulación.`
+  : null;
+
+// CSP: Origen de subida autorizado para permitir en connect-src (además de 'self')
+const uploadOrigin = obtenerVariableEntorno('FGREC_UPLOAD_ORIGIN');
+
+// CSP estricta para el portal
+const csp = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://static.wixstatic.com",
+  "font-src 'self' data:",
+  `connect-src 'self' ${uploadOrigin}`,
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'"
+].join('; ');
+
+Astro.response.headers.set('Content-Security-Policy', csp);
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="stylesheet" href="/assets/css/sitio.css" />
+
+  <style is:global>
+    :root {
+      --portal-azul: #0B2545;
+      --portal-azul-profundo: #071930;
+      --portal-dorado: #C5A059;
+      --portal-dorado-hover: #b08d48;
+      --portal-fondo: #F6F8FB;
+      --portal-blanco: #FFFFFF;
+      --portal-texto: #1E293B;
+      --portal-mutado: #64748B;
+      --portal-borde: #E2E8F0;
+      --portal-verde: #166534;
+      --portal-verde-fondo: #DCFCE7;
+      --portal-rojo: #991B1B;
+      --portal-rojo-fondo: #FEE2E2;
+      --portal-ambar: #92400E;
+      --portal-ambar-fondo: #FEF3C7;
+    }
+
+    body.portal-body {
+      background-color: var(--portal-fondo);
+      color: var(--portal-texto);
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .portal-header {
+      background: var(--portal-azul-profundo);
+      color: #fff;
+      border-bottom: 2px solid var(--portal-dorado);
+      padding: 0.875rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .portal-header__inner {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .portal-logo-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .portal-logo-link img {
+      height: 34px;
+      width: auto;
+    }
+
+    .portal-logo-link .portal-subtitulo {
+      font-size: 0.8125rem;
+      color: #cbd5e1;
+      display: block;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .portal-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .portal-btn-sm {
+      font-size: 0.8125rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .portal-btn-sm--ghost {
+      background: transparent;
+      color: #e2e8f0;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .portal-btn-sm--ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .portal-btn-sm--wa {
+      background: #25D366;
+      color: #071930;
+    }
+    .portal-btn-sm--wa:hover {
+      background: #20bd5a;
+    }
+
+    .portal-container {
+      max-width: 640px;
+      width: 100%;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+      flex: 1;
+      box-sizing: border-box;
+    }
+
+    .portal-card {
+      background: var(--portal-blanco);
+      border: 1px solid var(--portal-borde);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.25rem;
+    }
+
+    .portal-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--portal-azul);
+      margin: 0 0 0.5rem 0;
+      line-height: 1.3;
+    }
+
+    .portal-desc {
+      font-size: 0.9375rem;
+      color: var(--portal-mutado);
+      margin: 0 0 1.25rem 0;
+      line-height: 1.5;
+    }
+
+    .portal-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.875rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.05s ease;
+      box-sizing: border-box;
+    }
+
+    .portal-btn:active {
+      transform: scale(0.99);
+    }
+
+    .portal-btn--primary {
+      background: var(--portal-azul);
+      color: #fff;
+    }
+    .portal-btn--primary:hover {
+      background: var(--portal-azul-profundo);
+    }
+
+    .portal-btn--gold {
+      background: var(--portal-dorado);
+      color: #071930;
+    }
+    .portal-btn--gold:hover {
+      background: var(--portal-dorado-hover);
+    }
+
+    .portal-btn--outline {
+      background: transparent;
+      color: var(--portal-azul);
+      border: 1px solid var(--portal-borde);
+    }
+    .portal-btn--outline:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .portal-btn--wa-full {
+      background: #25D366;
+      color: #071930;
+    }
+    .portal-btn--wa-full:hover {
+      background: #20bd5a;
+    }
+
+    .portal-input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .portal-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.375rem;
+      color: var(--portal-texto);
+    }
+
+    .portal-input, .portal-select {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font-size: 1rem;
+      border: 1px solid var(--portal-borde);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--portal-texto);
+      box-sizing: border-box;
+    }
+    .portal-input:focus, .portal-select:focus {
+      outline: none;
+      border-color: var(--portal-azul);
+      box-shadow: 0 0 0 3px rgba(11, 37, 69, 0.15);
+    }
+
+    .portal-alert {
+      padding: 0.875rem 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      line-height: 1.45;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+    }
+    .portal-alert--error {
+      background: var(--portal-rojo-fondo);
+      color: var(--portal-rojo);
+      border: 1px solid #fca5a5;
+    }
+    .portal-alert--info {
+      background: var(--portal-ambar-fondo);
+      color: var(--portal-ambar);
+      border: 1px solid #fde68a;
+    }
+    .portal-alert--success {
+      background: var(--portal-verde-fondo);
+      color: var(--portal-verde);
+      border: 1px solid #86efac;
+    }
+
+    .portal-footer {
+      background: #fff;
+      border-top: 1px solid var(--portal-borde);
+      padding: 1.25rem 1rem;
+      font-size: 0.75rem;
+      color: var(--portal-mutado);
+      text-align: center;
+      margin-top: auto;
+    }
+
+    .portal-footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 0.35rem;
+    }
+    .portal-footer-links a {
+      color: var(--portal-mutado);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="portal-body">
+  <header class="portal-header">
+    <div class="portal-header__inner">
+      <a href="/mi-postulacion" class="portal-logo-link">
+        <img src="/favicon.svg" alt="FGREC" width="34" height="34" />
+        <div>
+          <span style="font-weight: 700; font-size: 0.9375rem; display: block; line-height: 1.2;">FGREC</span>
+          <span class="portal-subtitulo">Portal del Postulante</span>
+        </div>
+      </a>
+
+      <div class="portal-header-actions">
+        {whatsappHref && (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="portal-btn-sm portal-btn-sm--wa"
+            title="Hablar con un asesor"
+          >
+            <span>WhatsApp</span>
+          </a>
+        )}
+        {autenticado && (
+          <button type="button" id="btnSalirPortal" class="portal-btn-sm portal-btn-sm--ghost" style="cursor: pointer; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);">
+            Salir
+          </button>
+        )}
+      </div>
+    </div>
+  </header>
+
+  <main class="portal-container">
+    <slot />
+  </main>
+
+  <footer class="portal-footer">
+    <div>Fundación Gran Rosario Ecuador — Admisiones Institucionales</div>
+    <div class="portal-footer-links">
+      <a href="/proteccion-de-datos" target="_blank" rel="noopener">Protección de Datos</a>
+      <span>·</span>
+      <a href="/contacto" target="_blank" rel="noopener">Contacto</a>
+    </div>
+  </footer>
+
+  <script>
+    const btnSalir = document.getElementById('btnSalirPortal');
+    btnSalir?.addEventListener('click', async () => {
+      try {
+        await fetch('/api/portal/salir', {
+          method: 'POST',
+          headers: {
+            'X-FGREC-Portal': '1'
+          }
+        });
+      } finally {
+        window.location.href = '/mi-postulacion/ingresar';
+      }
+    });
+  </script>
+</body>
+</html>
