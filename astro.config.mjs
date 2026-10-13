@@ -12,6 +12,11 @@ export default defineConfig({
   devToolbar: {
     enabled: false
   },
+  vite: {
+    build: {
+      assetsInlineLimit: 0
+    }
+  },
   build: {
     format: 'directory'
   },
