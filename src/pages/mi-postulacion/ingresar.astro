@@ -5,39 +5,106 @@ import PortalLayout from '../../layouts/PortalLayout.astro';
 ---
 
 <PortalLayout title="Ingresar | Portal del Postulante">
-  <div class="portal-card">
-    <h1 class="portal-title">Ingreso al Portal</h1>
-    <p class="portal-desc">
-      Si ya iniciaste tu postulación con FGREC, escribe tu correo electrónico registrado o tu número de teléfono celular con código de país.
-    </p>
-
-    <div id="mensajeAlerta" class="portal-alert portal-alert--error" style="display: none;"></div>
-
-    <form id="formIngresar">
-      <div class="portal-input-group">
-        <label for="contactoInput" class="portal-label">Correo electrónico o celular con código de país</label>
-        <input
-          type="text"
-          id="contactoInput"
-          name="contacto"
-          class="portal-input"
-          placeholder="ejemplo@correo.com o +593991234567"
-          autocomplete="email"
-          required
-        />
-        <span style="display: block; font-size: 0.75rem; color: var(--portal-mutado); margin-top: 0.35rem;">
-          Si indicas un número de teléfono, asegúrate de incluir el signo + seguido del código de tu país.
-        </span>
+  <div class="portal-auth-grid">
+    <div class="portal-auth-info">
+      <div class="portal-auth-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <span>Admisiones · Red Universitaria FGREC</span>
       </div>
 
-      <div style="margin-bottom: 1.25rem; font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
-        Por tu seguridad, si los datos coinciden con una postulación activa, te enviaremos un código temporal de verificación de 6 dígitos a tu correo electrónico registrado.
+      <h1 class="portal-auth-title">
+        Bienvenido a tu Portal del Postulante
+      </h1>
+      
+      <p class="portal-auth-desc">
+        Consulta el estado de tu postulación en tiempo real, sube tu documentación académica oficial y da seguimiento a tu proceso de admisión sin complicaciones.
+      </p>
+
+      <ul class="portal-auth-features">
+        <li class="portal-auth-feature">
+          <span class="portal-auth-feature__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </span>
+          <div>
+            <strong>Evaluación de expediente en vivo</strong>
+            <p>Conoce en qué etapa se encuentra tu solicitud académica.</p>
+          </div>
+        </li>
+
+        <li class="portal-auth-feature">
+          <span class="portal-auth-feature__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </span>
+          <div>
+            <strong>Carga ágil de documentos</strong>
+            <p>Sube tu cédula, títulos o constancias directamente desde tu móvil o computadora.</p>
+          </div>
+        </li>
+
+        <li class="portal-auth-feature">
+          <span class="portal-auth-feature__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Acceso seguro sin contraseñas</strong>
+            <p>Ingreso instantáneo mediante código de verificación único enviado a tu correo.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="portal-card portal-card--auth">
+      <div style="margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.35rem 0;">
+          Ingreso al Portal
+        </h2>
+        <p style="font-size: 0.875rem; color: var(--portal-mutado); margin: 0; line-height: 1.45;">
+          Indica tu correo electrónico o tu número de teléfono celular registrado para recibir tu código de acceso.
+        </p>
       </div>
 
-      <button type="submit" id="btnEnviar" class="portal-btn portal-btn--primary">
-        Enviar código de acceso
-      </button>
-    </form>
+      <div id="mensajeAlerta" class="portal-alert portal-alert--error" style="display: none;"></div>
+
+      <form id="formIngresar">
+        <div class="portal-input-group">
+          <label for="contactoInput" class="portal-label">Correo electrónico o celular</label>
+          <input
+            type="text"
+            id="contactoInput"
+            name="contacto"
+            class="portal-input"
+            placeholder="ejemplo@correo.com o +593991234567"
+            autocomplete="email"
+            required
+          />
+          <span style="display: block; font-size: 0.75rem; color: var(--portal-mutado); margin-top: 0.4rem; line-height: 1.35;">
+            Si usas teléfono celular, incluye el código de país (ej. <strong>+593</strong> para Ecuador).
+          </span>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid var(--portal-borde); border-radius: 8px; padding: 0.75rem 0.875rem; margin-bottom: 1.25rem; font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
+          🛡️ Si tus datos corresponden a una postulación registrada, recibirás un código temporal de 6 dígitos en tu bandeja de entrada.
+        </div>
+
+        <button type="submit" id="btnEnviar" class="portal-btn portal-btn--primary">
+          Enviar código de acceso
+        </button>
+      </form>
+    </div>
   </div>
 </PortalLayout>
 

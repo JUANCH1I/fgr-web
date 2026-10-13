@@ -43,57 +43,106 @@ if (sesionToken) {
 ---
 
 <PortalLayout title="Verificar código | Portal del Postulante">
-  <div class="portal-card" style="max-width: 480px; margin: 0 auto;">
-    <h1 class="portal-title">
-      {nombrePila ? `Hola, ${nombrePila}` : 'Código de verificación'}
-    </h1>
-    <p class="portal-desc">
-      Para acceder a tu postulación y documentos, ingresa el código de 6 dígitos enviado a {infoDestino}.
-    </p>
-
-    <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
-    <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
-
-    <form id="formCodigo">
-      <div class="portal-input-group" style="text-align: center;">
-        <input
-          type="text"
-          id="codigoInput"
-          name="codigo"
-          class="portal-input"
-          inputmode="numeric"
-          pattern="[0-9]{6}"
-          maxlength="6"
-          placeholder="••••••"
-          autocomplete="one-time-code"
-          style="font-size: 2rem; letter-spacing: 0.35em; text-align: center; font-weight: 700; height: 3.5rem;"
-          required
-          autofocus
-        />
-        <span id="intentosTexto" style="display: block; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
-          Tienes hasta 5 intentos antes de que el código expire.
-        </span>
+  <div class="portal-auth-grid">
+    <div class="portal-auth-info">
+      <div class="portal-auth-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>Verificación de Seguridad</span>
       </div>
 
-      <button type="submit" id="btnVerificar" class="portal-btn portal-btn--primary">
-        Verificar código
-      </button>
-    </form>
+      <h1 class="portal-auth-title">
+        {nombrePila ? `Hola, ${nombrePila}` : 'Acceso Seguro a tu Expediente'}
+      </h1>
 
-    <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--portal-borde); padding-top: 1.25rem;">
-      <p style="font-size: 0.875rem; color: var(--portal-mutado); margin-bottom: 0.75rem;">
-        ¿Aún no lo tienes o venció el código anterior?
+      <p class="portal-auth-desc">
+        Hemos enviado un código temporal de 6 dígitos a <strong style="color: var(--portal-dorado);">{infoDestino}</strong> para validar tu identidad sin necesidad de contraseñas.
       </p>
-      <button
-        type="button"
-        id="btnReenviar"
-        class="portal-btn portal-btn--outline"
-        style="width: auto; padding: 0.625rem 1.25rem; font-size: 0.875rem;"
-      >
-        Enviar código
-      </button>
-      <div id="temporizadorReenvio" style="display: none; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
-        Podrás solicitar un nuevo código en <span id="segundosRestantes">60</span> s.
+
+      <ul class="portal-auth-features">
+        <li class="portal-auth-feature">
+          <span class="portal-auth-feature__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
+          <div>
+            <strong>Código de validez temporal</strong>
+            <p>El código expira en 15 minutos o tras 5 intentos incorrectos.</p>
+          </div>
+        </li>
+
+        <li class="portal-auth-feature">
+          <span class="portal-auth-feature__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </span>
+          <div>
+            <strong>Revisa Spam o Correo no deseado</strong>
+            <p>Si no lo encuentras en tu bandeja principal, busca correos de FGREC.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="portal-card portal-card--auth">
+      <div style="margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.35rem 0;">
+          Código de verificación
+        </h2>
+        <p style="font-size: 0.875rem; color: var(--portal-mutado); margin: 0; line-height: 1.45;">
+          Escribe los 6 dígitos recibidos para continuar:
+        </p>
+      </div>
+
+      <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
+      <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
+
+      <form id="formCodigo">
+        <div class="portal-input-group" style="text-align: center;">
+          <input
+            type="text"
+            id="codigoInput"
+            name="codigo"
+            class="portal-input"
+            inputmode="numeric"
+            pattern="[0-9]{6}"
+            maxlength="6"
+            placeholder="••••••"
+            autocomplete="one-time-code"
+            style="font-size: 2.25rem; letter-spacing: 0.35em; text-align: center; font-weight: 700; height: 3.75rem;"
+            required
+            autofocus
+          />
+          <span id="intentosTexto" style="display: block; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
+            Tienes hasta 5 intentos antes de que el código expire.
+          </span>
+        </div>
+
+        <button type="submit" id="btnVerificar" class="portal-btn portal-btn--primary">
+          Verificar código
+        </button>
+      </form>
+
+      <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--portal-borde); padding-top: 1.25rem;">
+        <p style="font-size: 0.875rem; color: var(--portal-mutado); margin-bottom: 0.75rem;">
+          ¿Aún no lo tienes o venció el código anterior?
+        </p>
+        <button
+          type="button"
+          id="btnReenviar"
+          class="portal-btn portal-btn--outline"
+          style="width: auto; padding: 0.625rem 1.25rem; font-size: 0.875rem; margin: 0 auto;"
+        >
+          Reenviar código
+        </button>
+        <div id="temporizadorReenvio" style="display: none; font-size: 0.8125rem; color: var(--portal-mutado); margin-top: 0.5rem;">
+          Podrás solicitar un nuevo código en <span id="segundosRestantes">60</span> s.
+        </div>
       </div>
     </div>
   </div>
