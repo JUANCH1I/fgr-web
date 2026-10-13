@@ -205,8 +205,59 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       box-sizing: border-box;
+    }
+
+    .portal-container--auth {
+      justify-content: center;
+    }
+
+    /* Grid para el dashboard de Mi Postulación */
+    .portal-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    @media (min-width: 960px) {
+      .portal-dashboard-grid {
+        grid-template-columns: 1.6fr 1fr;
+        gap: 32px;
+        align-items: start;
+      }
+    }
+
+    .portal-dashboard-main {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .portal-dashboard-aside {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Hero de bienvenida en el dashboard */
+    .portal-hero-lead {
+      background: #FFFFFF;
+      border: 1px solid var(--portal-borde);
+      border-radius: var(--portal-radio);
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(11, 27, 46, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portal-hero-lead::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--portal-cobre) 0%, var(--portal-cobre-claro) 100%);
     }
 
     /* Grid institucional de autenticación (2 columnas en desktop) */
@@ -545,7 +596,7 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     </div>
   </header>
 
-  <main class="portal-container">
+  <main class={`portal-container ${!autenticado ? 'portal-container--auth' : ''}`}>
     <slot />
   </main>
 
