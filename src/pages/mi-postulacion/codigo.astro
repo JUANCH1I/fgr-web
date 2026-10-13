@@ -38,7 +38,8 @@ if (sesionToken) {
     if (resp.data.nombre) nombrePila = resp.data.nombre;
   }
 } else if (contactoPendiente) {
-  infoDestino = contactoPendiente;
+  // El código siempre llega por correo: si la persona ingresó con su celular, no se muestra el número como destino.
+  infoDestino = contactoPendiente.includes('@') ? contactoPendiente : 'el correo electrónico registrado en tu postulación';
 }
 ---
 
@@ -67,7 +68,7 @@ if (sesionToken) {
           </span>
           <div>
             <strong>Código de validez temporal</strong>
-            <p>El código expira en 15 minutos o tras 5 intentos fallidos.</p>
+            <p>El código expira en 10 minutos o tras 5 intentos fallidos.</p>
           </div>
         </li>
 
