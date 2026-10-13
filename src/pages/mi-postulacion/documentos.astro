@@ -96,18 +96,19 @@ if (consentimientoPendiente && respuestaDocs.ok) {
     <div class="portal-card">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
         <div>
-          <a href="/mi-postulacion" style="font-size: 0.8125rem; font-weight: 600; color: var(--portal-mutado); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem;">
-            ← Volver al inicio
+          <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
+            <span aria-hidden="true">←</span> Volver a mi postulación
           </a>
-          <h1 class="portal-title">Documentación requerida</h1>
+          <p class="antetitulo" style="margin-bottom: 4px;">Expediente institucional</p>
+          <h1 class="portal-title" style="margin: 0; font-size: 28px;">Documentación requerida</h1>
         </div>
         {whatsappHref && (
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn-sm portal-btn-sm--wa">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn-sm portal-btn-sm--ghost" style="color: var(--portal-azul); border-color: var(--portal-borde);">
             Enviar por WhatsApp
           </a>
         )}
       </div>
-      <p class="portal-desc">
+      <p class="portal-desc" style="margin-top: 8px;">
         Carga los documentos solicitados para la evaluación académica de tu expediente. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
       </p>
 
@@ -116,21 +117,21 @@ if (consentimientoPendiente && respuestaDocs.ok) {
 
       <!-- Bloque de consentimiento pendiente -->
       {consentimientoPendiente && textoConsentimiento && (
-        <div id="bloqueConsentimiento" style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-            <span style="font-size: 1.25rem;">📝</span>
-            <h2 style="font-size: 1rem; font-weight: 700; color: #92400E; margin: 0;">
+        <div id="bloqueConsentimiento" class="nota-destacada" style="margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="font-size: 18px;">📝</span>
+            <h2 style="font-size: 17px; font-weight: 700; color: var(--portal-azul); margin: 0;">
               Consentimiento para tratamiento de datos y transferencia académica
             </h2>
           </div>
 
           {textoConsentimiento.borrador && (
-            <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; background: #FEF3C7; color: #B45309; display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.75rem; border: 1px solid #FDE68A;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--crema-2); color: var(--portal-cobre-texto); display: inline-block; padding: 2px 8px; border-radius: 4px; margin-bottom: 12px; border: 1px solid var(--portal-borde);">
               Borrador institucional ({textoConsentimiento.version})
             </div>
           )}
 
-          <div style="font-size: 0.875rem; color: #78350F; line-height: 1.5; white-space: pre-wrap; max-height: 180px; overflow-y: auto; background: #fff; padding: 0.75rem; border-radius: 6px; border: 1px solid #FDE68A; margin-bottom: 1rem;">
+          <div style="font-size: 14px; color: var(--portal-texto); line-height: 1.5; white-space: pre-wrap; max-height: 180px; overflow-y: auto; background: #FFFFFF; padding: 12px; border-radius: 4px; border: 1px solid var(--portal-borde); margin-bottom: 14px;">
             {textoConsentimiento.texto}
           </div>
 
@@ -139,7 +140,8 @@ if (consentimientoPendiente && respuestaDocs.ok) {
             id="btnAceptarConsentimiento"
             data-codigo={textoConsentimiento.codigo}
             data-version={textoConsentimiento.version}
-            class="portal-btn portal-btn--gold"
+            class="portal-btn portal-btn--acento"
+            style="width: auto;"
           >
             Acepto el consentimiento y habilitar la carga
           </button>

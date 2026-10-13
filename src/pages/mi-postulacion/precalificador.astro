@@ -74,14 +74,15 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
     </div>
   ) : (
     <div class="portal-card">
-      <div style="margin-bottom: 1.25rem;">
-        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--portal-dorado); letter-spacing: 0.05em;">
-          Orientación académica
-        </span>
-        <h1 class="portal-title" style="margin-top: 0.25rem;">
+      <div style="margin-bottom: 20px;">
+        <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
+          <span aria-hidden="true">←</span> Volver a mi postulación
+        </a>
+        <p class="antetitulo" style="margin-bottom: 4px;">Orientación académica</p>
+        <h1 class="portal-title" style="margin: 0; font-size: 28px;">
           {nombre ? `Hola, ${nombre}` : 'Precalificador de admisiones'}
         </h1>
-        <p class="portal-desc">
+        <p class="portal-desc" style="margin-top: 8px;">
           Completa las siguientes preguntas breves para evaluar los antecedentes académicos y orientar la vía de admisión que corresponde a tu perfil.
         </p>
       </div>

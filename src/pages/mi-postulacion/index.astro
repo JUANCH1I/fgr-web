@@ -82,29 +82,27 @@ const asesora = postulacion.asesora;
   ) : (
     <>
       <!-- Encabezado con estado -->
-      <div class="portal-card" style="border-left: 5px solid var(--portal-dorado);">
+      <div class="portal-card" style="border-left: 4px solid var(--portal-cobre);">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--portal-dorado); letter-spacing: 0.05em;">
-              Paso actual
-            </span>
-            <h1 class="portal-title" style="margin-top: 0.25rem; font-size: 1.5rem;">
+            <p class="antetitulo" style="margin-bottom: 4px;">Paso actual de tu proceso</p>
+            <h1 class="portal-title" style="margin: 0; font-size: 28px;">
               {paso.nombre}
             </h1>
           </div>
           <div>
             {situacion === 'ACTIVA' && (
-              <span style="display: inline-block; padding: 0.25rem 0.75rem; background: var(--portal-verde-fondo); color: var(--portal-verde); font-weight: 700; font-size: 0.8125rem; border-radius: 9999px;">
+              <span class="badge-acento" style="background: var(--portal-verde-fondo); color: var(--portal-verde); border-color: #C4DEC8;">
                 Activa
               </span>
             )}
             {situacion === 'EN_PAUSA' && (
-              <span style="display: inline-block; padding: 0.25rem 0.75rem; background: var(--portal-ambar-fondo); color: var(--portal-ambar); font-weight: 700; font-size: 0.8125rem; border-radius: 9999px;">
+              <span class="badge-acento" style="background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-color: #F6DFB3;">
                 Postulación en pausa
               </span>
             )}
             {situacion === 'CERRADA' && (
-              <span style="display: inline-block; padding: 0.25rem 0.75rem; background: var(--portal-rojo-fondo); color: var(--portal-rojo); font-weight: 700; font-size: 0.8125rem; border-radius: 9999px;">
+              <span class="badge-acento" style="background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-color: #F5C2C0;">
                 Postulación cerrada
               </span>
             )}
@@ -112,32 +110,33 @@ const asesora = postulacion.asesora;
         </div>
 
         {asesora?.nombre && (
-          <p style="margin: 0.75rem 0 0 0; font-size: 0.875rem; color: var(--portal-mutado);">
-            Te acompaña en el proceso: <strong>{asesora.nombre}</strong> (Asesoría institucional FGREC).
+          <p style="margin: 14px 0 0 0; font-size: 15px; color: var(--portal-mutado); border-top: 1px solid var(--portal-borde); padding-top: 12px;">
+            Te acompaña en el proceso: <strong style="color: var(--portal-azul);">{asesora.nombre}</strong> (Asesoría institucional FGREC).
           </p>
         )}
       </div>
 
       <!-- Próximo paso prioritario -->
       {proximoPaso && (
-        <div class="portal-card" style="background: #F8FAFC; border-color: #CBD5E1;">
-          <h2 style="font-size: 1rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-            <span>🎯</span> Próximo paso
+        <div class="tarjeta" style="background: #FFFFFF; border-left: 4px solid var(--portal-azul); margin-bottom: 20px;">
+          <p class="antetitulo" style="color: var(--portal-azul); margin-bottom: 4px;">🎯 Acción recomendada</p>
+          <h2 style="font-size: 22px; margin-bottom: 8px; color: var(--portal-azul);">
+            Próximo paso
           </h2>
-          <p style="font-size: 0.9375rem; margin: 0 0 1rem 0; line-height: 1.5; color: var(--portal-texto);">
+          <p class="entrada" style="font-size: 16px; margin-bottom: 18px; color: var(--portal-texto);">
             {proximoPaso.texto}
           </p>
 
           {proximoPaso.codigo === 'CARGAR_DOCUMENTOS' || proximoPaso.codigo === 'SUBSANAR_DOCUMENTOS' ? (
-            <a href="/mi-postulacion/documentos" class="portal-btn portal-btn--primary">
+            <a href="/mi-postulacion/documentos" class="portal-btn portal-btn--acento" style="width: auto; display: inline-flex;">
               Ir a mis documentos
             </a>
           ) : proximoPaso.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
-            <a href="/mi-postulacion/precalificador" class="portal-btn portal-btn--gold">
+            <a href="/mi-postulacion/precalificador" class="portal-btn portal-btn--acento" style="width: auto; display: inline-flex;">
               Completar precalificador
             </a>
           ) : whatsappHref ? (
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--outline">
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--outline" style="width: auto; display: inline-flex;">
               Consultar por WhatsApp
             </a>
           ) : null}
@@ -146,56 +145,56 @@ const asesora = postulacion.asesora;
 
       <!-- Resumen de documentos -->
       <div class="portal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--portal-azul); margin: 0;">
-            Documentos del expediente
-          </h2>
-          <a href="/mi-postulacion/documentos" style="font-size: 0.875rem; font-weight: 600; color: var(--portal-azul); text-decoration: underline;">
-            Ver todos
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+          <div>
+            <p class="antetitulo" style="margin-bottom: 4px;">Expediente académico</p>
+            <h2 class="portal-title" style="margin: 0; font-size: 24px;">
+              Documentos requeridos
+            </h2>
+          </div>
+          <a class="enlace-flecha" href="/mi-postulacion/documentos">
+            Ver todos <span aria-hidden="true">→</span>
           </a>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1rem 0 1.25rem 0; text-align: center;">
-          <div style="padding: 0.75rem; background: var(--portal-fondo); border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: var(--portal-azul);">{documentos.total}</div>
-            <div style="font-size: 0.75rem; color: var(--portal-mutado);">Total</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0 20px 0; text-align: center;">
+          <div style="padding: 14px; background: var(--portal-fondo); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
+            <div style="font-size: 28px; font-weight: 700; font-family: var(--serif); color: var(--portal-azul); line-height: 1.1;">{documentos.total}</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Total</div>
           </div>
-          <div style="padding: 0.75rem; background: var(--portal-fondo); border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: documentos.pendientes > 0 ? 'var(--portal-ambar)' : 'var(--portal-mutado)';">
+          <div style="padding: 14px; background: var(--portal-fondo); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
+            <div style="font-size: 28px; font-weight: 700; font-family: var(--serif); color: documentos.pendientes > 0 ? 'var(--portal-cobre-texto)' : 'var(--portal-mutado)'; line-height: 1.1;">
               {documentos.pendientes}
             </div>
-            <div style="font-size: 0.75rem; color: var(--portal-mutado);">Pendientes</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Pendientes</div>
           </div>
-          <div style="padding: 0.75rem; background: var(--portal-fondo); border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: documentos.observados > 0 ? 'var(--portal-rojo)' : 'var(--portal-mutado)';">
+          <div style="padding: 14px; background: var(--portal-fondo); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
+            <div style="font-size: 28px; font-weight: 700; font-family: var(--serif); color: documentos.observados > 0 ? 'var(--portal-rojo)' : 'var(--portal-mutado)'; line-height: 1.1;">
               {documentos.observados}
             </div>
-            <div style="font-size: 0.75rem; color: var(--portal-mutado);">Observados</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Observados</div>
           </div>
         </div>
 
         <a href="/mi-postulacion/documentos" class="portal-btn portal-btn--outline">
-          Gestionar documentación
+          Gestionar documentación del expediente
         </a>
       </div>
 
       <!-- Ayuda / Asesoría -->
-      <div class="portal-card" style="text-align: center;">
-        <h2 style="font-size: 1rem; font-weight: 700; color: var(--portal-azul); margin: 0 0 0.5rem 0;">
-          ¿Tienes alguna duda o necesitas asistencia?
+      <div class="tarjeta" style="background: var(--crema-2, #F3EBDD); border-color: #DFD5C3; text-align: center;">
+        <p class="antetitulo" style="margin-bottom: 6px;">Orientación personalizada</p>
+        <h2 style="font-size: 22px; color: var(--portal-azul); margin-bottom: 8px;">
+          ¿Tienes alguna duda con tu postulación?
         </h2>
-        <p style="font-size: 0.875rem; color: var(--portal-mutado); margin: 0 0 1rem 0;">
-          Las asesoras institucionales de la Fundación Gran Rosario están disponibles para orientarte.
+        <p style="font-size: 15px; color: var(--portal-mutado); max-width: 540px; margin: 0 auto 16px auto;">
+          Las asesoras de la Fundación del Gran Rosario Ecuador revisan tu documentación y te orientan en cada etapa.
         </p>
-        {whatsappHref ? (
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
-            <span>Hablar con un asesor por WhatsApp</span>
-          </a>
-        ) : (
-          <a href="/contacto" class="portal-btn portal-btn--outline">
+        <div style="max-width: 280px; margin: 0 auto;">
+          <a href="/contacto" class="portal-btn portal-btn--primary">
             Contactar a la Fundación
           </a>
-        )}
+        </div>
       </div>
     </>
   )}

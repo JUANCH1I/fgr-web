@@ -62,30 +62,35 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
 
   <style is:global>
     :root {
-      --portal-azul: #0B2545;
-      --portal-azul-profundo: #071930;
-      --portal-dorado: #C5A059;
-      --portal-dorado-hover: #b08d48;
-      --portal-fondo: #F6F8FB;
+      --portal-azul: var(--azul, #0B1B2E);
+      --portal-azul-profundo: var(--pie, #07121F);
+      --portal-cobre: var(--cobre, #C98A4B);
+      --portal-cobre-claro: var(--cobre-claro, #E2B587);
+      --portal-cobre-texto: var(--cobre-texto, #8F5320);
+      --portal-cobre-hover: var(--cobre-hover, #6E3F17);
+      --portal-dorado: var(--cobre, #C98A4B);
+      --portal-dorado-hover: var(--cobre-hover, #6E3F17);
+      --portal-fondo: #F7F4EE; /* Crema institucional idéntica a la landing */
       --portal-blanco: #FFFFFF;
-      --portal-texto: #1E293B;
-      --portal-mutado: #64748B;
-      --portal-borde: #E2E8F0;
-      --portal-verde: #166534;
-      --portal-verde-fondo: #DCFCE7;
-      --portal-rojo: #991B1B;
-      --portal-rojo-fondo: #FEE2E2;
-      --portal-ambar: #92400E;
-      --portal-ambar-fondo: #FEF3C7;
+      --portal-texto: var(--texto, #14202E);
+      --portal-mutado: var(--gris, #4F5B66);
+      --portal-borde: var(--borde, #E3DCCF);
+      --portal-linea: var(--linea-oscura, #22344A);
+      --portal-verde: #1F5A32;
+      --portal-verde-fondo: #E4EFE6;
+      --portal-rojo: #A32218;
+      --portal-rojo-fondo: #FDF2F2;
+      --portal-ambar: #8F5320;
+      --portal-ambar-fondo: #FDF7E7;
+      --portal-radio: 6px;
     }
 
     body.portal-body {
-      background-color: #F8FAFC;
-      background-image:
-        radial-gradient(at 0% 0%, rgba(11, 37, 69, 0.04) 0px, transparent 55%),
-        radial-gradient(at 100% 100%, rgba(197, 160, 89, 0.05) 0px, transparent 55%);
+      background-color: var(--portal-fondo);
       color: var(--portal-texto);
-      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.55;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -94,19 +99,20 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Cabecera institucional idéntica a la cabecera de la landing */
     .portal-header {
-      background: var(--portal-azul-profundo);
-      color: #fff;
-      border-bottom: 2px solid var(--portal-dorado);
-      padding: 0.875rem 1rem;
+      background: var(--portal-azul);
+      color: #FFFFFF;
+      border-bottom: 3px solid var(--portal-cobre);
       position: sticky;
       top: 0;
       z-index: 50;
     }
 
     .portal-header__inner {
-      max-width: 1040px;
+      max-width: var(--ancho, 1160px);
       margin: 0 auto;
+      padding: 14px var(--margen, 24px);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -116,58 +122,86 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     .portal-logo-link {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 14px;
       text-decoration: none;
-      color: #fff;
+      color: #FFFFFF;
     }
 
-    .portal-logo-link img {
-      height: 34px;
-      width: auto;
-    }
-
-    .portal-logo-link .portal-subtitulo {
-      font-size: 0.8125rem;
-      color: #cbd5e1;
+    .portal-logo-link .portal-logo-img {
+      width: 190px;
+      height: auto;
+      max-height: 54px;
+      object-fit: contain;
+      object-position: left center;
       display: block;
-      font-weight: 500;
-      letter-spacing: 0.02em;
+    }
+
+    .portal-badge-header {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      background: rgba(201, 138, 75, 0.15);
+      border: 1px solid rgba(226, 181, 135, 0.35);
+      border-radius: 4px;
+      color: var(--portal-cobre-claro);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .portal-header-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 14px;
     }
 
     .portal-btn-sm {
-      font-size: 0.8125rem;
-      padding: 0.375rem 0.75rem;
-      border-radius: 6px;
+      font-size: 14px;
+      padding: 7px 14px;
+      border-radius: 4px;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      border: 1px solid transparent;
+      border: 1.5px solid transparent;
       transition: all 0.15s ease;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .portal-btn-sm--ghost {
       background: transparent;
-      color: #e2e8f0;
-      border-color: rgba(255, 255, 255, 0.2);
+      color: #D5DCE4;
+      border-color: #5E738A;
     }
     .portal-btn-sm--ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+      border-color: #CBD5E1;
     }
 
+    .portal-link-volver {
+      color: #D5DCE4;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .portal-link-volver:hover {
+      color: #FFFFFF;
+      text-decoration: underline;
+    }
+
+    /* Contenedor principal */
     .portal-container {
-      max-width: 1040px;
+      max-width: var(--ancho, 1160px);
       width: 100%;
       margin: 0 auto;
-      padding: 2.5rem 1.25rem;
+      padding: 48px var(--margen, 24px);
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -175,286 +209,336 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       box-sizing: border-box;
     }
 
-    /* Grid para pantallas de acceso/código que previene espacio vacío en desktop */
+    /* Grid institucional de autenticación (2 columnas en desktop) */
     .portal-auth-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
-      align-items: center;
+      gap: 32px;
+      align-items: start;
       width: 100%;
       margin: auto 0;
     }
 
-    @media (min-width: 860px) {
+    @media (min-width: 900px) {
       .portal-auth-grid {
-        grid-template-columns: 1.15fr 0.95fr;
-        gap: 3.5rem;
+        grid-template-columns: 1.15fr 0.9fr;
+        gap: 56px;
+        align-items: center;
       }
     }
 
     .portal-auth-info {
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 16px;
     }
 
-    .portal-badge-institucional {
+    .portal-auth-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      background: rgba(11, 37, 69, 0.06);
-      border: 1px solid rgba(11, 37, 69, 0.12);
-      color: var(--portal-azul);
-      font-size: 0.8125rem;
+      gap: 8px;
+      font-size: 13px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
       font-weight: 700;
-      padding: 0.35rem 0.75rem;
-      border-radius: 9999px;
-      width: fit-content;
-      letter-spacing: 0.02em;
-    }
-
-    .portal-badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--portal-dorado);
+      color: var(--portal-cobre-texto);
+      margin: 0;
     }
 
     .portal-auth-title {
-      font-size: 2.15rem;
-      font-weight: 800;
-      color: var(--portal-azul-profundo);
-      line-height: 1.2;
-      letter-spacing: -0.02em;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(32px, 4vw, 44px);
+      line-height: 1.12;
+      color: var(--portal-azul);
+      letter-spacing: -0.01em;
       margin: 0;
     }
 
-    .portal-auth-subtitle {
-      font-size: 1.0625rem;
+    .portal-auth-title em {
+      font-style: normal;
+      color: var(--portal-cobre-texto);
+    }
+
+    .portal-auth-desc {
+      font-size: 18px;
       color: var(--portal-mutado);
-      line-height: 1.6;
+      line-height: 1.5;
       margin: 0;
     }
 
-    .portal-features-list {
+    .portal-auth-features {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0 0;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-top: 0.5rem;
+      gap: 14px;
     }
 
-    .portal-feature-item {
+    .portal-auth-feature {
       display: flex;
       align-items: flex-start;
-      gap: 0.875rem;
+      gap: 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--portal-borde);
+      border-radius: var(--portal-radio);
+      padding: 16px 18px;
+      box-shadow: 0 2px 6px rgba(11, 27, 46, 0.03);
     }
 
-    .portal-feature-icon {
-      font-size: 1.25rem;
-      background: #fff;
-      border: 1px solid var(--portal-borde);
+    .portal-auth-feature__icon {
       width: 38px;
       height: 38px;
+      background: var(--crema-2, #F3EBDD);
+      color: var(--portal-cobre-texto);
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
       flex-shrink: 0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
-    .portal-feature-heading {
-      font-size: 0.9375rem;
+    .portal-auth-feature strong {
+      display: block;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--portal-texto);
-      line-height: 1.3;
-      margin-bottom: 0.15rem;
+      color: var(--portal-azul);
+      margin-bottom: 2px;
     }
 
-    .portal-feature-text {
-      font-size: 0.84375rem;
+    .portal-auth-feature p {
+      font-size: 14px;
       color: var(--portal-mutado);
-      line-height: 1.45;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Tarjetas estilo Landing (como .tarjeta y .precalificador--destacado) */
+    .portal-card {
+      background: #FFFFFF;
+      border: 1px solid var(--portal-borde);
+      border-radius: var(--portal-radio);
+      padding: 28px;
+      box-shadow: 0 4px 16px rgba(11, 27, 46, 0.05);
+      margin-bottom: 20px;
     }
 
     .portal-card--auth {
       background: #FFFFFF;
-      border: 1px solid var(--portal-borde);
-      border-radius: 16px;
-      padding: 2.25rem 2rem;
-      box-shadow: 0 10px 25px -5px rgba(11, 37, 69, 0.08), 0 8px 10px -6px rgba(11, 37, 69, 0.04);
-      margin-bottom: 0;
+      border: 1.5px solid var(--portal-borde);
+      border-radius: 8px;
+      padding: 32px 30px;
+      box-shadow: 0 10px 30px rgba(11, 27, 46, 0.07), 0 2px 6px rgba(11, 27, 46, 0.03);
+      position: relative;
     }
 
-    .portal-card {
-      background: var(--portal-blanco);
-      border: 1px solid var(--portal-borde);
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      margin-bottom: 1.25rem;
+    .portal-card--auth::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--portal-cobre) 0%, var(--portal-cobre-claro) 100%);
+      border-radius: 8px 8px 0 0;
     }
 
     .portal-title {
-      font-size: 1.35rem;
-      font-weight: 700;
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 500;
       color: var(--portal-azul);
-      margin: 0 0 0.5rem 0;
-      line-height: 1.3;
+      margin: 0 0 8px 0;
+      line-height: 1.2;
     }
 
     .portal-desc {
-      font-size: 0.9375rem;
+      font-size: 16px;
       color: var(--portal-mutado);
-      margin: 0 0 1.25rem 0;
+      margin: 0 0 20px 0;
       line-height: 1.5;
     }
 
+    /* Botones estilo Landing */
     .portal-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       width: 100%;
-      padding: 0.875rem 1.25rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
+      min-height: 50px;
+      padding: 13px 24px;
+      border-radius: 4px;
+      border: 1.5px solid transparent;
+      font: inherit;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.2;
       text-decoration: none;
-      transition: background 0.15s ease, transform 0.05s ease;
+      text-align: center;
+      cursor: pointer;
       box-sizing: border-box;
+      transition: background-color .15s, color .15s, border-color .15s;
     }
 
     .portal-btn:active {
-      transform: scale(0.99);
+      transform: translateY(1px);
     }
 
     .portal-btn--primary {
       background: var(--portal-azul);
-      color: #fff;
+      color: #FFFFFF;
     }
     .portal-btn--primary:hover {
-      background: var(--portal-azul-profundo);
+      background: var(--azul-3, #1B3350);
+      color: #FFFFFF;
     }
 
-    .portal-btn--gold {
-      background: var(--portal-dorado);
-      color: #071930;
+    .portal-btn--gold, .portal-btn--acento {
+      background: var(--portal-cobre);
+      color: #FFFFFF;
     }
-    .portal-btn--gold:hover {
-      background: var(--portal-dorado-hover);
+    .portal-btn--gold:hover, .portal-btn--acento:hover {
+      background: var(--portal-cobre-hover);
+      color: #FFFFFF;
     }
 
     .portal-btn--outline {
-      background: transparent;
+      border-color: var(--portal-azul);
       color: var(--portal-azul);
-      border: 1px solid var(--portal-borde);
+      background: #FFFFFF;
     }
     .portal-btn--outline:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
+      background: var(--portal-fondo);
+      color: var(--portal-azul);
     }
 
     .portal-btn--wa-full {
-      background: #25D366;
-      color: #071930;
+      background: #1F5A32;
+      color: #FFFFFF;
+      border-color: #1F5A32;
     }
     .portal-btn--wa-full:hover {
-      background: #20bd5a;
+      background: #143d22;
+      color: #FFFFFF;
     }
 
+    /* Campos y formularios estilo Landing */
     .portal-input-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 18px;
     }
 
     .portal-label {
       display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      margin-bottom: 0.375rem;
-      color: var(--portal-texto);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--portal-azul);
     }
 
     .portal-input, .portal-select {
       width: 100%;
-      padding: 0.75rem 0.875rem;
-      font-size: 1rem;
-      border: 1px solid var(--portal-borde);
-      border-radius: 8px;
-      background: #fff;
+      min-height: 48px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 1.5px solid #CCD4DC;
+      border-radius: 4px;
+      background: #FCFCFD;
       color: var(--portal-texto);
       box-sizing: border-box;
+      transition: border-color .15s, box-shadow .15s;
     }
     .portal-input:focus, .portal-select:focus {
       outline: none;
-      border-color: var(--portal-azul);
-      box-shadow: 0 0 0 3px rgba(11, 37, 69, 0.15);
+      border-color: var(--portal-cobre);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(201, 138, 75, 0.2);
     }
 
+    /* Alertas */
     .portal-alert {
-      padding: 0.875rem 1rem;
-      border-radius: 8px;
-      font-size: 0.875rem;
+      padding: 14px 16px;
+      border-radius: 4px;
+      font-size: 15px;
       line-height: 1.45;
-      margin-bottom: 1.25rem;
+      margin-bottom: 18px;
       display: flex;
       align-items: flex-start;
-      gap: 0.625rem;
+      gap: 10px;
     }
     .portal-alert--error {
       background: var(--portal-rojo-fondo);
       color: var(--portal-rojo);
-      border: 1px solid #fca5a5;
+      border: 1px solid #F5C2C0;
+      font-weight: 600;
     }
     .portal-alert--info {
-      background: var(--portal-ambar-fondo);
-      color: var(--portal-ambar);
-      border: 1px solid #fde68a;
+      background: var(--crema-2, #F3EBDD);
+      color: var(--portal-cobre-texto);
+      border-left: 4px solid var(--portal-cobre);
+      border-radius: 0 4px 4px 0;
     }
     .portal-alert--success {
       background: var(--portal-verde-fondo);
       color: var(--portal-verde);
-      border: 1px solid #86efac;
+      border: 1px solid #C4DEC8;
+      font-weight: 600;
     }
 
+    /* Pie de página institucional */
     .portal-footer {
-      background: #fff;
-      border-top: 1px solid var(--portal-borde);
-      padding: 1.25rem 1rem;
-      font-size: 0.75rem;
-      color: var(--portal-mutado);
+      background: var(--pie, #07121F);
+      color: #D5DCE4;
+      border-top: 1px solid var(--linea-oscura, #22344A);
+      padding: 32px var(--margen, 24px);
+      font-size: 14px;
       text-align: center;
       margin-top: auto;
+    }
+
+    .portal-footer__inner {
+      max-width: var(--ancho, 1160px);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
 
     .portal-footer-links {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 0.35rem;
+      gap: 16px;
+      flex-wrap: wrap;
     }
     .portal-footer-links a {
-      color: var(--portal-mutado);
+      color: #D5DCE4;
       text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .portal-footer-links a:hover {
+      color: var(--portal-cobre-claro);
     }
   </style>
 </head>
 <body class="portal-body">
   <header class="portal-header">
     <div class="portal-header__inner">
-      <a href="/mi-postulacion" class="portal-logo-link">
-        <img src="/favicon.svg" alt="FGREC" width="34" height="34" />
-        <div>
-          <span style="font-weight: 700; font-size: 0.9375rem; display: block; line-height: 1.2;">FGREC</span>
-          <span class="portal-subtitulo">Portal del Postulante</span>
-        </div>
+      <a href="/" class="portal-logo-link" title="Volver al inicio del sitio">
+        <img class="portal-logo-img" src="https://static.wixstatic.com/media/64d480_878e9bae365142a8a7cfd49040026764~mv2.png" alt="Fundación del Gran Rosario Ecuador" width="190" height="54" />
+        <span class="portal-badge-header">Portal del Postulante</span>
       </a>
 
       <div class="portal-header-actions">
+        <a href="/" class="portal-link-volver">
+          <span aria-hidden="true">←</span>
+          <span>Volver al sitio</span>
+        </a>
         {autenticado && (
-          <button type="button" id="btnSalirPortal" class="portal-btn-sm portal-btn-sm--ghost" style="cursor: pointer; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);">
-            Salir
+          <button type="button" id="btnSalirPortal" class="portal-btn-sm portal-btn-sm--ghost">
+            Cerrar sesión
           </button>
         )}
       </div>
@@ -466,11 +550,17 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
   </main>
 
   <footer class="portal-footer">
-    <div>Fundación Gran Rosario Ecuador — Admisiones Institucionales</div>
-    <div class="portal-footer-links">
-      <a href="/proteccion-de-datos" target="_blank" rel="noopener">Protección de Datos</a>
-      <span>·</span>
-      <a href="/contacto" target="_blank" rel="noopener">Contacto</a>
+    <div class="portal-footer__inner">
+      <div><strong>Fundación del Gran Rosario Ecuador</strong> · Admisiones y Acompañamiento Académico</div>
+      <div class="portal-footer-links">
+        <a href="/" target="_blank" rel="noopener">Inicio</a>
+        <span>·</span>
+        <a href="/carreras/" target="_blank" rel="noopener">Carreras</a>
+        <span>·</span>
+        <a href="/proteccion-de-datos/" target="_blank" rel="noopener">Protección de Datos</a>
+        <span>·</span>
+        <a href="/contacto/" target="_blank" rel="noopener">Contacto</a>
+      </div>
     </div>
   </footer>
 
