@@ -271,6 +271,7 @@ export async function llamarFGRECPortal<T = any>(opciones: LlamadaPortalOpciones
     };
   } catch (err: any) {
     clearTimeout(timeoutId);
+    console.error('[FGREC Portal Network Error]:', err?.message || err);
     return {
       ok: false,
       status: 503,
