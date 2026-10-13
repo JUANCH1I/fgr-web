@@ -29,7 +29,7 @@ export const BRAND = {
   telefonoGeneral: '+593 96 301 7631',
   waGeneralSinPlus: '593963017631',
   web: 'https://www.fgrec.org',
-  correo: 'info@fgrec.org'
+  correo: 'contacto@fgrec.org'
 };
 
 export function escapeHtml(str: unknown): string {

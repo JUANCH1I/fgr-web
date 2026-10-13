@@ -204,7 +204,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 2. Envío de correos mediante el módulo de plantillas institucionales
     const apiKey = import.meta.env.RESEND_API_KEY || process.env.RESEND_API_KEY;
-    const destinatario = import.meta.env.EMAIL_DESTINATARIO || process.env.EMAIL_DESTINATARIO || 'info@fgrec.org';
+    const destinatario = import.meta.env.EMAIL_DESTINATARIO || process.env.EMAIL_DESTINATARIO || 'contacto@fgrec.org';
     const remitente = import.meta.env.EMAIL_REMITENTE || process.env.EMAIL_REMITENTE || 'Fundación Gran Rosario <contacto@fgrec.org>';
 
     let resendInternoEnviado = false;
