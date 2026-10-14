@@ -153,8 +153,8 @@ try {
               <h2 style="font-size: 26px; color: var(--portal-azul); margin: 0;">
                 {paso.nombre}
               </h2>
-              <span style="font-size: 13px; font-weight: 700; color: var(--portal-cobre-texto); text-transform: uppercase; letter-spacing: 0.08em;">
-                En curso
+              <span style={`font-size: 13px; font-weight: 700; color: ${situacion === 'EN_PAUSA' ? 'var(--portal-ambar)' : situacion === 'CERRADA' ? 'var(--portal-rojo)' : 'var(--portal-cobre-texto)'}; text-transform: uppercase; letter-spacing: 0.08em;`}>
+                {situacion === 'EN_PAUSA' ? 'En pausa' : situacion === 'CERRADA' ? 'Cerrada' : 'En curso'}
               </span>
             </div>
 
@@ -215,7 +215,7 @@ try {
               </div>
 
               <div style="padding: 16px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
-                <div style="font-size: 32px; font-weight: 700; font-family: var(--serif); color: documentos.pendientes > 0 ? 'var(--portal-cobre-texto)' : 'var(--portal-mutado)'; line-height: 1;">
+                <div style={`font-size: 32px; font-weight: 700; font-family: var(--serif); color: ${documentos.pendientes > 0 ? 'var(--portal-cobre-texto)' : 'var(--portal-mutado)'}; line-height: 1;`}>
                   {documentos.pendientes}
                 </div>
                 <div style="font-size: 12px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;">
@@ -224,7 +224,7 @@ try {
               </div>
 
               <div style="padding: 16px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
-                <div style="font-size: 32px; font-weight: 700; font-family: var(--serif); color: documentos.observados > 0 ? 'var(--portal-rojo)' : 'var(--portal-mutado)'; line-height: 1;">
+                <div style={`font-size: 32px; font-weight: 700; font-family: var(--serif); color: ${documentos.observados > 0 ? 'var(--portal-rojo)' : 'var(--portal-mutado)'}; line-height: 1;`}>
                   {documentos.observados}
                 </div>
                 <div style="font-size: 12px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;">
