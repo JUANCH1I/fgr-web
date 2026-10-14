@@ -30,7 +30,7 @@ const respuesta = await llamarFGRECPortal({
 let errorEnlace = false;
 let statusError = respuesta.status;
 let tituloError = 'Enlace no disponible';
-let mensajeError = 'El enlace de acceso no es válido o ha vencido. Recuerda que los enlaces tienen una vigencia de 14 días.';
+let mensajeError = 'El enlace de acceso no es válido o ha vencido. Recuerda que los enlaces tienen una vigencia de 7 días.';
 
 if (!respuesta.ok || !respuesta.data) {
   errorEnlace = true;
