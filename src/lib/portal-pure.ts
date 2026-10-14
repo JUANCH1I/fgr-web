@@ -60,7 +60,7 @@ export function presentarEstadoDocumento(requisito: RequisitoUI): PresentacionEs
     case 'VALIDADO':
       return {
         etiqueta: 'Validado',
-        detalle: 'Documento aprobado conforme a los requisitos.',
+        detalle: 'Documento validado conforme a los requisitos.',
         icono: 'validado',
         permiteSubida: false,
         textoBoton: null

@@ -13,7 +13,7 @@
   --texto: #14202E;
   --gris: #4F5B66;
   --gris-sobre-azul: #D5DCE4;
-  --crema: #F7F4EE;
+  --crema: #F2EBE0;
   --crema-2: #F3EBDD;
   --borde: #E3DCCF;
   --verde-fondo: #E4EFE6;
@@ -60,7 +60,7 @@ body {
   font-size: 17px;
   line-height: 1.55;
   color: var(--texto);
-  background: #FFFFFF;
+  background: #FAF6F0;
 }
 
 img { max-width: 100%; height: auto; display: block; }

@@ -73,7 +73,7 @@ export function paginaFondo(sitio, f, carrerasPorSlug) {
 
   const oferta = `<section class="seccion seccion--crema" aria-labelledby="oferta-titulo">
   <div class="contenedor">
-    <p class="antetitulo">Oferta académica</p>
+    <p class="antetitulo">Propuesta académica</p>
     <h2 id="oferta-titulo">Carreras disponibles</h2>
     ${f.oferta.map((g) => `<div class="oferta-grupo">
       <h3 class="oferta-grupo__titulo">${esc(g.grupo)} <span>${esc(g.nivel)}</span></h3>
