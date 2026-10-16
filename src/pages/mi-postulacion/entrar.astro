@@ -55,7 +55,7 @@ if (!respuesta.ok || !respuesta.data) {
     return Astro.redirect('/mi-postulacion/precalificador', 302);
   }
 
-  // Si el propósito es documentos o agenda, se requiere nivel 2.
+  // Si el propósito es documentos, carta o convenio, se requiere nivel 2.
   // No enviamos código automáticamente: llevamos a /codigo con botón claro para solicitarlo
   return Astro.redirect('/mi-postulacion/codigo', 302);
 }

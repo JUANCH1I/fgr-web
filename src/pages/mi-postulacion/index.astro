@@ -173,6 +173,10 @@ try {
                   <a href="/mi-postulacion/documentos#carta" class="boton boton--acento" style="display: inline-flex;">
                     Escribir mi carta
                   </a>
+                ) : proximoPaso.codigo === 'ACEPTAR_CONVENIO' ? (
+                  <a href="/mi-postulacion/convenio" class="boton boton--acento" style="display: inline-flex;">
+                    Leer y aceptar mi convenio
+                  </a>
                 ) : proximoPaso.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
                   <a href="/mi-postulacion/precalificador" class="boton boton--acento" style="display: inline-flex;">
                     Completar preguntas previas
