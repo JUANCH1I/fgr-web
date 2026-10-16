@@ -62,30 +62,45 @@ try {
 } catch {
   // Saludo fallback
 }
+
+// Mapeo jerárquico formal de etapas públicas a las 5 fases del proceso de admisión
+const pasoCodigo = paso.codigo || 'ORIENTACION';
+let faseActiva = 1;
+if (pasoCodigo === 'ORIENTACION') {
+  faseActiva = 1;
+} else if (['CARTA_INTERES', 'DOCUMENTACION', 'DOCUMENTACION_COMPLETA'].includes(pasoCodigo)) {
+  faseActiva = 2;
+} else if (['EVALUACION_ACADEMICA'].includes(pasoCodigo)) {
+  faseActiva = 3;
+} else if (['FONDO_ECUADOR'].includes(pasoCodigo)) {
+  faseActiva = 4;
+} else if (['PROPUESTA', 'RESERVA_CONFIRMADA', 'INSCRIPCION_CONFIRMADA'].includes(pasoCodigo)) {
+  faseActiva = 5;
+}
+
+const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
 ---
 
 <PortalLayout title="Mi postulación | Fundación Gran Rosario" autenticado={true}>
   {statusError === 429 ? (
-    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
-      <div style="font-size: 2.5rem; margin-bottom: 1rem;">⏳</div>
+    <div class="portal-card error-card">
       <h1 class="portal-title">Demasiados intentos</h1>
-      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
-        Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.
+      <p class="portal-desc">
+        Ha realizado demasiadas solicitudes en poco tiempo. Por favor espere unos minutos antes de volver a ingresar.
       </p>
       {whatsappHref && (
         <div style="max-width: 320px; margin: 0 auto;">
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
-            Hablar con un asesor por WhatsApp
+            Contactar por WhatsApp
           </a>
         </div>
       )}
     </div>
   ) : statusError !== null ? (
-    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
-      <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+    <div class="portal-card error-card">
       <h1 class="portal-title">Servicio no disponible</h1>
-      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
-        El servicio no está disponible; intenta de nuevo en unos minutos. Si necesitas atención inmediata, puedes escribir a nuestro canal oficial.
+      <p class="portal-desc">
+        El servicio no está disponible temporalmente; intente de nuevo en unos minutos. Si requiere atención inmediata, puede contactar a nuestro canal oficial.
       </p>
       {whatsappHref && (
         <div style="max-width: 320px; margin: 0 auto;">
@@ -96,255 +111,738 @@ try {
       )}
     </div>
   ) : (
-    <>
-      <!-- Hero de bienvenida institucional -->
-      <section class="portal-hero-lead" style="margin-bottom: 32px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 12px;">
-          <div>
-            <p class="antetitulo" style="margin-bottom: 6px;">Expediente de postulación · Red Universitaria</p>
-            <h1 class="portal-auth-title" style="font-size: clamp(28px, 3.5vw, 38px); margin: 0 0 6px 0;">
-              {nombrePostulante ? `Bienvenido/a, ${nombrePostulante}` : 'Tu expediente académico'}
-            </h1>
-            <p class="entrada" style="margin: 0; font-size: 17px; max-width: 680px;">
-              Seguimiento oficial de tu postulación con la Fundación del Gran Rosario Ecuador y la red de universidades aliadas.
-            </p>
-          </div>
-          <div>
-            {situacion === 'ACTIVA' && (
-              <span class="badge-acento" style="background: var(--portal-verde-fondo); color: var(--portal-verde); border-color: #C4DEC8; padding: 6px 14px; font-size: 13px;">
-                ● Postulación activa
-              </span>
-            )}
-            {situacion === 'EN_PAUSA' && (
-              <span class="badge-acento" style="background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-color: #F6DFB3; padding: 6px 14px; font-size: 13px;">
-                ⏸ En pausa {postulacion.pausaHasta ? `hasta ${postulacion.pausaHasta}` : ''}
-              </span>
-            )}
-            {situacion === 'CERRADA' && (
-              <span class="badge-acento" style="background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-color: #F5C2C0; padding: 6px 14px; font-size: 13px;">
-                ✕ Postulación cerrada
-              </span>
-            )}
-          </div>
+    <div class="postulacion-container">
+
+      <!-- FICHA DE EXPEDIENTE DEL POSTULANTE -->
+      <header class="applicant-bar">
+        <div class="applicant-bar__info">
+          <h1 class="applicant-bar__name">
+            {nombrePostulante ? nombrePostulante : 'Expediente del Postulante'}
+          </h1>
+          {situacion === 'ACTIVA' && (
+            <span class="badge-tag badge-tag--active">Postulación activa</span>
+          )}
+          {situacion === 'EN_PAUSA' && (
+            <span class="badge-tag badge-tag--pause">En pausa {postulacion.pausaHasta ? `hasta ${postulacion.pausaHasta}` : ''}</span>
+          )}
+          {situacion === 'CERRADA' && (
+            <span class="badge-tag badge-tag--closed">Postulación cerrada</span>
+          )}
+        </div>
+        <div class="applicant-bar__program">
+          Red Universitaria FGREC &middot; Universidad asociada: <strong>UGR</strong>
+        </div>
+      </header>
+
+      <!-- MAPA DE FASES / STEPPER FORMAL INSTITUCIONAL -->
+      <section class="stepper-card" aria-label="Fases del proceso de admisión académica">
+        <div class="stepper-card__header">
+          <h2 class="stepper-card__title">Proceso de Admisión Académica</h2>
+          <span class="stepper-card__legend">Campaña Ingreso Marzo 2027</span>
         </div>
 
-        {asesora?.nombre && (
-          <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--portal-borde); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-            <div style="font-size: 15px; color: var(--portal-mutado);">
-              Asesora institucional asignada: <strong style="color: var(--portal-azul);">{asesora.nombre}</strong>
+        <ol class="stepper">
+          <!-- Fase 1 -->
+          <li class={`step ${faseActiva > 1 ? 'step--completed' : faseActiva === 1 ? 'step--active' : ''}`}>
+            <div class="step__marker" aria-hidden="true">
+              {faseActiva > 1 ? (
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              ) : '1'}
             </div>
-            {whatsappHref && (
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="enlace-flecha" style="font-size: 14px;">
-                Contactar por WhatsApp <span aria-hidden="true">→</span>
-              </a>
-            )}
-          </div>
-        )}
+            <span class="step__title">1. Orientación y Registro</span>
+            <span class="step__status">{faseActiva > 1 ? 'Completado' : 'En curso'}</span>
+          </li>
+
+          <!-- Fase 2 -->
+          <li class={`step ${faseActiva > 2 ? 'step--completed' : faseActiva === 2 ? 'step--active' : ''}`}>
+            <div class="step__marker" aria-hidden="true">
+              {faseActiva > 2 ? (
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              ) : '2'}
+            </div>
+            <span class="step__title">2. Documentación y Carta</span>
+            <span class="step__status">
+              {faseActiva > 2 ? 'Completado' : faseActiva === 2 ? (enRevision ? 'En revisión' : 'En curso') : 'Pendiente'}
+            </span>
+          </li>
+
+          <!-- Fase 3 -->
+          <li class={`step ${faseActiva > 3 ? 'step--completed' : faseActiva === 3 ? 'step--active' : ''}`}>
+            <div class="step__marker" aria-hidden="true">
+              {faseActiva > 3 ? (
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              ) : '3'}
+            </div>
+            <span class="step__title">3. Dictamen y Admisión</span>
+            <span class="step__status">{faseActiva > 3 ? 'Completado' : faseActiva === 3 ? 'En curso' : 'Pendiente'}</span>
+          </li>
+
+          <!-- Fase 4 -->
+          <li class={`step ${faseActiva > 4 ? 'step--completed' : faseActiva === 4 ? 'step--active' : ''}`}>
+            <div class="step__marker" aria-hidden="true">
+              {faseActiva > 4 ? (
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              ) : '4'}
+            </div>
+            <span class="step__title">4. Fondo Institucional</span>
+            <span class="step__status">{faseActiva > 4 ? 'Completado' : faseActiva === 4 ? 'En curso' : 'Pendiente'}</span>
+          </li>
+
+          <!-- Fase 5 -->
+          <li class={`step ${faseActiva === 5 ? 'step--active' : ''}`}>
+            <div class="step__marker" aria-hidden="true">5</div>
+            <span class="step__title">5. Matrícula y Alta</span>
+            <span class="step__status">{faseActiva === 5 ? 'En curso' : 'Final'}</span>
+          </li>
+        </ol>
       </section>
 
-      <!-- Grid principal de dos columnas -->
-      <div class="portal-dashboard-grid">
-        <!-- Columna principal (izquierda) -->
-        <div class="portal-dashboard-main">
-          <!-- Etapa actual y acción prioritaria -->
-          <div class="tarjeta" style="background: #FFFFFF; border-left: 4px solid var(--portal-cobre); position: relative;">
-            <p class="antetitulo" style="margin-bottom: 6px;">Etapa del proceso</p>
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
-              <h2 style="font-size: 26px; color: var(--portal-azul); margin: 0;">
-                {paso.nombre}
-              </h2>
-              <span style={`font-size: 13px; font-weight: 700; color: ${situacion === 'EN_PAUSA' ? 'var(--portal-ambar)' : situacion === 'CERRADA' ? 'var(--portal-rojo)' : 'var(--portal-cobre-texto)'}; text-transform: uppercase; letter-spacing: 0.08em;`}>
-                {situacion === 'EN_PAUSA' ? 'En pausa' : situacion === 'CERRADA' ? 'Cerrada' : 'En curso'}
-              </span>
-            </div>
+      <!-- GRID PRINCIPAL -->
+      <div class="postulacion-layout">
 
-            {proximoPaso ? (
-              <div style="background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 18px 20px; margin-top: 16px;">
-                <p class="antetitulo" style="color: var(--portal-cobre-texto); margin-bottom: 4px;">🎯 Próxima acción requerida</p>
-                <p style="font-size: 16px; font-weight: 600; color: var(--portal-azul); margin: 0 0 16px 0; line-height: 1.4;">
-                  {proximoPaso.texto}
-                </p>
+        <!-- COLUMNA PRINCIPAL DE ACCIÓN -->
+        <div class="postulacion-main">
 
-                {proximoPaso.codigo === 'CARGAR_DOCUMENTOS' || proximoPaso.codigo === 'SUBSANAR_DOCUMENTOS' ? (
-                  <a href="/mi-postulacion/documentos" class="boton boton--acento" style="display: inline-flex;">
-                    Gestionar mis documentos
-                  </a>
-                ) : proximoPaso.codigo === 'ESCRIBIR_CARTA' ? (
-                  <a href="/mi-postulacion/documentos#carta" class="boton boton--acento" style="display: inline-flex;">
-                    Escribir mi carta
-                  </a>
-                ) : proximoPaso.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
-                  <a href="/mi-postulacion/precalificador" class="boton boton--acento" style="display: inline-flex;">
-                    Completar preguntas previas
-                  </a>
-                ) : whatsappHref ? (
-                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--contorno" style="display: inline-flex;">
-                    Consultar con mi asesora
-                  </a>
-                ) : null}
-              </div>
-            ) : (
-              <p class="entrada" style="font-size: 16px; margin: 12px 0 0 0;">
-                Tu expediente se encuentra al día. El equipo de admisiones está revisando la información.
-              </p>
-            )}
-          </div>
+          <!-- TARJETA PRINCIPAL DE ACCIÓN REQUERIDA -->
+          <article class="action-card">
+            <span class="action-card__tag">
+              {enRevision
+                ? 'Expediente remitido a secretaría'
+                : `Fase ${faseActiva} en curso · Requerimiento de admisión`}
+            </span>
 
-          <!-- Resumen del expediente documental -->
-          <div class="tarjeta" style="background: #FFFFFF;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
-              <div>
-                <p class="antetitulo" style="margin-bottom: 4px;">Documentación académica</p>
-                <h2 style="font-size: 24px; color: var(--portal-azul); margin: 0;">
-                  Estado del expediente
-                </h2>
-              </div>
-              <a class="enlace-flecha" href="/mi-postulacion/documentos">
-                Ver todos los documentos <span aria-hidden="true">→</span>
-              </a>
-            </div>
+            <h2 class="action-card__heading">
+              {enRevision
+                ? 'Expediente formal en revisión institucional'
+                : proximoPaso?.codigo === 'CARGAR_DOCUMENTOS' || proximoPaso?.codigo === 'SUBSANAR_DOCUMENTOS'
+                ? 'Completar expediente de admisión institucional'
+                : proximoPaso?.codigo === 'ESCRIBIR_CARTA'
+                ? 'Presentar carta de interés institucional'
+                : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR'
+                ? 'Completar registro de antecedentes previos'
+                : paso.nombre}
+            </h2>
 
-            <p style="font-size: 15px; color: var(--portal-mutado); margin: 0 0 18px 0; line-height: 1.5;">
-              La universidad aliada requiere la validación de estos requisitos para emitir el dictamen académico formal.
+            <p class="action-card__lead">
+              {enRevision
+                ? 'Su documentación y carta de interés han sido recibidas y se encuentran bajo revisión de la Dirección de Admisiones y la universidad asociada.'
+                : proximoPaso?.texto
+                ? proximoPaso.texto
+                : 'Para remitir su legajo a la Dirección de Admisiones y al comité académico de la universidad asociada, es necesario consignar la documentación obligatoria requerida y su carta de interés institucional.'}
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; text-align: center;">
-              <div style="padding: 16px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
-                <div style="font-size: 32px; font-weight: 700; font-family: var(--serif); color: var(--portal-azul); line-height: 1;">
-                  {documentos.total}
+            <!-- AUDITORÍA DE ELEMENTOS PENDIENTES -->
+            <div class="audit-list">
+              <div class="audit-list__row">
+                <div class="audit-list__col-left">
+                  <span class={`audit-indicator ${documentos.pendientes === 0 && documentos.total > 0 ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
+                    {documentos.pendientes === 0 && documentos.total > 0 && (
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    )}
+                  </span>
+                  <span>Documentos de identidad y título habilitante</span>
                 </div>
-                <div style="font-size: 12px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;">
-                  Requisitos totales
-                </div>
+                {documentos.pendientes === 0 && documentos.total > 0 ? (
+                  <span class="badge-status badge-status--ok">Completos ({documentos.total})</span>
+                ) : (
+                  <span class="badge-status badge-status--pending">
+                    {documentos.total - documentos.pendientes} de {documentos.total} cargados
+                  </span>
+                )}
               </div>
 
-              <div style="padding: 16px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
-                <div style={`font-size: 32px; font-weight: 700; font-family: var(--serif); color: ${documentos.pendientes > 0 ? 'var(--portal-cobre-texto)' : 'var(--portal-mutado)'}; line-height: 1;`}>
-                  {documentos.pendientes}
+              <div class="audit-list__row">
+                <div class="audit-list__col-left">
+                  <span class={`audit-indicator ${enRevision ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
+                    {enRevision && (
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    )}
+                  </span>
+                  <span>Carta de interés institucional</span>
                 </div>
-                <div style="font-size: 12px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;">
-                  Pendientes
-                </div>
+                {enRevision ? (
+                  <span class="badge-status badge-status--ok">Presentada</span>
+                ) : (
+                  <span class="badge-status badge-status--pending">Borrador o pendiente</span>
+                )}
               </div>
 
-              <div style="padding: 16px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio);">
-                <div style={`font-size: 32px; font-weight: 700; font-family: var(--serif); color: ${documentos.observados > 0 ? 'var(--portal-rojo)' : 'var(--portal-mutado)'}; line-height: 1;`}>
-                  {documentos.observados}
+              <div class="audit-list__row">
+                <div class="audit-list__col-left">
+                  <span class="audit-indicator audit-indicator--ok">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <span>Consentimiento para tratamiento de datos académicos</span>
                 </div>
-                <div style="font-size: 12px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;">
-                  Observados
-                </div>
+                <span class="badge-status badge-status--ok">Registrado</span>
               </div>
             </div>
 
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <a href="/mi-postulacion/documentos" class="boton boton--contorno">
-                Abrir módulo de documentos
+            <!-- BOTÓN PRINCIPAL DE GESTIÓN -->
+            {enRevision ? (
+              <a href="/mi-postulacion/documentos" class="btn-primary">
+                <span>Ver expediente presentado</span>
+                <span aria-hidden="true">&rarr;</span>
               </a>
-              {documentos.pendientes > 0 && (
-                <a href="/mi-postulacion/documentos" class="boton boton--acento">
-                  Cargar documentos pendientes
-                </a>
-              )}
+            ) : proximoPaso?.codigo === 'ESCRIBIR_CARTA' ? (
+              <a href="/mi-postulacion/documentos#carta" class="btn-primary">
+                <span>Redactar carta de interés</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            ) : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
+              <a href="/mi-postulacion/precalificador" class="btn-primary">
+                <span>Completar preguntas previas</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            ) : (
+              <a href="/mi-postulacion/documentos" class="btn-primary">
+                <span>Gestionar documentación y carta de interés</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            )}
+          </article>
+
+          <!-- SEGUIMIENTO ARANCELARIO -->
+          <section class="aranceles-card">
+            <div class="aranceles-card__header">
+              <h3 class="aranceles-card__title">Aranceles y Registro de Pagos</h3>
+              <span class="badge-status badge-status--ok">Al día</span>
             </div>
-          </div>
+            <p class="aranceles-card__text">
+              No registra pagos pendientes de validación administrativa. Al efectuar un depósito o transferencia bancaria, podrá informar el comprobante a través de esta sección.
+            </p>
+            <a href="/mi-postulacion/documentos" class="aranceles-card__link">
+              <span>Consultar historial de comprobantes</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </section>
+
         </div>
 
-        <!-- Columna lateral (derecha) -->
-        <div class="portal-dashboard-aside">
-          <!-- Tarjeta Destacada: Tu Asesor Institucional Asignado -->
-          <div class="tarjeta" style="background: #FFFFFF; border-top: 4px solid var(--portal-cobre); box-shadow: 0 4px 16px rgba(11, 27, 46, 0.06);">
-            <p class="antetitulo" style="margin-bottom: 6px;">Asesoría Personalizada</p>
-            <h3 style="font-size: 21px; color: var(--portal-azul); margin-bottom: 12px;">
-              Tu Asesor Asignado
-            </h3>
+        <!-- COLUMNA LATERAL (ASESORÍA INSTITUCIONAL) -->
+        <aside class="postulacion-aside">
+          <div class="aside-card">
+            <h3 class="aside-card__section-title">Asesoría Institucional</h3>
 
             {asesora?.nombre ? (
-              <div>
-                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: var(--crema, #F7F4EE); padding: 14px 16px; border-radius: var(--portal-radio); border: 1px solid var(--portal-borde);">
-                  <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--portal-azul); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; font-family: var(--serif);">
-                    {asesora.nombre.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <strong style="display: block; font-size: 17px; color: var(--portal-azul); line-height: 1.2;">
-                      {asesora.nombre}
-                    </strong>
-                    <span style="font-size: 13px; color: var(--portal-cobre-texto); font-weight: 600;">
-                      Admisiones Institucionales FGREC
-                    </span>
-                  </div>
+              <div class="advisor-profile">
+                <div class="advisor-avatar">
+                  {asesora.nombre.slice(0, 2).toUpperCase()}
                 </div>
-
-                <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 16px;">
-                  Tu asesora revisa tu expediente académico, valida tus requisitos ante la universidad y te guía en cada paso del proceso.
-                </p>
-
-                {whatsappHref && (
-                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--acento" style="width: 100%; display: flex; gap: 8px;">
-                    <span>Hablar con {asesora.nombre.split(' ')[0]}</span>
-                    <span aria-hidden="true">→</span>
-                  </a>
-                )}
+                <div class="advisor-details">
+                  <strong>{asesora.nombre}</strong>
+                  <span>Admisiones Internacionales &middot; FGREC</span>
+                </div>
               </div>
             ) : (
-              <div>
-                <div style="background: var(--crema, #F7F4EE); padding: 14px 16px; border-radius: var(--portal-radio); border: 1px solid var(--portal-borde); margin-bottom: 14px;">
-                  <strong style="display: block; font-size: 16px; color: var(--portal-azul); margin-bottom: 2px;">
-                    Equipo de Admisiones FGREC
-                  </strong>
-                  <span style="font-size: 13px; color: var(--portal-mutado);">
-                    Asignación en curso
-                  </span>
+              <div class="advisor-profile">
+                <div class="advisor-avatar">FG</div>
+                <div class="advisor-details">
+                  <strong>Equipo de Admisiones</strong>
+                  <span>Coordinación Académica &middot; FGREC</span>
                 </div>
-                <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 16px;">
-                  Tu expediente está siendo asignado a una asesora institucional para acompañarte en tu postulación.
-                </p>
-                {whatsappHref && (
-                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="boton boton--oscuro" style="width: 100%;">
-                    Contactar mesa de admisiones
-                  </a>
-                )}
               </div>
             )}
-          </div>
 
-          <!-- Tarjeta de Acompañamiento Institucional (Rol de la Fundación) -->
-          <div class="tarjeta" style="background: var(--crema-2, #F3EBDD); border-color: #DFD5C3;">
-            <p class="antetitulo" style="margin-bottom: 6px;">Acompañamiento FGREC</p>
-            <h3 style="font-size: 20px; color: var(--portal-azul); margin-bottom: 8px;">
-              ¿Cómo funciona tu proceso?
-            </h3>
-            <p style="font-size: 14px; color: var(--portal-mutado); line-height: 1.5; margin-bottom: 14px;">
-              La Fundación del Gran Rosario te orienta y acompaña con cada trámite hacia la universidad aliada:
+            <p class="advisor-desc">
+              Responsable del seguimiento de su expediente, verificación formal y coordinación con la secretaría académica de la universidad asociada.
             </p>
 
-            <ul style="padding-left: 18px; margin: 0 0 18px 0; font-size: 14px; color: var(--portal-texto); line-height: 1.5;">
-              <li>Revisión preliminar de tu documentación.</li>
-              <li>Articulación y solicitud de dictamen académico.</li>
-              <li>Acceso al Beneficio Institucional FGREC.</li>
-              <li>Acompañamiento hasta tu matriculación oficial.</li>
-            </ul>
+            {whatsappHref && (
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="btn-contact">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.072-.497-1.745-.724-2.868-2.502-2.955-2.617-.087-.116-.708-.941-.708-1.794s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.35.491 1.199.534 1.286.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.087-.178.181-.077.355.101.173.449.741.964 1.201.662.591 1.221.774 1.394.861.173.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/>
+                </svg>
+                <span>Contactar vía WhatsApp</span>
+              </a>
+            )}
 
-            <a class="enlace-flecha" href="/la-fundacion/" target="_blank" rel="noopener" style="font-size: 14px;">
-              Conocer más sobre la Fundación <span aria-hidden="true">→</span>
-            </a>
+            <div class="info-dl">
+              <div class="info-dl__item">
+                <span class="info-dl__label">Horario:</span>
+                <span>Lunes a Viernes 08:30 a 17:30</span>
+              </div>
+              <div class="info-dl__item">
+                <span class="info-dl__label">Sede:</span>
+                <span>Torre 1492, Of. 902, Quito</span>
+              </div>
+              <div class="info-dl__item">
+                <span class="info-dl__label">Régimen:</span>
+                <span>Convocatoria Marzo 2027</span>
+              </div>
+            </div>
           </div>
+        </aside>
 
-          <!-- Canales de contacto directo y sede -->
-          <div class="tarjeta" style="background: #FFFFFF;">
-            <p class="antetitulo" style="margin-bottom: 6px;">Sede y Soporte</p>
-            <h3 style="font-size: 18px; color: var(--portal-azul); margin-bottom: 6px;">
-              Oficina Quito, Ecuador
-            </h3>
-            <p style="font-size: 13px; color: var(--portal-mutado); line-height: 1.45; margin-bottom: 14px;">
-              Av. 12 de Octubre y Lincoln, Edificio Torre 1492, Of. 902.
-            </p>
-            <a href="/contacto/" target="_blank" rel="noopener" class="enlace-flecha" style="font-size: 14px;">
-              Ver ubicación y horarios <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </div>
       </div>
-    </>
+
+    </div>
   )}
 </PortalLayout>
+
+<style>
+  .postulacion-container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 16px 0 48px;
+  }
+
+  .error-card {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: #FFFFFF;
+    border: 1px solid var(--portal-borde);
+    border-radius: var(--portal-radio);
+  }
+
+  /* BARRA DE EXPEDIENTE DEL POSTULANTE */
+  .applicant-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--portal-borde);
+  }
+  .applicant-bar__info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .applicant-bar__name {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--portal-azul);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .badge-tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 3px;
+  }
+  .badge-tag--active {
+    background: var(--portal-verde-fondo);
+    color: var(--portal-verde);
+    border: 1px solid #C4DEC8;
+  }
+  .badge-tag--pause {
+    background: var(--portal-ambar-fondo);
+    color: var(--portal-ambar);
+    border: 1px solid #F6DFB3;
+  }
+  .badge-tag--closed {
+    background: var(--portal-rojo-fondo);
+    color: var(--portal-rojo);
+    border: 1px solid #F5C2C0;
+  }
+  .applicant-bar__program {
+    font-size: 13.5px;
+    color: var(--portal-mutado);
+  }
+  .applicant-bar__program strong {
+    color: var(--portal-azul);
+    font-weight: 600;
+  }
+
+  /* STEPPER FORMAL INSTITUCIONAL */
+  .stepper-card {
+    background: var(--portal-blanco);
+    border: 1px solid var(--portal-borde);
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 3px rgba(11, 27, 46, 0.04);
+  }
+  .stepper-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 22px;
+  }
+  .stepper-card__title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--portal-cobre-texto);
+    margin: 0;
+  }
+  .stepper-card__legend {
+    font-size: 12px;
+    color: var(--portal-mutado);
+  }
+
+  .stepper {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .stepper::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: #CBD5E1;
+    z-index: 1;
+  }
+  .step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .step__marker {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid #94A3B8;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .step--completed .step__marker {
+    background: var(--portal-verde);
+    border-color: var(--portal-verde);
+    color: #FFFFFF;
+  }
+  .step--active .step__marker {
+    background: var(--portal-azul);
+    border-color: var(--portal-cobre);
+    color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(201, 138, 75, 0.2);
+  }
+  .step__title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--portal-mutado);
+    line-height: 1.3;
+  }
+  .step--active .step__title {
+    color: var(--portal-azul);
+    font-weight: 700;
+  }
+  .step__status {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+    color: #94A3B8;
+  }
+  .step--completed .step__status { color: var(--portal-verde); }
+  .step--active .step__status { color: var(--portal-cobre-texto); }
+
+  /* LAYOUT GRID DE DOS COLUMNAS */
+  .postulacion-layout {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* TARJETA DE ACCIÓN PRIORITARIA */
+  .action-card {
+    background: var(--portal-blanco);
+    border: 1px solid var(--portal-borde);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(11, 27, 46, 0.04);
+    margin-bottom: 24px;
+  }
+  .action-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--portal-azul);
+  }
+  .action-card__tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--portal-cobre-texto);
+    background: #F3EBDD;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    border-left: 2px solid var(--portal-cobre);
+  }
+  .action-card__heading {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--portal-azul);
+    margin: 0 0 12px 0;
+    line-height: 1.25;
+  }
+  .action-card__lead {
+    font-size: 14.5px;
+    color: var(--portal-mutado);
+    margin: 0 0 24px 0;
+    line-height: 1.6;
+  }
+
+  /* AUDITORÍA DE ELEMENTOS PENDIENTES */
+  .audit-list {
+    background: #FDFDFD;
+    border: 1px solid var(--portal-borde);
+    border-radius: 3px;
+    margin-bottom: 26px;
+  }
+  .audit-list__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid #F1ECE3;
+    font-size: 13.5px;
+    gap: 12px;
+  }
+  .audit-list__row:last-child { border-bottom: none; }
+  .audit-list__col-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--portal-azul);
+    font-weight: 500;
+  }
+  .audit-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .audit-indicator--ok {
+    background: var(--portal-verde-fondo);
+    color: var(--portal-verde);
+  }
+  .audit-indicator--pending {
+    border: 1.5px solid #94A3B8;
+    background: transparent;
+  }
+  .badge-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .badge-status--ok {
+    background: var(--portal-verde-fondo);
+    color: var(--portal-verde);
+  }
+  .badge-status--pending {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--portal-azul);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: 0.02em;
+    padding: 13px 26px;
+    border-radius: 3px;
+    border: 1px solid var(--portal-azul);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-primary:hover {
+    background: var(--portal-cobre-hover);
+    border-color: var(--portal-cobre-hover);
+    color: #FFFFFF;
+  }
+
+  /* SECCIÓN ARANCELARIA */
+  .aranceles-card {
+    background: var(--portal-blanco);
+    border: 1px solid var(--portal-borde);
+    border-radius: 4px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(11, 27, 46, 0.03);
+  }
+  .aranceles-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .aranceles-card__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--portal-azul);
+    margin: 0;
+  }
+  .aranceles-card__text {
+    font-size: 13.5px;
+    color: var(--portal-mutado);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+  }
+  .aranceles-card__link {
+    color: var(--portal-azul);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .aranceles-card__link:hover {
+    border-color: var(--portal-azul);
+  }
+
+  /* ASIDE INSTITUCIONAL */
+  .aside-card {
+    background: var(--portal-blanco);
+    border: 1px solid var(--portal-borde);
+    border-radius: 4px;
+    padding: 26px;
+    box-shadow: 0 1px 3px rgba(11, 27, 46, 0.03);
+  }
+  .aside-card__section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--portal-cobre-texto);
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--portal-borde);
+  }
+  .advisor-profile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .advisor-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 2px;
+    background: var(--portal-azul);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: var(--serif);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--portal-cobre);
+    flex-shrink: 0;
+  }
+  .advisor-details strong {
+    display: block;
+    color: var(--portal-azul);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .advisor-details span {
+    font-size: 12.5px;
+    color: var(--portal-mutado);
+  }
+  .advisor-desc {
+    font-size: 13px;
+    color: var(--portal-mutado);
+    line-height: 1.55;
+    margin: 0 0 20px 0;
+  }
+  .btn-contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #FFFFFF;
+    color: var(--portal-azul);
+    border: 1px solid var(--portal-azul);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 10px 16px;
+    border-radius: 3px;
+    transition: all 0.15s;
+    margin-bottom: 24px;
+  }
+  .btn-contact:hover {
+    background: var(--portal-azul);
+    color: #FFFFFF;
+  }
+  .info-dl {
+    margin: 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--portal-borde);
+    font-size: 12.5px;
+    color: var(--portal-mutado);
+  }
+  .info-dl__item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--portal-borde);
+  }
+  .info-dl__item:last-child { border-bottom: none; }
+  .info-dl__label { font-weight: 600; color: var(--portal-azul); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .postulacion-layout { grid-template-columns: 1fr; gap: 20px; }
+    .action-card { padding: 22px 18px; }
+    .stepper { display: flex; flex-direction: column; gap: 12px; }
+    .stepper::before { display: none; }
+    .step { flex-direction: row; text-align: left; gap: 14px; }
+    .step__marker { margin-bottom: 0; width: 30px; height: 30px; font-size: 12px; }
+    .audit-list__row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+</style>
