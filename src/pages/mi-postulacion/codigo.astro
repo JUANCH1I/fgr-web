@@ -207,6 +207,8 @@ if (sesionToken) {
         setTimeout(() => {
           if (data.siguiente === 'documentos') {
             window.location.href = '/mi-postulacion/documentos';
+          } else if (data.siguiente === 'carta') {
+            window.location.href = '/mi-postulacion/documentos#carta';
           } else if (data.siguiente === 'precalificador') {
             window.location.href = '/mi-postulacion/precalificador';
           } else {

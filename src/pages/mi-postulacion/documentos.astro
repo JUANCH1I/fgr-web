@@ -1,7 +1,9 @@
 ---
 export const prerender = false;
 
+import { createHash } from 'node:crypto';
 import PortalLayout from '../../layouts/PortalLayout.astro';
+import CartaInteres from '../../components/CartaInteres.astro';
 import {
   COOKIE_SESION_NOMBRE,
   llamarFGRECPortal,
@@ -10,6 +12,7 @@ import {
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
 import { presentarEstadoDocumento, type RequisitoUI } from '../../lib/portal-pure.ts';
+import { resumirExpediente } from '../../lib/carta-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -75,6 +78,31 @@ try {
 } catch {
   // Asesoría fallback
 }
+
+// 4. Carta de interés: parte del expediente (documentos + carta)
+let carta: any = null;
+let errorCarta: { status: number; code?: string; message?: string } | null = null;
+if (respuestaDocs.ok) {
+  const respCarta = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'carta',
+    sesion: sesionToken,
+    contexto
+  });
+  if (respCarta.status === 401) {
+    borrarSesionYContacto(Astro.cookies);
+    return Astro.redirect('/mi-postulacion/ingresar', 302);
+  }
+  if (respCarta.ok) {
+    carta = respCarta.data;
+  } else {
+    errorCarta = { status: respCarta.status, code: respCarta.error?.code, message: respCarta.error?.message };
+  }
+}
+// Clave opaca para el respaldo local del borrador: no expone el token de sesión.
+const claveSesion = createHash('sha256').update(sesionToken).digest('hex').slice(0, 16);
+const cartaEnviada = Boolean(carta) && carta.puedeEditar === false;
+const resumen = resumirExpediente(requisitos, cartaEnviada);
 ---
 
 <PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
@@ -109,6 +137,7 @@ try {
       )}
     </div>
   ) : (
+    <Fragment>
     <div class="portal-card">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
         <div>
@@ -125,8 +154,20 @@ try {
         )}
       </div>
       <p class="portal-desc" style="margin-top: 8px;">
-        Carga los documentos solicitados para la evaluación académica de tu expediente. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
+        Tu expediente se compone de dos partes: los documentos solicitados y tu carta de interés. Pasa a revisión cuando hayas cargado los documentos obligatorios y enviado tu carta. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
       </p>
+
+      <ul class="resumen-expediente" aria-label="Avance de tu expediente" style="list-style: none; margin: 0 0 20px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
+        <li style={`color: ${resumen.documentosCompletos ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
+          <span aria-hidden="true">{resumen.documentosCompletos ? '✓' : '○'}</span>
+          Documentos obligatorios: {resumen.obligatoriosCompletos} de {resumen.obligatoriosTotal} cargados
+        </li>
+        <li style={`color: ${cartaEnviada ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
+          <span aria-hidden="true">{cartaEnviada ? '✓' : '○'}</span>
+          Carta de interés: {cartaEnviada ? 'enviada' : (carta ? 'pendiente de enviar' : 'aún no disponible')}
+          {!cartaEnviada && carta && <a href="#carta" class="enlace-flecha" style="margin-left: 8px; font-size: 14px;">Ir a la carta <span aria-hidden="true">↓</span></a>}
+        </li>
+      </ul>
 
       {asesoraAsignada?.nombre && (
         <div style="background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
@@ -289,6 +330,8 @@ try {
           )}
         </div>
       </div>
+    <CartaInteres carta={carta} error={errorCarta} claveSesion={claveSesion} />
+    </Fragment>
   )}
 
   <div class="portal-card" style="font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
