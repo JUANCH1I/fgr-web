@@ -12,7 +12,7 @@ import {
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
 import { presentarEstadoDocumento, type RequisitoUI } from '../../lib/portal-pure.ts';
-import { resumirExpediente } from '../../lib/carta-pure.ts';
+import { leerExpediente, resumirExpediente } from '../../lib/carta-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -102,7 +102,10 @@ if (respuestaDocs.ok) {
 // Clave opaca para el respaldo local del borrador: no expone el token de sesión.
 const claveSesion = createHash('sha256').update(sesionToken).digest('hex').slice(0, 16);
 const cartaEnviada = Boolean(carta) && carta.puedeEditar === false;
-const resumen = resumirExpediente(requisitos, cartaEnviada);
+// El estado oficial lo calcula el servidor; si no lo envía (backend anterior) se usa el cálculo local de antes.
+const expediente = leerExpediente(docsData.expediente) ?? leerExpediente(carta?.expediente);
+const resumen = resumirExpediente(requisitos, cartaEnviada, expediente);
+const cartaEnviadaFinal = resumen.cartaEnviada;
 ---
 
 <PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
@@ -157,15 +160,26 @@ const resumen = resumirExpediente(requisitos, cartaEnviada);
         Tu expediente se compone de dos partes: los documentos solicitados y tu carta de interés. Pasa a revisión cuando hayas cargado los documentos obligatorios y enviado tu carta. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
       </p>
 
+      {resumen.estado === 'EN_REVISION' && (
+        <div class="portal-alert portal-alert--info" role="status" style="margin-bottom: 16px;">
+          <span><strong>Tu expediente está en revisión.</strong> Mientras dure la revisión no puedes cambiar los documentos ni la carta. Si hace falta algo, tu asesora te avisará.</span>
+        </div>
+      )}
+      {resumen.estado === 'REVISADO' && (
+        <div class="portal-alert portal-alert--success" role="status" style="margin-bottom: 16px;">
+          <span><strong>Tu expediente fue revisado.</strong> Ya no se pueden cambiar los documentos ni la carta.</span>
+        </div>
+      )}
+
       <ul class="resumen-expediente" aria-label="Avance de tu expediente" style="list-style: none; margin: 0 0 20px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
         <li style={`color: ${resumen.documentosCompletos ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
           <span aria-hidden="true">{resumen.documentosCompletos ? '✓' : '○'}</span>
           Documentos obligatorios: {resumen.obligatoriosCompletos} de {resumen.obligatoriosTotal} cargados
         </li>
-        <li style={`color: ${cartaEnviada ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
-          <span aria-hidden="true">{cartaEnviada ? '✓' : '○'}</span>
-          Carta de interés: {cartaEnviada ? 'enviada' : (carta ? 'pendiente de enviar' : 'aún no disponible')}
-          {!cartaEnviada && carta && <a href="#carta" class="enlace-flecha" style="margin-left: 8px; font-size: 14px;">Ir a la carta <span aria-hidden="true">↓</span></a>}
+        <li style={`color: ${cartaEnviadaFinal ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
+          <span aria-hidden="true">{cartaEnviadaFinal ? '✓' : '○'}</span>
+          Carta de interés: {cartaEnviadaFinal ? 'enviada' : (carta ? 'pendiente de enviar' : 'aún no disponible')}
+          {!cartaEnviadaFinal && !resumen.soloLectura && carta && <a href="#carta" class="enlace-flecha" style="margin-left: 8px; font-size: 14px;">Ir a la carta <span aria-hidden="true">↓</span></a>}
         </li>
       </ul>
 
@@ -297,7 +311,7 @@ const resumen = resumirExpediente(requisitos, cartaEnviada);
                     )}
 
                     <!-- Zona de acción para cargar o reemplazar archivo -->
-                    {vista.permiteSubida && (
+                    {vista.permiteSubida && !resumen.soloLectura && (
                       <div style="margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--portal-borde); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
                         <label
                           class="boton boton--acento btn-cargar-archivo"
@@ -330,7 +344,7 @@ const resumen = resumirExpediente(requisitos, cartaEnviada);
           )}
         </div>
       </div>
-    <CartaInteres carta={carta} error={errorCarta} claveSesion={claveSesion} />
+    <CartaInteres carta={carta} error={errorCarta} claveSesion={claveSesion} soloLectura={resumen.soloLectura} />
     </Fragment>
   )}
 

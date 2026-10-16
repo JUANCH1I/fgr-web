@@ -7,13 +7,16 @@ interface Props {
   carta?: any;
   error?: { status: number; code?: string; message?: string } | null;
   claveSesion: string;
+  /** Expediente en revisión o ya revisado: la carta no se edita aunque el servidor la devuelva como borrador. */
+  soloLectura?: boolean;
 }
 
-const { carta, error, claveSesion } = Astro.props;
+const { carta, error, claveSesion, soloLectura = false } = Astro.props;
 
 const sinPais = error?.code === 'COUNTRY_REQUIRED' || error?.code === 'GUIDE_UNAVAILABLE';
 const enviada = Boolean(carta) && carta.puedeEditar === false;
-const editable = Boolean(carta) && carta.puedeEditar !== false;
+const editable = Boolean(carta) && carta.puedeEditar !== false && !soloLectura;
+const bloqueadaSinEnviar = Boolean(carta) && carta.puedeEditar !== false && soloLectura;
 const esNuevaVersion = editable && Number(carta.version) > 1;
 const fechaEnvio = formatearFechaCarta(carta?.enviadaEn);
 const guia = carta?.guia;
@@ -61,8 +64,14 @@ const datos = editable
         Carta enviada{fechaEnvio ? ` el ${fechaEnvio}` : ''}. Ya forma parte de tu expediente y no se puede modificar.
       </p>
       <div class="carta__lectura" tabindex="0" aria-label="Texto de la carta enviada">{carta.texto}</div>
-      <p class="carta__ayuda">Si necesitas ajustar algo, escríbele a tu asesora: puede solicitar una versión nueva.</p>
+      {!soloLectura && <p class="carta__ayuda">Si necesitas ajustar algo, escríbele a tu asesora: puede solicitar una versión nueva.</p>}
     </>
+  )}
+
+  {bloqueadaSinEnviar && (
+    <div class="portal-alert portal-alert--info" style="margin-top: 14px;" role="status">
+      <span>Tu carta no se puede editar mientras tu expediente está en revisión o ya fue revisado.</span>
+    </div>
   )}
 
   {editable && (

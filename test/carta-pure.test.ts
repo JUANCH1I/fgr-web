@@ -11,6 +11,7 @@ import {
   serializarRespaldo,
   fusionarBorrador,
   resumirExpediente,
+  leerExpediente,
   interpretarErrorCarta,
   crearAutoguardado,
   type EstadoAutoguardado,
@@ -82,6 +83,41 @@ test('resumirExpediente: documentos obligatorios y carta determinan si pasa a re
   assert.equal(b.listoParaRevision, false);
   assert.equal(resumirExpediente([{ obligatorio: true, estado: 'VALIDADO' }], true).listoParaRevision, true);
   assert.equal(resumirExpediente([{ obligatorio: true, estado: 'OBSERVADO' }], true).documentosCompletos, false);
+});
+
+test('resumirExpediente sin `expediente` del servidor conserva el cálculo local y queda EN_PREPARACION', () => {
+  const r = resumirExpediente([{ obligatorio: true, estado: 'RECIBIDO' }], true, null);
+  assert.equal(r.estado, 'EN_PREPARACION');
+  assert.equal(r.soloLectura, false);
+  assert.equal(r.documentosCompletos, true);
+});
+
+test('resumirExpediente: el servidor manda (no se recalcula la regla de documentos completos)', () => {
+  // El servidor descuenta requisitos que no aplican; el listado local aún muestra uno pendiente.
+  const reqs = [{ obligatorio: true, estado: 'RECIBIDO' }, { obligatorio: true, estado: 'PENDIENTE' }];
+  const r = resumirExpediente(reqs, false, { documentosCompletos: true, cartaEnviada: true, estado: 'EN_PREPARACION' });
+  assert.equal(r.documentosCompletos, true);
+  assert.equal(r.cartaEnviada, true);
+  assert.equal(r.listoParaRevision, true);
+  assert.equal(r.obligatoriosCompletos, 1);
+  const contra = resumirExpediente([{ obligatorio: true, estado: 'RECIBIDO' }], true, { documentosCompletos: false, cartaEnviada: false, estado: 'EN_PREPARACION' });
+  assert.equal(contra.documentosCompletos, false);
+  assert.equal(contra.cartaEnviada, false);
+});
+
+test('resumirExpediente: EN_REVISION y REVISADO dejan todo de solo lectura', () => {
+  for (const estado of ['EN_REVISION', 'REVISADO'] as const) {
+    const r = resumirExpediente([], true, { documentosCompletos: true, cartaEnviada: true, estado });
+    assert.equal(r.estado, estado);
+    assert.equal(r.soloLectura, true);
+  }
+});
+
+test('leerExpediente valida la forma y devuelve null si falta o es inválida', () => {
+  assert.deepEqual(leerExpediente({ documentosCompletos: true, cartaEnviada: false, estado: 'EN_REVISION' }), { documentosCompletos: true, cartaEnviada: false, estado: 'EN_REVISION' });
+  assert.equal(leerExpediente(undefined), null);
+  assert.equal(leerExpediente({ documentosCompletos: true, cartaEnviada: false, estado: 'OTRO' }), null);
+  assert.equal(leerExpediente({ documentosCompletos: 'si', cartaEnviada: false, estado: 'REVISADO' }), null);
 });
 
 test('interpretarErrorCarta clasifica los errores del contrato', () => {

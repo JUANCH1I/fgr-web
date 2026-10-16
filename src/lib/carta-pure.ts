@@ -100,25 +100,66 @@ export interface RequisitoResumen {
   estado?: string;
 }
 
+export interface RequisitoResumen {
+  obligatorio?: boolean;
+  estado?: string;
+}
+
+export type EstadoExpediente = 'EN_PREPARACION' | 'EN_REVISION' | 'REVISADO';
+
+/** Estado oficial del expediente tal como lo devuelve el servidor (GET documentos y GET carta). */
+export interface ExpedienteServidor {
+  documentosCompletos: boolean;
+  cartaEnviada: boolean;
+  estado: EstadoExpediente;
+}
+
 export interface ResumenExpediente {
+  /** Obligatorios con documento recibido o validado (solo para mostrar «X de Y»). */
   obligatoriosTotal: number;
   obligatoriosCompletos: number;
   documentosCompletos: boolean;
   cartaEnviada: boolean;
   listoParaRevision: boolean;
+  estado: EstadoExpediente;
+  /** El expediente está en revisión o ya fue revisado: ni la carta ni los documentos se editan. */
+  soloLectura: boolean;
 }
 
-/** Un documento obligatorio cuenta como completo si ya fue recibido o validado. */
-export function resumirExpediente(requisitos: RequisitoResumen[], cartaEnviada: boolean): ResumenExpediente {
+const ESTADOS_EXPEDIENTE: readonly string[] = ['EN_PREPARACION', 'EN_REVISION', 'REVISADO'];
+
+/** Lee `expediente` de una respuesta del servidor; null si falta o no tiene la forma del contrato (servidor anterior). */
+export function leerExpediente(crudo: unknown): ExpedienteServidor | null {
+  if (!crudo || typeof crudo !== 'object') return null;
+  const e = crudo as Record<string, unknown>;
+  if (typeof e.documentosCompletos !== 'boolean' || typeof e.cartaEnviada !== 'boolean') return null;
+  if (typeof e.estado !== 'string' || !ESTADOS_EXPEDIENTE.includes(e.estado)) return null;
+  return { documentosCompletos: e.documentosCompletos, cartaEnviada: e.cartaEnviada, estado: e.estado as EstadoExpediente };
+}
+
+/**
+ * Resumen para mostrar. La regla de «documentos completos» es del servidor (`expediente`, que descuenta los
+ * requisitos que no aplican a la persona): el sitio no la recalcula. Solo si el servidor no la envía (despliegue
+ * del sitio antes que el backend) se usa el cálculo local anterior y el estado queda EN_PREPARACION.
+ */
+export function resumirExpediente(
+  requisitos: RequisitoResumen[],
+  cartaEnviadaLocal: boolean,
+  expediente?: ExpedienteServidor | null
+): ResumenExpediente {
   const obligatorios = requisitos.filter((r) => r.obligatorio);
-  const completos = obligatorios.filter((r) => r.estado === 'RECIBIDO' || r.estado === 'VALIDADO').length;
-  const documentosCompletos = completos === obligatorios.length;
+  const recibidos = obligatorios.filter((r) => r.estado === 'RECIBIDO' || r.estado === 'VALIDADO').length;
+  const documentosCompletos = expediente ? expediente.documentosCompletos : recibidos === obligatorios.length;
+  const cartaEnviada = expediente ? expediente.cartaEnviada : cartaEnviadaLocal;
+  const estado = expediente ? expediente.estado : 'EN_PREPARACION';
   return {
     obligatoriosTotal: obligatorios.length,
-    obligatoriosCompletos: completos,
+    obligatoriosCompletos: recibidos,
     documentosCompletos,
     cartaEnviada,
-    listoParaRevision: documentosCompletos && cartaEnviada
+    listoParaRevision: documentosCompletos && cartaEnviada,
+    estado,
+    soloLectura: estado !== 'EN_PREPARACION'
   };
 }
 
