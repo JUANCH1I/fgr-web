@@ -315,6 +315,8 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
                       <div style="margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--portal-borde); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
                         <label
                           class="boton boton--acento btn-cargar-archivo"
+                          tabindex="0"
+                          role="button"
                           style="cursor: pointer; width: auto; font-size: 15px; min-height: 44px; padding: 10px 20px; display: inline-flex;"
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -328,7 +330,7 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
                             class="input-file-documento"
                             data-requisito={req.codigo}
                             accept="image/jpeg,image/png,application/pdf"
-                            style="display: none;"
+                            style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;"
                           />
                         </label>
                         <span style="font-size: 13px; color: var(--portal-mutado);">
@@ -571,6 +573,16 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
         mostrarError('Error de red durante la carga del archivo. Vuelve a seleccionar el archivo para intentar de nuevo.');
         setEstado('Error de subida', false);
         target.value = '';
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLLabelElement>('.btn-cargar-archivo').forEach((label) => {
+    label.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const input = label.querySelector<HTMLInputElement>('input[type="file"]');
+        input?.click();
       }
     });
   });

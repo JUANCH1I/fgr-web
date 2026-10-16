@@ -125,6 +125,7 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       gap: 14px;
       text-decoration: none;
       color: #FFFFFF;
+      min-width: 0;
     }
 
     .portal-logo-link .portal-logo-img {
@@ -148,12 +149,31 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .portal-header-actions {
       display: flex;
       align-items: center;
       gap: 14px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .portal-header__inner {
+        padding: 10px 16px;
+        gap: 0.75rem;
+      }
+      .portal-logo-link .portal-logo-img {
+        width: 145px;
+        max-height: 42px;
+      }
+      .portal-badge-header {
+        display: none;
+      }
+      .portal-link-volver {
+        font-size: 13px;
+      }
     }
 
     .portal-btn-sm {
