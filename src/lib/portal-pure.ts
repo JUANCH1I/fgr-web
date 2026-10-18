@@ -126,6 +126,36 @@ export function mensajeResultadoPrecalificador(via: string, nombre?: string | nu
   };
 }
 
+export interface ResumenDocumentosPanel {
+  completos: boolean;
+  etiqueta: string;
+}
+
+/**
+ * Estado de los documentos para el panel "Mi postulación". `documentos.pendientes` cuenta solo obligatorios sin
+ * archivo y `total` incluye los opcionales, así que el panel habla de "obligatorios": nunca llama "completos" al
+ * conjunto mientras haya uno opcional sin cargar. La regla de completitud es del servidor (`expediente`).
+ */
+export function resumirDocumentosPanel(
+  documentos: { pendientes?: number; observados?: number; total?: number } | null | undefined,
+  expediente?: { documentosCompletos?: boolean } | null
+): ResumenDocumentosPanel {
+  const pendientes = Number(documentos?.pendientes ?? 0);
+  const observados = Number(documentos?.observados ?? 0);
+  const total = Number(documentos?.total ?? 0);
+  const completos = typeof expediente?.documentosCompletos === 'boolean'
+    ? expediente.documentosCompletos
+    : pendientes === 0 && observados === 0 && total > 0;
+  if (completos) return { completos: true, etiqueta: 'Obligatorios completos' };
+  if (pendientes > 0) {
+    return { completos: false, etiqueta: pendientes === 1 ? 'Falta 1 obligatorio' : `Faltan ${pendientes} obligatorios` };
+  }
+  if (observados > 0) {
+    return { completos: false, etiqueta: observados === 1 ? '1 documento con observaciones' : `${observados} documentos con observaciones` };
+  }
+  return { completos: false, etiqueta: 'Pendiente de carga' };
+}
+
 export const LIMITE_MAX_BYTES_ARCHIVO = 10 * 1024 * 1024; // 10 MB
 export const TIPOS_MIME_PERMITIDOS = ['application/pdf', 'image/jpeg', 'image/png'] as const;
 
