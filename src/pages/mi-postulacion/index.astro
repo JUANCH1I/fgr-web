@@ -9,6 +9,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
+import { leerConvenio, formatearFechaConvenio } from '../../lib/convenio-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -63,6 +64,25 @@ try {
   // Saludo fallback
 }
 
+// Estado del convenio de corresponsabilidad (solo lectura). Si la consulta falla, el panel simplemente no lo muestra.
+let convenio = leerConvenio(null);
+try {
+  const respConvenio = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'convenio',
+    sesion: sesionToken,
+    contexto
+  });
+  if (respConvenio.ok) {
+    convenio = leerConvenio(respConvenio.data);
+  }
+} catch {
+  // Sin estado de convenio
+}
+const convenioPendiente = convenio.estado === 'GENERADO';
+const convenioAceptado = convenio.estado === 'ACEPTADO';
+const fechaConvenio = formatearFechaConvenio(convenio.aceptadoEn);
+
 // Mapeo jerárquico formal de etapas públicas a las 5 fases del proceso de admisión
 const pasoCodigo = paso.codigo || 'ORIENTACION';
 let faseActiva = 1;
@@ -78,7 +98,9 @@ if (pasoCodigo === 'ORIENTACION') {
   faseActiva = 5;
 }
 
-const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
+const accionConvenio = proximoPaso?.codigo === 'ACEPTAR_CONVENIO';
+// Un convenio pendiente tiene prioridad sobre el aviso de revisión: es lo único que el postulante puede hacer.
+const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA' && !accionConvenio;
 ---
 
 <PortalLayout title="Mi postulación | Fundación Gran Rosario" autenticado={true}>
@@ -226,6 +248,8 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
                 ? 'Completar expediente de admisión institucional'
                 : proximoPaso?.codigo === 'ESCRIBIR_CARTA'
                 ? 'Presentar carta de interés institucional'
+                : proximoPaso?.codigo === 'ACEPTAR_CONVENIO'
+                ? 'Revisar y aceptar su convenio de corresponsabilidad'
                 : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR'
                 ? 'Completar registro de antecedentes previos'
                 : paso.nombre}
@@ -290,6 +314,26 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
                 </div>
                 <span class="badge-status badge-status--ok">Registrado</span>
               </div>
+
+              {(convenioPendiente || convenioAceptado) && (
+                <div class="audit-list__row">
+                  <div class="audit-list__col-left">
+                    <span class={`audit-indicator ${convenioAceptado ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
+                      {convenioAceptado && (
+                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      )}
+                    </span>
+                    <span>Convenio de corresponsabilidad</span>
+                  </div>
+                  {convenioAceptado ? (
+                    <span class="badge-status badge-status--ok">Aceptado{fechaConvenio ? ` el ${fechaConvenio}` : ''}</span>
+                  ) : (
+                    <span class="badge-status badge-status--pending">Pendiente de aceptación</span>
+                  )}
+                </div>
+              )}
             </div>
 
             <!-- BOTÓN PRINCIPAL DE GESTIÓN -->
@@ -301,6 +345,11 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
             ) : proximoPaso?.codigo === 'ESCRIBIR_CARTA' ? (
               <a href="/mi-postulacion/documentos#carta" class="btn-primary">
                 <span>Redactar carta de interés</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            ) : proximoPaso?.codigo === 'ACEPTAR_CONVENIO' ? (
+              <a href="/mi-postulacion/convenio" class="btn-primary">
+                <span>Leer y aceptar mi convenio</span>
                 <span aria-hidden="true">&rarr;</span>
               </a>
             ) : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
@@ -317,16 +366,15 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA';
           </article>
 
           <!-- SEGUIMIENTO ARANCELARIO -->
-          <section class="aranceles-card">
+          <section class="aranceles-card" aria-labelledby="pagos-titulo">
             <div class="aranceles-card__header">
-              <h3 class="aranceles-card__title">Aranceles y Registro de Pagos</h3>
-              <span class="badge-status badge-status--ok">Al día</span>
+              <h3 class="aranceles-card__title" id="pagos-titulo">Aranceles y Registro de Pagos</h3>
             </div>
             <p class="aranceles-card__text">
-              No registra pagos pendientes de validación administrativa. Al efectuar un depósito o transferencia bancaria, podrá informar el comprobante a través de esta sección.
+              Consulte los pagos que ya figuran en su postulación e informe uno nuevo adjuntando su comprobante. FGREC revisa cada envío antes de confirmarlo.
             </p>
-            <a href="/mi-postulacion/documentos" class="aranceles-card__link">
-              <span>Consultar historial de comprobantes</span>
+            <a href="/mi-postulacion/pagos" class="aranceles-card__link">
+              <span>Ver mis pagos e informar un pago</span>
               <span aria-hidden="true">&rarr;</span>
             </a>
           </section>
