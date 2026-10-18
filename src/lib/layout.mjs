@@ -58,8 +58,7 @@ export function cierreAsesor(sitio, { titulo = '¿Prefieres que lo veamos juntos
     </div>
     <div class="botones">
       ${boton('Hablar ahora con un asesor', sitio.enlaces.asesor, 'acento')}
-      ${boton('Agendar entrevista', sitio.enlaces.agenda, 'claro')}
-      ${sitio.enlaces.agenda ? '' : boton('Evaluar mis estudios', '/continuidad-academica/', 'claro')}
+      ${boton('Evaluar mis estudios', '/continuidad-academica/', 'claro')}
     </div>
   </div>
 </section>`;

@@ -55,7 +55,7 @@ if (!respuesta.ok || !respuesta.data) {
     return Astro.redirect('/mi-postulacion/precalificador', 302);
   }
 
-  // Si el propósito requiere nivel 2 (documentos, carta o agenda), solicitamos el código
+  // Si el propósito requiere nivel 2 (documentos o carta), solicitamos el código
   // de verificación automáticamente para que el postulante lo reciba en su correo al llegar a /codigo
   await llamarFGRECPortal({
     metodo: 'POST',

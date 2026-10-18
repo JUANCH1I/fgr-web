@@ -229,3 +229,13 @@ export function normalizarContacto(contacto: string): { valido: boolean; normali
   const esTelValido = /^\+[1-9]\d{6,14}$/.test(telLimpio);
   return { valido: esTelValido, normalizado: telLimpio, esEmail: false };
 }
+
+/**
+ * Whether the dashboard shows the letter as sent. The server's `expediente.cartaEnviada` (GET postulacion) is the
+ * source; an older backend without the field falls back to the previous inference (the dossier is in review, which
+ * requires the letter to be sent).
+ */
+export function cartaEnviadaEnPanel(postulacion: unknown, enRevision: boolean): boolean {
+  const expediente = (postulacion as { expediente?: { cartaEnviada?: unknown } } | null | undefined)?.expediente;
+  return typeof expediente?.cartaEnviada === 'boolean' ? expediente.cartaEnviada : enRevision;
+}

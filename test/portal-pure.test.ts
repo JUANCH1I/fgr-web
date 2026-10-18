@@ -7,7 +7,8 @@ import {
   validarUrlSubida,
   normalizarContacto,
   deducirTipoMime,
-  mensajeErrorSubida
+  mensajeErrorSubida,
+  cartaEnviadaEnPanel
 } from '../src/lib/portal-pure.ts';
 
 test('presentarEstadoDocumento maneja los 5 estados del Anexo §42', () => {
@@ -131,4 +132,14 @@ test('normalizarContacto valida emails y telefonos E.164', () => {
 
   const telInvalido = normalizarContacto('0991234567');
   assert.equal(telInvalido.valido, false);
+});
+
+test('cartaEnviadaEnPanel usa expediente.cartaEnviada y, sin el campo (backend anterior), cae a la inferencia por revisión', () => {
+  assert.equal(cartaEnviadaEnPanel({ expediente: { cartaEnviada: true } }, false), true);
+  assert.equal(cartaEnviadaEnPanel({ expediente: { cartaEnviada: false } }, true), false);
+  assert.equal(cartaEnviadaEnPanel({}, true), true);
+  assert.equal(cartaEnviadaEnPanel({}, false), false);
+  assert.equal(cartaEnviadaEnPanel({ expediente: {} }, false), false);
+  assert.equal(cartaEnviadaEnPanel(null, true), true);
+  assert.equal(cartaEnviadaEnPanel({ expediente: { cartaEnviada: 'true' } }, false), false);
 });
