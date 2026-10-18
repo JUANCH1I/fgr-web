@@ -17,9 +17,8 @@
   },
 
   "enlaces": {
-    "_nota": "asesor: a dónde lleva el botón «Hablar ahora con un asesor» (puede ser /contacto/ o un enlace de WhatsApp como https://wa.me/593963017631). agenda: enlace de la agenda de entrevistas; mientras esté vacío, el botón «Agendar entrevista» no se muestra. resolucion: PDF de la resolución (con los documentos de los fundadores tapados); mientras esté vacío, el enlace «Ver resolución» no se muestra.",
+    "_nota": "asesor: a dónde lleva el botón «Hablar ahora con un asesor» (puede ser /contacto/ o un enlace de WhatsApp como https://wa.me/593963017631). resolucion: PDF de la resolución (con los documentos de los fundadores tapados); mientras esté vacío, el enlace «Ver resolución» no se muestra.",
     "asesor": "/contacto/",
-    "agenda": "",
     "resolucion": ""
   },
 

@@ -209,7 +209,6 @@ export function paginaMaestria(sitio, m, carrerasPorSlug) {
       <div class="botones botones--columna">
         ${boton('Consultar por un seminario', sitio.enlaces.asesor, 'oscuro')}
         ${c ? boton('Ver la ficha de la maestría', '/carreras/' + c.slug + '/', 'contorno') : ''}
-        ${boton('Agendar entrevista', sitio.enlaces.agenda, 'contorno')}
       </div>
       <p class="nota">Un asesor te indica cuándo abre cada seminario y cómo se articula con la maestría.</p>
     </aside>

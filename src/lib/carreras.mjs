@@ -202,7 +202,6 @@ export function ficha(sitio, c, { carreras, fondos, maestrias }) {
       <div class="botones botones--columna">
         ${boton('Evaluar mis estudios', '/continuidad-academica/#evaluar', 'oscuro')}
         ${boton('Hablar ahora con un asesor', sitio.enlaces.asesor, 'contorno')}
-        ${sitio.enlaces.agenda ? boton('Agendar entrevista', sitio.enlaces.agenda, 'contorno') : ''}
       </div>
       <p class="nota">¿Dudas sobre la validez del título en tu país? Un asesor te orienta antes de inscribirte.</p>
       ${maestria ? '<p class="nota">' + enlaceFlecha('Seminarios que puedes cursar como microcertificación', '/microcertificaciones/' + maestria.slug + '/') + '</p>' : ''}

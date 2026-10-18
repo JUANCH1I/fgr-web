@@ -56,7 +56,7 @@ ${datosJSON('datos-carreras', datosCarrerasNavegador(carreras))}`,
     // Precalificador "Evaluar mis estudios".
     'precalificador': () => {
       const areas = [...new Set(carreras.map((c) => c.area))].sort((a, b) => a.localeCompare(b, 'es'));
-      return `<div class="precalificador" data-precalificador data-destino="${esc(sitio.formularios.destino)}" data-correo="${esc(sitio.contacto.correo)}" data-asesor="${esc(sitio.enlaces.asesor)}" data-agenda="${esc(sitio.enlaces.agenda)}">
+      return `<div class="precalificador" data-precalificador data-destino="${esc(sitio.formularios.destino)}" data-correo="${esc(sitio.contacto.correo)}" data-asesor="${esc(sitio.enlaces.asesor)}">
   <p class="precalificador__paso" data-paso-texto>Evaluar mis estudios · Paso 1 de 3</p>
 
   <section data-paso="1">
@@ -94,7 +94,6 @@ ${datosJSON('datos-carreras', datosCarrerasNavegador(carreras))}`,
     <p class="nota" data-nota-envio></p>
     <div class="fila">
       ${boton('Hablar ahora con un asesor', sitio.enlaces.asesor, 'oscuro')}
-      ${boton('Agendar entrevista', sitio.enlaces.agenda, 'contorno')}
       ${boton('Ver carreras', '/carreras/', 'contorno')}
     </div>
     <div class="fila"><button type="button" class="boton-texto" data-volver="1">Empezar de nuevo</button></div>
@@ -121,7 +120,6 @@ ${datosJSON('datos-precalificador', { areas, carreras: carreras.map((c) => ({ n:
     // Botones principales del sitio.
     'botones-asesor': () => `<div class="botones">
   ${boton('Hablar ahora con un asesor', sitio.enlaces.asesor, 'oscuro')}
-  ${boton('Agendar entrevista', sitio.enlaces.agenda, 'contorno')}
 </div>`
   };
 }
