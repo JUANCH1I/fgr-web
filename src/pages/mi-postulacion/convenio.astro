@@ -141,6 +141,10 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
           <object class="convenio__visor" data={RUTA_PDF_CONVENIO} type="application/pdf" aria-label="Documento del convenio de corresponsabilidad">
             <p class="carta__ayuda">Tu navegador no muestra el PDF aquí. Usa «Abrir el PDF» o «Descargar el PDF».</p>
           </object>
+          <p class="carta__ayuda convenio__respaldo">
+            ¿No ves el documento? <a class="enlace-flecha" href={RUTA_PDF_CONVENIO} target="_blank" rel="noopener">Abrir el PDF <span aria-hidden="true">→</span></a>
+            o <a class="enlace-flecha" href={`${RUTA_PDF_CONVENIO}?descargar=1`} download={convenio.nombreArchivo || 'convenio.pdf'}>descargarlo</a>.
+          </p>
 
           {pendiente && aceptacion && (
             <form id="formAceptar" class="convenio__aceptar" novalidate data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256}>
@@ -153,10 +157,13 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
                 Al confirmar quedan registrados la fecha y la hora, tu dirección de red, tu navegador y la huella del documento que aceptas.
               </p>
               <div class="convenio__acciones" style="margin-top: 14px;">
-                <button type="submit" id="btnAceptar" class="portal-btn portal-btn--acento" style="width: auto;" disabled>
+                <button type="submit" id="btnAceptar" class="portal-btn portal-btn--acento" style="width: auto;" disabled aria-describedby="ayudaAceptar">
                   Confirmar mi aceptación
                 </button>
               </div>
+              <p id="ayudaAceptar" class="carta__ayuda" style="margin-top: 8px;">
+                Para habilitar este botón, marca primero la casilla que confirma que leíste y aceptas el convenio.
+              </p>
             </form>
           )}
         </>
@@ -188,6 +195,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
   .convenio__casilla input:focus-visible { outline: 3px solid var(--portal-cobre); outline-offset: 2px; }
   .convenio__aceptado { display: flex; gap: 8px; align-items: baseline; margin: 14px 0 0 0; padding: 12px 16px; background: var(--portal-verde-fondo); color: var(--portal-verde); border-radius: var(--portal-radio); font-weight: 600; }
   .carta__ayuda { font-size: 13px; color: var(--portal-mutado); margin: 12px 0 0 0; }
+  .convenio__respaldo { margin-top: 8px; }
   /* En un teléfono el PDF no se incrusta de forma fiable: se abre o se descarga con los botones. */
   @media (max-width: 720px) {
     .convenio__visor { display: none; }
