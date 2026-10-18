@@ -528,6 +528,27 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       box-shadow: 0 0 0 3px rgba(201, 138, 75, 0.2);
     }
 
+    /* Grupos de opciones (radios): el área tocable mide al menos 44px */
+    .portal-fieldset { border: 0; padding: 0; min-width: 0; }
+    .portal-fieldset legend { padding: 0; }
+    .portal-radios { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    .portal-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 8px 16px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid #CCD4DC;
+      border-radius: 4px;
+      background: #FCFCFD;
+      box-sizing: border-box;
+    }
+    .portal-radio input[type="radio"] { width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--portal-azul); cursor: pointer; }
+    .portal-radio:has(input:checked) { border-color: var(--portal-cobre); background: #FFFFFF; }
+    .portal-radio:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(201, 138, 75, 0.35); }
+
     /* Alertas */
     .portal-alert {
       padding: 14px 16px;

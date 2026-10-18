@@ -110,7 +110,8 @@ export function presentarEstadoDocumento(requisito: RequisitoUI): PresentacionEs
  */
 export function mensajeResultadoPrecalificador(via: string, nombre?: string | null): { titulo: string; mensaje: string; advertencia: string } {
   const nombreStr = nombre ? `¡Gracias, ${nombre}!` : '¡Gracias!';
-  if (via === 'LICENCIATURA_COMPLETA') {
+  // FGREC responde LICENCIATURA; LICENCIATURA_COMPLETA se conserva por compatibilidad.
+  if (via === 'LICENCIATURA' || via === 'LICENCIATURA_COMPLETA') {
     return {
       titulo: 'Licenciatura completa',
       mensaje: `${nombreStr} Con los antecedentes que nos indicaste, puedes avanzar por la vía de una licenciatura completa.`,

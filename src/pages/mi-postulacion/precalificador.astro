@@ -9,6 +9,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
+import { SITUACIONES, BACHILLERATO_OPCIONES } from '../../lib/precalificador-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -96,80 +97,67 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
               <label for="inputSituacion" class="portal-label">¿Cuál es tu situación académica actual?</label>
               <select id="inputSituacion" name="situacion" class="portal-select" required>
                 <option value="">Selecciona una opción...</option>
-                <option value="ESTUDIANTE_SECUNDARIA">Estudiante en último año de secundaria / bachillerato</option>
-                <option value="GRADUADO_SECUNDARIA">Graduado de secundaria / bachiller</option>
-                <option value="ESTUDIOS_SUPERIORES">Con estudios superiores o universitarios previos</option>
+                {SITUACIONES.map((s) => <option value={s.clave}>{s.texto}</option>)}
               </select>
             </div>
           )}
 
-          {faltan.includes('bachillerato') && (
-            <div class="portal-input-group">
-              <label for="inputBachillerato" class="portal-label">¿Completaste el bachillerato o educación secundaria?</label>
-              <select id="inputBachillerato" name="bachillerato" class="portal-select" required>
-                <option value="">Selecciona una opción...</option>
-                <option value="SI">Sí, ya tengo mi título de bachiller / secundaria completa</option>
-                <option value="EN_CURSO">Estoy cursando el último año</option>
-                <option value="NO">No finalizado</option>
-              </select>
-            </div>
-          )}
+          <div class="portal-input-group">
+            <label for="inputBachillerato" class="portal-label">¿Completaste el bachillerato o educación secundaria?</label>
+            <select id="inputBachillerato" name="bachillerato" class="portal-select" required>
+              <option value="">Selecciona una opción...</option>
+              {BACHILLERATO_OPCIONES.map((b) => <option value={b.clave}>{b.texto}</option>)}
+            </select>
+          </div>
 
-          {faltan.includes('estudiosPrevios') && (
-            <div class="portal-input-group">
-              <label class="portal-label">¿Iniciaste o realizaste estudios superiores (universitarios o técnicos) con anterioridad?</label>
-              <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
-                  <input type="radio" name="estudiosPrevios" value="true" required /> Sí
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
-                  <input type="radio" name="estudiosPrevios" value="false" required /> No
-                </label>
-              </div>
+          <fieldset class="portal-input-group portal-fieldset">
+            <legend class="portal-label">¿Iniciaste o realizaste estudios superiores (universitarios o técnicos) con anterioridad?</legend>
+            <div class="portal-radios">
+              <label class="portal-radio">
+                <input type="radio" name="estudiosPrevios" value="true" required /> <span>Sí</span>
+              </label>
+              <label class="portal-radio">
+                <input type="radio" name="estudiosPrevios" value="false" required /> <span>No</span>
+              </label>
             </div>
-          )}
+          </fieldset>
 
           <div id="bloqueEstudiosPrevios" style="display: none; padding-left: 0.75rem; border-left: 3px solid var(--portal-dorado); margin-bottom: 1.25rem;">
-            {faltan.includes('carreraPrevia') && (
-              <div class="portal-input-group">
-                <label for="inputCarreraPrevia" class="portal-label">Carrera o programa cursado previamente</label>
-                <input
-                  type="text"
-                  id="inputCarreraPrevia"
-                  name="carreraPrevia"
-                  class="portal-input"
-                  placeholder="Ej. Licenciatura en Enfermería, Tecnicatura, etc."
-                />
-              </div>
-            )}
+            <div class="portal-input-group">
+              <label for="inputCarreraPrevia" class="portal-label">Carrera o programa cursado previamente</label>
+              <input
+                type="text"
+                id="inputCarreraPrevia"
+                name="carreraPrevia"
+                class="portal-input"
+                maxlength="120"
+                placeholder="Ej. Licenciatura en Enfermería, Tecnicatura, etc."
+              />
+            </div>
 
-            {faltan.includes('finalizada') && (
-              <div class="portal-input-group">
-                <label class="portal-label">¿Te graduaste o finalizaste esa carrera previa?</label>
-                <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                  <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
-                    <input type="radio" name="finalizada" value="true" /> Sí, finalizada
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
-                    <input type="radio" name="finalizada" value="false" /> Incompleta / en curso
-                  </label>
-                </div>
+            <fieldset class="portal-input-group portal-fieldset">
+              <legend class="portal-label">¿Te graduaste o finalizaste esa carrera previa?</legend>
+              <div class="portal-radios">
+                <label class="portal-radio">
+                  <input type="radio" name="finalizada" value="true" /> <span>Sí, finalizada</span>
+                </label>
+                <label class="portal-radio">
+                  <input type="radio" name="finalizada" value="false" /> <span>Incompleta / en curso</span>
+                </label>
               </div>
-            )}
+            </fieldset>
 
-            {faltan.includes('duracionAnios') && (
-              <div class="portal-input-group">
-                <label for="inputDuracionAnios" class="portal-label">Duración oficial de los estudios previos (en años)</label>
-                <select id="inputDuracionAnios" name="duracionAnios" class="portal-select">
-                  <option value="">Selecciona...</option>
-                  <option value="1">1 año</option>
-                  <option value="2">2 años</option>
-                  <option value="3">3 años (tecnicatura / título intermedio)</option>
-                  <option value="4">4 años</option>
-                  <option value="5">5 o más años</option>
-                </select>
-              </div>
-            )}
+            <div class="portal-input-group">
+              <label for="inputDuracionAnios" class="portal-label">Duración oficial de los estudios previos (en años)</label>
+              <select id="inputDuracionAnios" name="duracionAnios" class="portal-select">
+                <option value="">Selecciona...</option>
+                <option value="1">1 año</option>
+                <option value="2">2 años</option>
+                <option value="3">3 años (tecnicatura / título intermedio)</option>
+                <option value="4">4 años</option>
+                <option value="5">5 o más años</option>
+              </select>
+            </div>
           </div>
 
           {faltan.includes('areaInteres') && (
@@ -213,6 +201,7 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
 
 <script>
   import { mensajeResultadoPrecalificador } from '../../lib/portal-pure.ts';
+  import { construirPrecalificacion, mensajeErrorPrecalificador } from '../../lib/precalificador-pure.ts';
 
   const form = document.getElementById('formPrecalificador') as HTMLFormElement | null;
   const btnEnviar = document.getElementById('btnEnviarPrecalificador') as HTMLButtonElement | null;
@@ -225,12 +214,17 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
   const bloqueEstudiosPrevios = document.getElementById('bloqueEstudiosPrevios') as HTMLDivElement | null;
 
   const radiosEstudios = document.querySelectorAll('input[name="estudiosPrevios"]');
+  const camposDetalle = bloqueEstudiosPrevios
+    ? Array.from(bloqueEstudiosPrevios.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select'))
+    : [];
+  const alternarDetalle = (conEstudios: boolean) => {
+    if (bloqueEstudiosPrevios) bloqueEstudiosPrevios.style.display = conEstudios ? 'block' : 'none';
+    // Con estudios previos el detalle es obligatorio para FGREC; sin ellos no se pregunta.
+    camposDetalle.forEach((campo) => { campo.required = conEstudios; });
+  };
   radiosEstudios.forEach((radio) => {
     radio.addEventListener('change', (e) => {
-      const val = (e.target as HTMLInputElement).value;
-      if (bloqueEstudiosPrevios) {
-        bloqueEstudiosPrevios.style.display = val === 'true' ? 'block' : 'none';
-      }
+      alternarDetalle((e.target as HTMLInputElement).value === 'true');
     });
   });
 
@@ -245,17 +239,9 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
     if (alertaError) alertaError.style.display = 'none';
 
     const formData = new FormData(form);
-    const precalificacion: Record<string, any> = {};
-
-    formData.forEach((value, key) => {
-      if (key === 'estudiosPrevios' || key === 'finalizada') {
-        precalificacion[key] = value === 'true';
-      } else if (key === 'duracionAnios') {
-        precalificacion[key] = value ? Number(value) : null;
-      } else {
-        precalificacion[key] = value;
-      }
-    });
+    const respuestas: Record<string, string> = {};
+    formData.forEach((value, key) => { respuestas[key] = String(value); });
+    const precalificacion = construirPrecalificacion(respuestas);
 
     if (btnEnviar) {
       btnEnviar.disabled = true;
@@ -288,7 +274,7 @@ const faltan: string[] = Array.isArray(data.faltan) ? data.faltan : [];
         if (seccionFormulario) seccionFormulario.style.display = 'none';
         if (seccionResultado) seccionResultado.style.display = 'block';
       } else {
-        mostrarError(data.message || 'Error al procesar las respuestas.');
+        mostrarError(mensajeErrorPrecalificador(res.status, data));
         if (btnEnviar) {
           btnEnviar.disabled = false;
           btnEnviar.textContent = 'Enviar respuestas';
