@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseAmountCents, formatPaymentAmount, validatePaymentBody, publicPaymentContext, registrationUnavailable } from '../src/lib/payment-pure.ts';
+import { parseAmountCents, formatPaymentAmount, validatePaymentBody, formatPaymentDate, publicPaymentContext, registrationUnavailable } from '../src/lib/payment-pure.ts';
 
 const body = { cotizacionId: 1, medioPagoId: 2, cuentaReceptoraId: 3, importeBrutoCentavos: 12345, moneda: 'USD', fechaPago: '2026-10-10', referencia: 'OP-123', nombreArchivo: 'recibo.pdf', tipo: 'application/pdf', tamano: 300 };
 
@@ -37,4 +37,10 @@ test('public context exposes only payment and catalog contract fields', () => {
   assert.match(registrationUnavailable({ ...result, cotizaciones: [] })!, /cotización/);
   assert.match(registrationUnavailable({ ...result, cuentas: [] })!, /medios y cuentas/);
   assert.match(registrationUnavailable({ ...result, puedeRegistrar: false })!, /no está habilitada/);
+});
+
+test('formatPaymentDate muestra dd/mm/aaaa sin mover el día', () => {
+  assert.equal(formatPaymentDate('2026-10-18'), '18/10/2026');
+  assert.equal(formatPaymentDate('2026-01-05'), '05/01/2026');
+  assert.equal(formatPaymentDate(''), '');
 });

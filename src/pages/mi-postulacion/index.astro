@@ -9,7 +9,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
-import { cartaEnviadaEnPanel } from '../../lib/portal-pure.ts';
+import { cartaEnviadaEnPanel, resumirDocumentosPanel } from '../../lib/portal-pure.ts';
 import { leerConvenio, formatearFechaConvenio } from '../../lib/convenio-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
@@ -48,6 +48,7 @@ const situacion = postulacion.situacion || 'ACTIVA';
 const proximoPaso = postulacion.proximoPaso;
 const documentos = postulacion.documentos || { pendientes: 0, observados: 0, total: 0 };
 const asesora = postulacion.asesora;
+const resumenDocumentos = resumirDocumentosPanel(documentos, postulacion.expediente);
 
 // Obtener nombre de pila del postulante para un saludo personalizado institucional
 let nombrePostulante = '';
@@ -269,8 +270,8 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
             <div class="audit-list">
               <div class="audit-list__row">
                 <div class="audit-list__col-left">
-                  <span class={`audit-indicator ${documentos.pendientes === 0 && documentos.total > 0 ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
-                    {documentos.pendientes === 0 && documentos.total > 0 && (
+                  <span class={`audit-indicator ${resumenDocumentos.completos ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
+                    {resumenDocumentos.completos && (
                       <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                       </svg>
@@ -278,13 +279,9 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
                   </span>
                   <span>Documentos de identidad y título habilitante</span>
                 </div>
-                {documentos.pendientes === 0 && documentos.total > 0 ? (
-                  <span class="badge-status badge-status--ok">Completos ({documentos.total})</span>
-                ) : (
-                  <span class="badge-status badge-status--pending">
-                    {documentos.total - documentos.pendientes} de {documentos.total} cargados
-                  </span>
-                )}
+                <span class={`badge-status ${resumenDocumentos.completos ? 'badge-status--ok' : 'badge-status--pending'}`}>
+                  {resumenDocumentos.etiqueta}
+                </span>
               </div>
 
               <div class="audit-list__row">

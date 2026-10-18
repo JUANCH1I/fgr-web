@@ -44,7 +44,9 @@ export function presentarEstadoDocumento(requisito: RequisitoUI): PresentacionEs
     case 'PENDIENTE':
       return {
         etiqueta: 'Pendiente',
-        detalle: 'Aún no has cargado este documento requerido.',
+        detalle: requisito.obligatorio
+          ? 'Aún no has cargado este documento requerido.'
+          : 'Este documento es opcional; puedes cargarlo si lo tienes disponible.',
         icono: 'pendiente',
         permiteSubida: true,
         textoBoton: 'Cargar'
@@ -110,7 +112,8 @@ export function presentarEstadoDocumento(requisito: RequisitoUI): PresentacionEs
  */
 export function mensajeResultadoPrecalificador(via: string, nombre?: string | null): { titulo: string; mensaje: string; advertencia: string } {
   const nombreStr = nombre ? `¡Gracias, ${nombre}!` : '¡Gracias!';
-  if (via === 'LICENCIATURA_COMPLETA') {
+  // FGREC responde LICENCIATURA; LICENCIATURA_COMPLETA se conserva por compatibilidad.
+  if (via === 'LICENCIATURA' || via === 'LICENCIATURA_COMPLETA') {
     return {
       titulo: 'Licenciatura completa',
       mensaje: `${nombreStr} Con los antecedentes que nos indicaste, puedes avanzar por la vía de una licenciatura completa.`,
@@ -123,6 +126,36 @@ export function mensajeResultadoPrecalificador(via: string, nombre?: string | nu
     mensaje: `${nombreStr} Tus antecedentes pueden ser evaluados por la Universidad para determinar qué reconocimiento de trayecto o ciclo corresponde.`,
     advertencia: 'La resolución académica final sobre equivalencias y materias corresponde exclusivamente a la Universidad del Gran Rosario.'
   };
+}
+
+export interface ResumenDocumentosPanel {
+  completos: boolean;
+  etiqueta: string;
+}
+
+/**
+ * Estado de los documentos para el panel "Mi postulación". `documentos.pendientes` cuenta solo obligatorios sin
+ * archivo y `total` incluye los opcionales, así que el panel habla de "obligatorios": nunca llama "completos" al
+ * conjunto mientras haya uno opcional sin cargar. La regla de completitud es del servidor (`expediente`).
+ */
+export function resumirDocumentosPanel(
+  documentos: { pendientes?: number; observados?: number; total?: number } | null | undefined,
+  expediente?: { documentosCompletos?: boolean } | null
+): ResumenDocumentosPanel {
+  const pendientes = Number(documentos?.pendientes ?? 0);
+  const observados = Number(documentos?.observados ?? 0);
+  const total = Number(documentos?.total ?? 0);
+  const completos = typeof expediente?.documentosCompletos === 'boolean'
+    ? expediente.documentosCompletos
+    : pendientes === 0 && observados === 0 && total > 0;
+  if (completos) return { completos: true, etiqueta: 'Obligatorios completos' };
+  if (pendientes > 0) {
+    return { completos: false, etiqueta: pendientes === 1 ? 'Falta 1 obligatorio' : `Faltan ${pendientes} obligatorios` };
+  }
+  if (observados > 0) {
+    return { completos: false, etiqueta: observados === 1 ? '1 documento con observaciones' : `${observados} documentos con observaciones` };
+  }
+  return { completos: false, etiqueta: 'Pendiente de carga' };
 }
 
 export const LIMITE_MAX_BYTES_ARCHIVO = 10 * 1024 * 1024; // 10 MB

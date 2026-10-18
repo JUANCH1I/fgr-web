@@ -2,7 +2,7 @@
 export const prerender = false;
 import PortalLayout from '../../layouts/PortalLayout.astro';
 import { COOKIE_SESION_NOMBRE, llamarFGRECPortal, extraerContextoVisitante, borrarSesionYContacto } from '../../lib/fgrec-portal.ts';
-import { publicPaymentContext, registrationUnavailable, formatPaymentAmount, paymentToday, type PaymentContext } from '../../lib/payment-pure.ts';
+import { publicPaymentContext, registrationUnavailable, formatPaymentAmount, formatPaymentDate, paymentToday, type PaymentContext } from '../../lib/payment-pure.ts';
 
 Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 const session = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
@@ -42,7 +42,7 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
           {context.pagos.map(payment => (
             <li class="payment-item">
               <div class="payment-item-heading"><h3>{formatPaymentAmount(payment.importeCentavos, payment.moneda)}</h3><span class="payment-state" data-state={payment.estado}>{payment.estadoTexto}</span></div>
-              <dl><div><dt>Fecha del pago</dt><dd>{payment.fechaPago}</dd></div><div><dt>Medio de pago</dt><dd>{payment.medioPago}</dd></div><div><dt>Referencia</dt><dd>{payment.referencia}</dd></div><div><dt>Cotización</dt><dd>{payment.cotizacion}</dd></div></dl>
+              <dl><div><dt>Fecha del pago</dt><dd>{formatPaymentDate(payment.fechaPago)}</dd></div><div><dt>Medio de pago</dt><dd>{payment.medioPago}</dd></div><div><dt>Referencia</dt><dd>{payment.referencia}</dd></div><div><dt>Cotización</dt><dd>{payment.cotizacion}</dd></div></dl>
               <p class="payment-help">{payment.comprobanteRecibido ? 'Comprobante recibido' : 'Sin comprobante registrado'}</p>
               {payment.motivo && <p class="payment-reason">{payment.motivo}</p>}
             </li>
@@ -150,7 +150,7 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
 </style>
 
 <script>
-  import { parseAmountCents, validatePaymentBody, formatPaymentAmount, type Payment } from '../../lib/payment-pure.ts';
+  import { parseAmountCents, validatePaymentBody, formatPaymentAmount, formatPaymentDate, type Payment } from '../../lib/payment-pure.ts';
   import { validarArchivoCliente } from '../../lib/portal-pure.ts';
   import { reportPayment, PaymentUploadError } from '../../lib/payment-upload.ts';
 
@@ -191,7 +191,7 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
         const state = document.createElement('span'); state.className = 'payment-state'; state.dataset.state = payment.estado; state.textContent = payment.estadoTexto;
         heading.append(amount, state);
         const details = document.createElement('dl');
-        for (const [label, value] of [['Fecha del pago', payment.fechaPago], ['Medio de pago', payment.medioPago], ['Referencia', payment.referencia], ['Cotización', payment.cotizacion]]) {
+        for (const [label, value] of [['Fecha del pago', formatPaymentDate(payment.fechaPago)], ['Medio de pago', payment.medioPago], ['Referencia', payment.referencia], ['Cotización', payment.cotizacion]]) {
           const row = document.createElement('div'); const term = document.createElement('dt'); term.textContent = label; const valueElement = document.createElement('dd'); valueElement.textContent = value; row.append(term, valueElement); details.append(row);
         }
         const evidence = document.createElement('p'); evidence.className = 'payment-help'; evidence.textContent = payment.comprobanteRecibido ? 'Comprobante recibido' : 'Sin comprobante registrado';

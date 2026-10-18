@@ -8,8 +8,16 @@ import {
   normalizarContacto,
   deducirTipoMime,
   mensajeErrorSubida,
-  cartaEnviadaEnPanel
+  cartaEnviadaEnPanel,
+  resumirDocumentosPanel
 } from '../src/lib/portal-pure.ts';
+
+test('un documento opcional pendiente se presenta como opcional, no como requerido', () => {
+  const opcional = presentarEstadoDocumento({ codigo: 'X', nombre: 'Otro', obligatorio: false, estado: 'PENDIENTE' });
+  assert.match(opcional.detalle || '', /opcional/);
+  assert.doesNotMatch(opcional.detalle || '', /requerido/);
+  assert.match(presentarEstadoDocumento({ codigo: 'X', nombre: 'Otro', obligatorio: true, estado: 'PENDIENTE' }).detalle || '', /requerido/);
+});
 
 test('presentarEstadoDocumento maneja los 5 estados del Anexo §42', () => {
   assert.equal(presentarEstadoDocumento({
@@ -142,4 +150,18 @@ test('cartaEnviadaEnPanel usa expediente.cartaEnviada y, sin el campo (backend a
   assert.equal(cartaEnviadaEnPanel({ expediente: {} }, false), false);
   assert.equal(cartaEnviadaEnPanel(null, true), true);
   assert.equal(cartaEnviadaEnPanel({ expediente: { cartaEnviada: 'true' } }, false), false);
+});
+
+test('resumirDocumentosPanel habla de obligatorios y no llama completos con un opcional pendiente', () => {
+  // Caso del E2E: 3 obligatorios cargados, 1 opcional pendiente (total 4, pendientes 0).
+  assert.deepEqual(
+    resumirDocumentosPanel({ pendientes: 0, observados: 0, total: 4 }, { documentosCompletos: true }),
+    { completos: true, etiqueta: 'Obligatorios completos' }
+  );
+  assert.equal(resumirDocumentosPanel({ pendientes: 2, observados: 0, total: 4 }, { documentosCompletos: false }).etiqueta, 'Faltan 2 obligatorios');
+  assert.equal(resumirDocumentosPanel({ pendientes: 1, observados: 0, total: 4 }, null).etiqueta, 'Falta 1 obligatorio');
+  assert.equal(resumirDocumentosPanel({ pendientes: 0, observados: 1, total: 3 }, { documentosCompletos: false }).etiqueta, '1 documento con observaciones');
+  // Sin `expediente` (backend anterior) se infiere de los conteos.
+  assert.equal(resumirDocumentosPanel({ pendientes: 0, observados: 0, total: 3 }).completos, true);
+  assert.equal(resumirDocumentosPanel(undefined).completos, false);
 });
