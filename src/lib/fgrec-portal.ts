@@ -77,10 +77,22 @@ export interface ContextoVisitante {
   ua?: string;
 }
 
+/** Un archivo que FGREC devuelve tal cual (el PDF del convenio). */
+export interface ArchivoFGREC {
+  bytes: Uint8Array;
+  tipo: string;
+  /** Huella SHA-256 que FGREC informa en X-Content-SHA256 ('' si no la envía). */
+  sha256: string;
+  /** Nombre sugerido en Content-Disposition ('' si no lo envía). */
+  nombreArchivo: string;
+}
+
 export interface RespuestaFGREC<T = any> {
   ok: boolean;
   status: number;
   data?: T;
+  /** Solo en las rutas que devuelven un archivo (convenio/pdf). */
+  archivo?: ArchivoFGREC;
   error?: {
     code: string;
     message: string;
@@ -160,6 +172,12 @@ export interface LlamadaPortalOpciones {
   sesion?: string;
   contexto: ContextoVisitante;
   idempotencyKey?: string;
+}
+
+/** El nombre de archivo de un Content-Disposition, o '' si no hay. */
+export function nombreDeContentDisposition(valor: string | null): string {
+  const coincide = /filename="([^"\\]*)"/.exec(valor || '');
+  return coincide ? coincide[1] : '';
 }
 
 /**
@@ -244,6 +262,18 @@ export async function llamarFGRECPortal<T = any>(opciones: LlamadaPortalOpciones
     }
 
     const contentType = respuesta.headers.get('content-type') || '';
+    if (respuesta.ok && contentType.includes('application/pdf')) {
+      return {
+        ok: true,
+        status: respuesta.status,
+        archivo: {
+          bytes: new Uint8Array(await respuesta.arrayBuffer()),
+          tipo: 'application/pdf',
+          sha256: respuesta.headers.get('x-content-sha256') || '',
+          nombreArchivo: nombreDeContentDisposition(respuesta.headers.get('content-disposition'))
+        }
+      };
+    }
     if (contentType.includes('application/json')) {
       const data = await respuesta.json();
       if (respuesta.ok) {

@@ -1,0 +1,268 @@
+---
+export const prerender = false;
+
+// Convenio de corresponsabilidad (decisión del 16/10/2026; docs/integracion-web.md §4.6 de fgrec-sistema).
+// El sitio no calcula nada: muestra el resumen que calcula FGREC, reenvía el PDF y confirma la aceptación del documento
+// exacto (versión y huella) que el postulante tiene delante.
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  COOKIE_SESION_NOMBRE,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  borrarSesionYContacto,
+  obtenerVariableEntorno
+} from '../../lib/fgrec-portal.ts';
+import {
+  DECLARACION_ACEPTACION,
+  RUTA_ACEPTAR_CONVENIO,
+  RUTA_PDF_CONVENIO,
+  cuerpoAceptacion,
+  filasResumen,
+  formatearFechaConvenio,
+  leerConvenio
+} from '../../lib/convenio-pure.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+
+if (!sesionToken) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const respuesta = await llamarFGRECPortal({
+  metodo: 'GET',
+  rutaRelativa: 'convenio',
+  sesion: sesionToken,
+  contexto: extraerContextoVisitante(Astro.request)
+});
+
+if (respuesta.status === 401) {
+  borrarSesionYContacto(Astro.cookies);
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+if (respuesta.status === 403) {
+  return Astro.redirect('/mi-postulacion/codigo', 302);
+}
+
+const statusError = !respuesta.ok ? respuesta.status : null;
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20tengo%20una%20consulta%20sobre%20mi%20convenio%20de%20corresponsabilidad.`
+  : null;
+
+const convenio = leerConvenio(respuesta.data);
+const aceptado = convenio.estado === 'ACEPTADO';
+const pendiente = convenio.estado === 'GENERADO';
+const hayDocumento = (pendiente || aceptado) && convenio.resumen !== null;
+const aceptacion = cuerpoAceptacion(convenio);
+const filas = hayDocumento && convenio.resumen ? filasResumen(convenio.resumen) : [];
+const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
+---
+
+<PortalLayout title="Convenio de corresponsabilidad | Fundación Gran Rosario" autenticado={true}>
+  {statusError === 429 ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <h1 class="portal-title">Demasiados intentos</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.
+      </p>
+    </div>
+  ) : statusError !== null ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <h1 class="portal-title">Servicio no disponible</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        El servicio no está disponible; intenta de nuevo en unos minutos. Si necesitas atención inmediata, puedes escribir a nuestro canal oficial.
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Contactar por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : (
+    <section class="portal-card convenio" aria-labelledby="convenioTitulo">
+      <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
+        <span aria-hidden="true">←</span> Volver a mi postulación
+      </a>
+      <p class="antetitulo" style="margin-bottom: 4px;">Parte de tu postulación</p>
+      <h1 id="convenioTitulo" class="portal-title" style="margin: 0; font-size: 28px;">{convenio.titulo}</h1>
+
+      {!hayDocumento && (
+        <div class="portal-alert portal-alert--info" style="margin-top: 16px;" role="status">
+          <span>
+            {convenio.estado === 'NO_APLICA'
+              ? 'Tu postulación no requiere un convenio de corresponsabilidad en este momento.'
+              : 'Todavía no hay un convenio para tu postulación. Tu asesora te avisará cuando esté listo para que lo leas y lo aceptes.'}
+          </span>
+        </div>
+      )}
+
+      {hayDocumento && (
+        <>
+          <p class="portal-desc" style="margin-top: 8px;">
+            El convenio formaliza tu Beneficio Institucional FGREC: lo que la Fundación sostiene y lo que tú te comprometes a cumplir.
+            Léelo completo antes de aceptarlo.
+          </p>
+
+          {convenio.textoEnBorrador && (
+            <div class="portal-alert portal-alert--info" style="margin: 12px 0;" role="note">
+              <span>El texto de este convenio todavía está en revisión de la Fundación. Si algo no te queda claro, consulta con tu asesora antes de aceptarlo.</span>
+            </div>
+          )}
+
+          {aceptado && (
+            <p class="convenio__aceptado" role="status">
+              <span aria-hidden="true">✓</span>
+              Aceptado el {fechaAceptacion || 'día de su aceptación'}. Ya forma parte de tu expediente y no se puede modificar.
+            </p>
+          )}
+
+          <h2 class="convenio__subtitulo">Resumen</h2>
+          <dl class="convenio__resumen">
+            {filas.map((fila) => (
+              <div class={`convenio__fila${fila.destacado ? ' convenio__fila--destacada' : ''}`}>
+                <dt>{fila.etiqueta}</dt>
+                <dd>{fila.valor}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <h2 class="convenio__subtitulo">Documento</h2>
+          <div class="convenio__acciones">
+            <a class="portal-btn portal-btn--outline" style="width: auto;" href={RUTA_PDF_CONVENIO} target="_blank" rel="noopener">
+              Abrir el PDF
+            </a>
+            <a class="portal-btn portal-btn--outline" style="width: auto;" href={`${RUTA_PDF_CONVENIO}?descargar=1`} download={convenio.nombreArchivo || 'convenio.pdf'}>
+              Descargar el PDF
+            </a>
+          </div>
+          <object class="convenio__visor" data={RUTA_PDF_CONVENIO} type="application/pdf" aria-label="Documento del convenio de corresponsabilidad">
+            <p class="carta__ayuda">Tu navegador no muestra el PDF aquí. Usa «Abrir el PDF» o «Descargar el PDF».</p>
+          </object>
+
+          {pendiente && aceptacion && (
+            <form id="formAceptar" class="convenio__aceptar" novalidate data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256}>
+              <div id="convenioAlerta" class="portal-alert portal-alert--error" style="display: none; margin-bottom: 14px;" role="alert"></div>
+              <label class="convenio__casilla" for="chkAcepto">
+                <input type="checkbox" id="chkAcepto" name="acepto" />
+                <span>{DECLARACION_ACEPTACION}</span>
+              </label>
+              <p class="carta__ayuda" style="margin-top: 6px;">
+                Al confirmar quedan registrados la fecha y la hora, tu dirección de red, tu navegador y la huella del documento que aceptas.
+              </p>
+              <div class="convenio__acciones" style="margin-top: 14px;">
+                <button type="submit" id="btnAceptar" class="portal-btn portal-btn--acento" style="width: auto;" disabled>
+                  Confirmar mi aceptación
+                </button>
+              </div>
+            </form>
+          )}
+        </>
+      )}
+
+      {whatsappHref && (
+        <p class="carta__ayuda" style="margin-top: 22px;">
+          ¿Tienes dudas sobre el convenio? <a class="enlace-flecha" href={whatsappHref} target="_blank" rel="noopener noreferrer">Escríbele a tu asesora <span aria-hidden="true">→</span></a>
+        </p>
+      )}
+    </section>
+  )}
+</PortalLayout>
+
+<style>
+  .convenio__subtitulo { font-size: 18px; color: var(--portal-azul); margin: 24px 0 10px 0; }
+  .convenio__resumen { margin: 0; border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); overflow: hidden; }
+  .convenio__fila { display: grid; grid-template-columns: minmax(130px, 38%) 1fr; gap: 4px 16px; padding: 10px 16px; border-bottom: 1px solid var(--portal-borde); font-size: 15px; line-height: 1.45; }
+  .convenio__fila:last-child { border-bottom: 0; }
+  .convenio__fila dt { color: var(--portal-mutado); }
+  .convenio__fila dd { margin: 0; color: var(--portal-texto); overflow-wrap: anywhere; }
+  .convenio__fila--destacada { background: var(--crema, #F7F4EE); }
+  .convenio__fila--destacada dd { font-weight: 700; color: var(--portal-azul); }
+  .convenio__acciones { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .convenio__visor { display: block; width: 100%; height: 520px; margin-top: 14px; border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); background: #FFFFFF; }
+  .convenio__aceptar { margin-top: 24px; padding: 18px 20px; background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); }
+  .convenio__casilla { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; cursor: pointer; font-size: 16px; font-weight: 600; color: var(--portal-azul); line-height: 1.4; }
+  .convenio__casilla input { width: 22px; height: 22px; margin: 2px 0 0 0; flex-shrink: 0; accent-color: var(--portal-azul); }
+  .convenio__casilla input:focus-visible { outline: 3px solid var(--portal-cobre); outline-offset: 2px; }
+  .convenio__aceptado { display: flex; gap: 8px; align-items: baseline; margin: 14px 0 0 0; padding: 12px 16px; background: var(--portal-verde-fondo); color: var(--portal-verde); border-radius: var(--portal-radio); font-weight: 600; }
+  .carta__ayuda { font-size: 13px; color: var(--portal-mutado); margin: 12px 0 0 0; }
+  /* En un teléfono el PDF no se incrusta de forma fiable: se abre o se descarga con los botones. */
+  @media (max-width: 720px) {
+    .convenio__visor { display: none; }
+    .convenio__fila { grid-template-columns: 1fr; }
+    .convenio__acciones .portal-btn { width: 100% !important; }
+  }
+</style>
+
+<script>
+  const formulario = document.getElementById('formAceptar') as HTMLFormElement | null;
+  if (formulario) {
+    const casilla = document.getElementById('chkAcepto') as HTMLInputElement;
+    const boton = document.getElementById('btnAceptar') as HTMLButtonElement;
+    const alerta = document.getElementById('convenioAlerta') as HTMLElement;
+    const ruta = formulario.dataset.ruta || '';
+    const version = Number(formulario.dataset.version);
+    const sha256 = formulario.dataset.sha256 || '';
+
+    const mostrar = (mensaje: string, volverALeer = false) => {
+      alerta.textContent = mensaje;
+      if (volverALeer) {
+        const enlace = document.createElement('a');
+        enlace.href = window.location.pathname;
+        enlace.textContent = ' Abrir el convenio vigente';
+        enlace.className = 'enlace-flecha';
+        alerta.appendChild(enlace);
+      }
+      alerta.style.display = 'flex';
+    };
+
+    casilla.addEventListener('change', () => {
+      boton.disabled = !casilla.checked;
+      alerta.style.display = 'none';
+    });
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      if (!casilla.checked) {
+        mostrar('Para continuar, marca que leíste y aceptas el convenio.');
+        return;
+      }
+      boton.disabled = true;
+      casilla.disabled = true;
+      boton.textContent = 'Registrando tu aceptación…';
+      try {
+        const res = await fetch(ruta, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' },
+          body: JSON.stringify({ acepto: true, version, sha256 })
+        });
+        if (res.ok) {
+          window.location.reload();
+          return;
+        }
+        let datos: any = {};
+        try {
+          datos = await res.json();
+        } catch {}
+        if (res.status === 401) {
+          window.location.href = '/mi-postulacion/ingresar';
+          return;
+        }
+        const cambio = datos.code === 'CONVENIO_CHANGED' || datos.code === 'CONVENIO_UNAVAILABLE';
+        const textos: Record<string, string> = {
+          CONVENIO_CHANGED: 'El convenio cambió mientras lo leías. Vuelve a abrirlo para leer la versión vigente.',
+          CONVENIO_UNAVAILABLE: 'Por ahora no hay un convenio para aceptar. Si crees que es un error, consulta con tu asesora.',
+          PDF_INTEGRITY: 'No pudimos verificar el documento. No se registró ninguna aceptación; consulta con tu asesora.'
+        };
+        mostrar(textos[datos.code] || datos.message || 'No se pudo registrar tu aceptación. Inténtalo de nuevo en unos minutos.', cambio);
+      } catch {
+        mostrar('No pudimos conectar para registrar tu aceptación. Inténtalo de nuevo.');
+      }
+      boton.textContent = 'Confirmar mi aceptación';
+      casilla.disabled = false;
+      boton.disabled = !casilla.checked;
+    });
+  }
+</script>
