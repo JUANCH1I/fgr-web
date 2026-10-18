@@ -12,6 +12,13 @@ import {
   resumirDocumentosPanel
 } from '../src/lib/portal-pure.ts';
 
+test('un documento opcional pendiente se presenta como opcional, no como requerido', () => {
+  const opcional = presentarEstadoDocumento({ codigo: 'X', nombre: 'Otro', obligatorio: false, estado: 'PENDIENTE' });
+  assert.match(opcional.detalle || '', /opcional/);
+  assert.doesNotMatch(opcional.detalle || '', /requerido/);
+  assert.match(presentarEstadoDocumento({ codigo: 'X', nombre: 'Otro', obligatorio: true, estado: 'PENDIENTE' }).detalle || '', /requerido/);
+});
+
 test('presentarEstadoDocumento maneja los 5 estados del Anexo §42', () => {
   assert.equal(presentarEstadoDocumento({
     codigo: 'TITULO',

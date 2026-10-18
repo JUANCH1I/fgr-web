@@ -44,7 +44,9 @@ export function presentarEstadoDocumento(requisito: RequisitoUI): PresentacionEs
     case 'PENDIENTE':
       return {
         etiqueta: 'Pendiente',
-        detalle: 'Aún no has cargado este documento requerido.',
+        detalle: requisito.obligatorio
+          ? 'Aún no has cargado este documento requerido.'
+          : 'Este documento es opcional; puedes cargarlo si lo tienes disponible.',
         icono: 'pendiente',
         permiteSubida: true,
         textoBoton: 'Cargar'
