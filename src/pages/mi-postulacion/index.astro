@@ -9,6 +9,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
+import { cartaEnviadaEnPanel } from '../../lib/portal-pure.ts';
 import { leerConvenio, formatearFechaConvenio } from '../../lib/convenio-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
@@ -101,6 +102,7 @@ if (pasoCodigo === 'ORIENTACION') {
 const accionConvenio = proximoPaso?.codigo === 'ACEPTAR_CONVENIO';
 // Un convenio pendiente tiene prioridad sobre el aviso de revisión: es lo único que el postulante puede hacer.
 const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA' && !accionConvenio;
+const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
 ---
 
 <PortalLayout title="Mi postulación | Fundación Gran Rosario" autenticado={true}>
@@ -287,8 +289,8 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA' && !accionConvenio;
 
               <div class="audit-list__row">
                 <div class="audit-list__col-left">
-                  <span class={`audit-indicator ${enRevision ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
-                    {enRevision && (
+                  <span class={`audit-indicator ${cartaEnviada ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
+                    {cartaEnviada && (
                       <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                       </svg>
@@ -296,8 +298,8 @@ const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA' && !accionConvenio;
                   </span>
                   <span>Carta de interés institucional</span>
                 </div>
-                {enRevision ? (
-                  <span class="badge-status badge-status--ok">Presentada</span>
+                {cartaEnviada ? (
+                  <span class="badge-status badge-status--ok">Enviada</span>
                 ) : (
                   <span class="badge-status badge-status--pending">Borrador o pendiente</span>
                 )}
