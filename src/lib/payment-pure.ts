@@ -39,6 +39,12 @@ export function formatPaymentAmount(cents: number, currency: string): string {
   return `${currency} ${digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${digits.slice(-2)}`;
 }
 
+/** Fecha del pago como dd/mm/aaaa. Reordena el texto AAAA-MM-DD sin pasar por Date, para que la zona horaria no mueva el día. */
+export function formatPaymentDate(value: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? '');
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : String(value ?? '');
+}
+
 export function paymentToday(): string {
   return new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Guayaquil', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }
