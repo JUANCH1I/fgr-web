@@ -2,6 +2,7 @@
 // Sección "Carta de interés" del expediente (página de documentos del portal).
 // Recibe el estado ya consultado a FGREC (GET carta) o el error con que respondió.
 import { formatearFechaCarta, MAXIMO_CARACTERES_CARTA } from '../lib/carta-pure.ts';
+import { resumirCarta, type ResumenCarta } from '../lib/documentos-pure.ts';
 
 interface Props {
   carta?: any;
@@ -9,25 +10,29 @@ interface Props {
   claveSesion: string;
   /** Expediente en revisión o ya revisado: la carta no se edita aunque el servidor la devuelva como borrador. */
   soloLectura?: boolean;
+  /** Resumen de una línea para el encabezado; si no llega se calcula aquí. */
+  resumen?: ResumenCarta;
 }
 
 const { carta, error, claveSesion, soloLectura = false } = Astro.props;
+const resumen = Astro.props.resumen ?? resumirCarta({ carta, soloLectura });
 
 const sinPais = error?.code === 'COUNTRY_REQUIRED' || error?.code === 'GUIDE_UNAVAILABLE';
 const enviada = Boolean(carta) && carta.puedeEditar === false;
 const editable = Boolean(carta) && carta.puedeEditar !== false && !soloLectura;
 const bloqueadaSinEnviar = Boolean(carta) && carta.puedeEditar !== false && soloLectura;
 const esNuevaVersion = editable && Number(carta.version) > 1;
-const fechaEnvio = formatearFechaCarta(carta?.enviadaEn);
 const guia = carta?.guia;
 const preguntas: string[] = Array.isArray(guia?.preguntas) ? guia.preguntas : [];
 const anterior = carta?.anterior && typeof carta.anterior.texto === 'string' ? carta.anterior : null;
+const textoActual = typeof carta?.texto === 'string' ? carta.texto : '';
+const tieneTexto = textoActual.trim().length > 0;
 
 // Datos para el script del navegador. Se escapa "<" para que ningún texto cierre la etiqueta <script>.
 const datos = editable
   ? JSON.stringify({
       version: Number(carta.version) || 1,
-      texto: typeof carta.texto === 'string' ? carta.texto : '',
+      texto: textoActual,
       maximo: Number(carta.maximoCaracteres) || MAXIMO_CARACTERES_CARTA,
       claveSesion,
       anterior: anterior ? anterior.texto : null
@@ -35,82 +40,85 @@ const datos = editable
   : '';
 ---
 
-<section class="portal-card carta" id="carta" aria-labelledby="cartaTitulo">
-  <p class="antetitulo" style="margin-bottom: 4px;">Parte de tu expediente</p>
-  <h2 id="cartaTitulo" class="portal-title" style="margin: 0; font-size: 26px;">
-    {guia?.titulo || 'Carta de interés'}
-  </h2>
+<section class="exp-seccion carta" id="carta" aria-labelledby="cartaTitulo" tabindex="-1">
+  <div class="exp-seccion__cab">
+    <h2 id="cartaTitulo" class="exp-seccion__titulo">Carta de interés</h2>
+    {resumen.linea && (
+      <p class={`exp-seccion__resumen carta__resumen carta__resumen--${resumen.estado.toLowerCase()}`}>
+        {enviada && (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm4.6 7.6-5.2 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.5-4.7a1 1 0 0 1 1.4 1.4Z"></path></svg>
+        )}
+        {resumen.linea}
+      </p>
+    )}
+  </div>
 
   {error && sinPais && (
-    <div class="portal-alert portal-alert--info" style="margin-top: 14px;" role="status">
-      <span>{error.message || 'Todavía no podemos habilitar tu carta. Una asesora te avisará cuando puedas escribirla.'}</span>
-    </div>
+    <p class="carta__aviso" role="status">
+      {error.message || 'Todavía no podemos habilitar tu carta. Una asesora te avisará cuando puedas escribirla.'}
+    </p>
   )}
 
   {error && !sinPais && (
-    <div class="portal-alert portal-alert--error" style="margin-top: 14px;" role="alert">
-      <span>
-        {error.status === 429
-          ? 'Hay muchas solicitudes en este momento. Espera unos minutos y recarga la página para ver tu carta.'
-          : 'Por ahora no podemos mostrar tu carta. Recarga la página en unos minutos; si el problema continúa, consulta con tu asesora.'}
-      </span>
-    </div>
+    <p class="carta__aviso carta__aviso--error" role="alert">
+      {error.status === 429
+        ? 'Hay muchas solicitudes en este momento. Espera unos minutos y recarga la página para ver tu carta.'
+        : 'Por ahora no podemos mostrar tu carta. Recarga la página en unos minutos; si el problema continúa, consulta con tu asesora.'}
+    </p>
   )}
 
   {enviada && (
-    <>
-      <p class="carta__enviada" role="status">
-        <span aria-hidden="true">✓</span>
-        Carta enviada{fechaEnvio ? ` el ${fechaEnvio}` : ''}. Ya forma parte de tu expediente y no se puede modificar.
+    <details class="carta__ver">
+      <summary>Ver mi carta</summary>
+      <div class="carta__lectura" tabindex="0" role="region" aria-label="Texto de la carta enviada">{carta.texto}</div>
+      <p class="carta__ayuda">
+        Ya forma parte de tu expediente y no se puede modificar.
+        {!soloLectura && ' Si necesitas ajustar algo, escríbele a tu asesora: puede solicitar una versión nueva.'}
       </p>
-      <div class="carta__lectura" tabindex="0" aria-label="Texto de la carta enviada">{carta.texto}</div>
-      {!soloLectura && <p class="carta__ayuda">Si necesitas ajustar algo, escríbele a tu asesora: puede solicitar una versión nueva.</p>}
-    </>
+    </details>
   )}
 
-  {bloqueadaSinEnviar && (
-    <div class="portal-alert portal-alert--info" style="margin-top: 14px;" role="status">
-      <span>Tu carta no se puede editar mientras tu expediente está en revisión o ya fue revisado.</span>
-    </div>
+  {bloqueadaSinEnviar && tieneTexto && (
+    <details class="carta__ver">
+      <summary>Ver mi borrador</summary>
+      <div class="carta__lectura" tabindex="0" role="region" aria-label="Texto de tu borrador">{textoActual}</div>
+    </details>
   )}
 
   {editable && (
     <>
-      {guia?.texto && <p class="portal-desc" style="margin-top: 8px;">{guia.texto}</p>}
+      {guia?.texto && <p class="carta__intro">{guia.texto}</p>}
+
+      {esNuevaVersion && (
+        <p class="carta__aviso" role="status">
+          Puedes escribirla de nuevo{anterior ? ' o partir de lo que enviaste antes.' : '.'}
+        </p>
+      )}
 
       {preguntas.length > 0 && (
-        <div class="carta__guia">
-          <p class="carta__guia-titulo">Algunas ideas para orientarte</p>
+        <details class="carta__guia" open={!tieneTexto}>
+          <summary>Algunas ideas para orientarte</summary>
           <ul>
             {preguntas.map((pregunta) => <li>{pregunta}</li>)}
           </ul>
           <p class="carta__guia-nota">Son una guía, no un formulario: escribe con tus propias palabras y con la extensión que necesites.</p>
-        </div>
-      )}
-
-      {esNuevaVersion && (
-        <div class="portal-alert portal-alert--info" role="status">
-          <span>
-            Tu asesora solicitó una nueva versión de tu carta. Puedes escribirla de nuevo
-            {anterior ? ' o partir de lo que enviaste antes.' : '.'}
-          </span>
-        </div>
+        </details>
       )}
 
       {anterior && (
         <details class="carta__anterior">
           <summary>Ver la versión que enviaste{formatearFechaCarta(anterior.enviadaEn) ? ` el ${formatearFechaCarta(anterior.enviadaEn)}` : ''}</summary>
           <div class="carta__lectura" tabindex="0">{anterior.texto}</div>
-          <button type="button" id="btnUsarAnterior" class="portal-btn-sm portal-btn-sm--ghost" style="color: var(--portal-azul); border-color: var(--portal-borde);">
+          <button type="button" id="btnUsarAnterior" class="boton boton--contorno carta__boton-sec">
             Usar como punto de partida
           </button>
         </details>
       )}
 
-      <div id="cartaAlerta" class="portal-alert portal-alert--error" style="display: none; margin-top: 14px;" role="alert"></div>
-      <div id="cartaRecuperada" class="portal-alert portal-alert--info" style="display: none; margin-top: 14px;" role="status">
+      <div id="cartaAlerta" class="portal-alert portal-alert--error" style="display: none; margin: 14px 0 0;" role="alert"></div>
+      <p id="cartaRecuperada" class="carta__aviso" style="display: none;" role="status">
         Recuperamos el texto que habías escrito en este dispositivo y lo estamos guardando.
-      </div>
+      </p>
 
       <div class="portal-input-group" style="margin-top: 16px; margin-bottom: 8px;">
         <label class="portal-label" for="cartaTexto">Tu carta</label>
@@ -132,18 +140,18 @@ const datos = editable
       </div>
 
       <div id="cartaAcciones" class="carta__acciones">
-        <button type="button" id="btnEnviarCarta" class="portal-btn portal-btn--acento" style="width: auto;">
+        <button type="button" id="btnEnviarCarta" class="boton boton--acento">
           Enviar mi carta
         </button>
-        <span class="carta__ayuda" style="margin: 0;">Tu borrador se guarda solo mientras escribes.</span>
+        <span class="carta__ayuda">Tu borrador se guarda solo mientras escribes.</span>
       </div>
 
-      <div id="cartaConfirmar" class="nota-destacada carta__confirmar" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cartaConfirmarTitulo" tabindex="-1">
-        <p id="cartaConfirmarTitulo" style="margin: 0 0 4px 0; font-weight: 700; color: var(--portal-azul);">¿Enviar tu carta ahora?</p>
+      <div id="cartaConfirmar" class="carta__confirmar" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cartaConfirmarTitulo" tabindex="-1">
+        <p id="cartaConfirmarTitulo" class="carta__confirmar-titulo">¿Enviar tu carta ahora?</p>
         <p style="margin: 0 0 12px 0;">Una vez enviada no se puede modificar. Revisa tu texto antes de confirmar.</p>
         <div class="carta__acciones">
-          <button type="button" id="btnConfirmarEnvio" class="portal-btn portal-btn--acento" style="width: auto;">Sí, enviar carta</button>
-          <button type="button" id="btnCancelarEnvio" class="portal-btn portal-btn--outline" style="width: auto;">Seguir editando</button>
+          <button type="button" id="btnConfirmarEnvio" class="boton boton--acento">Sí, enviar carta</button>
+          <button type="button" id="btnCancelarEnvio" class="boton boton--contorno">Seguir editando</button>
         </div>
       </div>
 
@@ -153,18 +161,62 @@ const datos = editable
 </section>
 
 <style>
-  .carta { scroll-margin-top: 16px; }
-  .carta__guia {
-    background: var(--crema, #F7F4EE);
+  .carta { scroll-margin-top: 96px; }
+  .carta__resumen { display: flex; align-items: center; gap: 6px; }
+  .carta__resumen--enviada { color: var(--portal-verde); font-weight: 600; }
+  .carta__intro { margin: 12px 0 0; color: var(--portal-texto); max-width: 65ch; }
+  .carta__aviso {
+    margin: 14px 0 0;
+    padding: 12px 16px;
+    background: var(--crema, #F2EBE0);
     border: 1px solid var(--portal-borde);
     border-radius: var(--portal-radio);
-    padding: 14px 18px;
-    margin: 4px 0 16px 0;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--portal-texto);
   }
-  .carta__guia-titulo { margin: 0 0 6px 0; font-weight: 700; color: var(--portal-azul); font-size: 15px; }
+  .carta__aviso--error { background: var(--portal-rojo-fondo); border-color: #F5C2C0; color: var(--portal-rojo); font-weight: 600; }
+  .carta__guia, .carta__anterior, .carta__ver { margin: 14px 0 0; }
+  .carta__guia {
+    background: var(--crema, #F2EBE0);
+    border: 1px solid var(--portal-borde);
+    border-radius: var(--portal-radio);
+    padding: 0 16px;
+  }
+  .carta__guia[open] { padding-bottom: 14px; }
   .carta__guia ul { margin: 0 0 8px 0; padding-left: 20px; line-height: 1.5; font-size: 15px; }
   .carta__guia li { margin-bottom: 4px; }
-  .carta__guia-nota { margin: 0; font-size: 13px; color: var(--portal-mutado); }
+  .carta__guia-nota { margin: 0; font-size: 14px; color: var(--portal-mutado); }
+  .carta__guia summary, .carta__anterior summary, .carta__ver summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--portal-azul);
+    font-size: 15px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .carta__ver summary {
+    display: inline-flex;
+    padding: 0 18px;
+    border: 1.5px solid var(--portal-azul);
+    border-radius: 4px;
+    background: #FFFFFF;
+  }
+  .carta__ver summary:hover { background: var(--crema, #F2EBE0); }
+  .carta__ver[open] summary { margin-bottom: 12px; }
+  .carta__guia summary::-webkit-details-marker, .carta__anterior summary::-webkit-details-marker, .carta__ver summary::-webkit-details-marker { display: none; }
+  .carta__guia summary::before, .carta__anterior summary::before, .carta__ver summary::before {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    margin-right: 12px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  .carta__guia[open] > summary::before, .carta__anterior[open] > summary::before, .carta__ver[open] > summary::before { transform: rotate(45deg); }
   .carta__texto {
     display: block;
     width: 100%;
@@ -188,25 +240,25 @@ const datos = editable
     box-shadow: 0 0 0 3px rgba(201, 138, 75, 0.2);
   }
   .carta__barra { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-height: 22px; margin-bottom: 14px; }
-  .carta__estado { margin: 0; font-size: 13px; color: var(--portal-mutado); }
+  .carta__estado { margin: 0; font-size: 14px; color: var(--portal-mutado); }
   .carta__estado[data-tipo="error"] { color: var(--portal-rojo); font-weight: 600; }
   .carta__estado[data-tipo="ok"] { color: var(--portal-verde); }
-  .carta__contador { margin: 0; font-size: 13px; color: var(--portal-mutado); }
+  .carta__contador { margin: 0; font-size: 14px; color: var(--portal-mutado); }
   .carta__contador[data-limite="true"] { color: var(--portal-rojo); font-weight: 700; }
   .carta__acciones { display: flex; gap: 12px 16px; align-items: center; flex-wrap: wrap; }
-  .carta__ayuda { font-size: 13px; color: var(--portal-mutado); margin: 12px 0 0 0; }
-  .carta__confirmar { margin-top: 16px; font-size: 15px; line-height: 1.45; }
-  .carta__confirmar:focus { outline: 2px solid var(--portal-cobre); outline-offset: 2px; }
-  .carta__enviada {
-    margin: 14px 0;
-    padding: 12px 16px;
-    background: var(--portal-verde-fondo);
-    color: var(--portal-verde);
-    border: 1px solid #C4DEC8;
+  .carta__ayuda { font-size: 14px; color: var(--portal-mutado); margin: 12px 0 0 0; }
+  .carta__acciones .carta__ayuda { margin: 0; }
+  .carta__confirmar {
+    margin-top: 16px;
+    padding: 16px 20px;
+    background: var(--crema, #F2EBE0);
+    border: 1px solid var(--portal-cobre);
     border-radius: var(--portal-radio);
-    font-weight: 600;
     font-size: 15px;
+    line-height: 1.45;
   }
+  .carta__confirmar:focus { outline: 2px solid var(--portal-cobre); outline-offset: 2px; }
+  .carta__confirmar-titulo { margin: 0 0 4px 0; font-weight: 700; color: var(--portal-azul); }
   .carta__lectura {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -220,15 +272,14 @@ const datos = editable
     overflow-y: auto;
     margin: 8px 0 12px 0;
   }
-  .carta__lectura:focus-visible, .carta__anterior summary:focus-visible, #btnUsarAnterior:focus-visible {
-    outline: 2px solid var(--portal-cobre);
+  .carta__lectura:focus-visible, .carta summary:focus-visible, .carta__boton-sec:focus-visible {
+    outline: 3px solid var(--portal-cobre);
     outline-offset: 2px;
   }
-  .carta__anterior { margin: 0 0 8px 0; }
-  .carta__anterior summary { cursor: pointer; font-weight: 700; color: var(--portal-azul); font-size: 15px; min-height: 32px; }
+  .carta__boton-sec { min-height: 44px; padding: 8px 18px; font-size: 15px; }
   @media (max-width: 520px) {
     .carta__texto { min-height: 280px; }
-    .carta__acciones :global(.portal-btn) { width: 100% !important; }
+    .carta__acciones :global(.boton) { width: 100%; }
   }
 </style>
 
@@ -381,7 +432,7 @@ const datos = editable
     actualizarContador();
     actualizarBotonAnterior();
     if (fusion.recuperadoDelRespaldo) {
-      recuperadaEl.style.display = 'flex';
+      recuperadaEl.style.display = 'block';
       autoguardado.cambiar(fusion.texto);
     } else if (fusion.texto) {
       ponerEstado('Guardado', 'ok');

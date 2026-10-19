@@ -11,8 +11,15 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
-import { presentarEstadoDocumento, type RequisitoUI } from '../../lib/portal-pure.ts';
+import type { RequisitoUI } from '../../lib/portal-pure.ts';
 import { leerExpediente, resumirExpediente } from '../../lib/carta-pure.ts';
+import {
+  contarDocumentos,
+  modelarTarjetaEstado,
+  presentarFilaDocumento,
+  resumirCarta,
+  resumirSeccionDocumentos
+} from '../../lib/documentos-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -63,8 +70,9 @@ if (consentimientoPendiente && respuestaDocs.ok) {
   }
 }
 
-// 3. Consultar datos de la postulación para obtener el asesor asignado
+// 3. Consultar datos de la postulación para obtener la asesora asignada y el próximo paso
 let asesoraAsignada: { nombre: string; whatsapp?: string | null } | null = null;
+let proximoPaso: { codigo?: string | null; texto?: string | null } | null = null;
 try {
   const respPostulacion = await llamarFGRECPortal({
     metodo: 'GET',
@@ -75,8 +83,11 @@ try {
   if (respPostulacion.ok && respPostulacion.data?.asesora) {
     asesoraAsignada = respPostulacion.data.asesora;
   }
+  if (respPostulacion.ok && respPostulacion.data?.proximoPaso) {
+    proximoPaso = respPostulacion.data.proximoPaso;
+  }
 } catch {
-  // Asesoría fallback
+  // Sin asesora ni próximo paso: la tarjeta se arma con lo que hay
 }
 
 // 4. Carta de interés: parte del expediente (documentos + carta)
@@ -106,6 +117,26 @@ const cartaEnviada = Boolean(carta) && carta.puedeEditar === false;
 const expediente = leerExpediente(docsData.expediente) ?? leerExpediente(carta?.expediente);
 const resumen = resumirExpediente(requisitos, cartaEnviada, expediente);
 const cartaEnviadaFinal = resumen.cartaEnviada;
+
+// Modelo de la página: tarjeta de estado, filas de documentos y resumen de cada sección
+const conteo = contarDocumentos(requisitos);
+const cartaEditable = Boolean(carta) && carta.puedeEditar !== false && !resumen.soloLectura;
+const tarjeta = modelarTarjetaEstado({
+  estado: resumen.estado,
+  conteo,
+  documentosCompletos: resumen.documentosCompletos,
+  cartaEnviada: cartaEnviadaFinal,
+  cartaEditable,
+  cartaTieneTexto: typeof carta?.texto === 'string' && carta.texto.trim().length > 0,
+  cartaNuevaVersion: cartaEditable && Number(carta?.version) > 1,
+  consentimientoPendiente: consentimientoPendiente && Boolean(textoConsentimiento),
+  proximoPaso
+});
+const resumenDocumentos = resumirSeccionDocumentos(conteo);
+const resumenCarta = resumirCarta({ carta, soloLectura: resumen.soloLectura });
+const filas = requisitos.map((req) => ({ req, fila: presentarFilaDocumento(req, resumen.soloLectura) }));
+const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
+const inicialAsesora = asesoraAsignada?.nombre ? asesoraAsignada.nombre.trim().charAt(0).toUpperCase() : '';
 ---
 
 <PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
@@ -140,87 +171,72 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
       )}
     </div>
   ) : (
-    <Fragment>
-    <div class="portal-card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
-        <div>
-          <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
-            <span aria-hidden="true">←</span> Volver a mi postulación
-          </a>
-          <p class="antetitulo" style="margin-bottom: 4px;">Expediente institucional</p>
-          <h1 class="portal-title" style="margin: 0; font-size: 28px;">Documentación requerida</h1>
+    <div class="exp">
+      <header class="exp__cab">
+        <a class="enlace-flecha" href="/mi-postulacion">
+          <span aria-hidden="true">←</span> Volver a mi postulación
+        </a>
+        <h1 class="exp__titulo">Documentación requerida</h1>
+      </header>
+
+      <div id="alertaError" class="portal-alert portal-alert--error" role="alert" style="display: none;"></div>
+      <div id="alertaExito" class="portal-alert portal-alert--success" role="status" style="display: none;"></div>
+
+      <section class={`exp-estado exp-estado--${tarjeta.tono}`} aria-labelledby="estadoTitulo" data-estado={resumen.estado}>
+        <div class="exp-estado__principal" role="status">
+          <span class="exp-estado__icono" aria-hidden="true">
+            {tarjeta.tono === 'revision' && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15.5 14"></polyline></svg>
+            )}
+            {tarjeta.tono === 'revisado' && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"></polyline></svg>
+            )}
+            {tarjeta.tono === 'preparacion' && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><polyline points="14 3 14 8 19 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+            )}
+          </span>
+          <div class="exp-estado__cuerpo">
+            <h2 id="estadoTitulo" class="exp-estado__titulo">{tarjeta.titulo}</h2>
+            {tarjeta.texto && <p class="exp-estado__texto">{tarjeta.texto}</p>}
+            {tarjeta.aviso && <p class="exp-estado__aviso">{tarjeta.aviso}</p>}
+            {tarjeta.accion && (
+              <a class="boton boton--acento exp-estado__accion" href={tarjeta.accion.href} data-ir>
+                {tarjeta.accion.texto}
+              </a>
+            )}
+          </div>
         </div>
-        {whatsappHref && (
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn-sm portal-btn-sm--ghost" style="color: var(--portal-azul); border-color: var(--portal-borde);">
-            Enviar por WhatsApp
-          </a>
+
+        {(asesoraAsignada?.nombre || whatsappHref) && (
+          <div class="exp-estado__asesora">
+            {asesoraAsignada?.nombre ? (
+              <span class="exp-estado__persona">
+                <span class="exp-estado__avatar" aria-hidden="true">{inicialAsesora}</span>
+                <span>Tu asesora: <strong>{asesoraAsignada.nombre}</strong></span>
+              </span>
+            ) : (
+              <span>¿Tienes dudas sobre tu expediente?</span>
+            )}
+            {whatsappHref && (
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="exp-estado__enlace">
+                {asesoraAsignada?.nombre ? 'Escribir por WhatsApp' : 'Consultar por WhatsApp'} <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </div>
         )}
-      </div>
-      <p class="portal-desc" style="margin-top: 8px;">
-        Tu expediente se compone de dos partes: los documentos solicitados y tu carta de interés. Pasa a revisión cuando hayas cargado los documentos obligatorios y enviado tu carta. Solo se aceptan archivos PDF, JPG y PNG de hasta 10 MB.
-      </p>
+      </section>
 
-      {resumen.estado === 'EN_REVISION' && (
-        <div class="portal-alert portal-alert--info" role="status" style="margin-bottom: 16px;">
-          <span><strong>Tu expediente está en revisión.</strong> Mientras dure la revisión no puedes cambiar los documentos ni la carta. Si hace falta algo, tu asesora te avisará.</span>
-        </div>
-      )}
-      {resumen.estado === 'REVISADO' && (
-        <div class="portal-alert portal-alert--success" role="status" style="margin-bottom: 16px;">
-          <span><strong>Tu expediente fue revisado.</strong> Ya no se pueden cambiar los documentos ni la carta.</span>
-        </div>
-      )}
-
-      <ul class="resumen-expediente" aria-label="Avance de tu expediente" style="list-style: none; margin: 0 0 20px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
-        <li style={`color: ${resumen.documentosCompletos ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
-          <span aria-hidden="true">{resumen.documentosCompletos ? '✓' : '○'}</span>
-          Documentos obligatorios: {resumen.obligatoriosCompletos} de {resumen.obligatoriosTotal} cargados
-        </li>
-        <li style={`color: ${cartaEnviadaFinal ? 'var(--portal-verde)' : 'var(--portal-texto)'};`}>
-          <span aria-hidden="true">{cartaEnviadaFinal ? '✓' : '○'}</span>
-          Carta de interés: {cartaEnviadaFinal ? 'enviada' : (carta ? 'pendiente de enviar' : 'aún no disponible')}
-          {!cartaEnviadaFinal && !resumen.soloLectura && carta && <a href="#carta" class="enlace-flecha" style="margin-left: 8px; font-size: 14px;">Ir a la carta <span aria-hidden="true">↓</span></a>}
-        </li>
-      </ul>
-
-      {asesoraAsignada?.nombre && (
-        <div style="background: var(--crema, #F7F4EE); border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--portal-azul); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0;">
-              {asesoraAsignada.nombre.charAt(0).toUpperCase()}
-            </div>
-            <span style="font-size: 14px; color: var(--portal-texto);">
-              Tu asesora asignada para este expediente es <strong style="color: var(--portal-azul);">{asesoraAsignada.nombre}</strong>.
-            </span>
-          </div>
-          {whatsappHref && (
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="enlace-flecha" style="font-size: 13px;">
-              Consultar con mi asesora <span aria-hidden="true">→</span>
-            </a>
-          )}
-        </div>
-      )}
-
-      <div id="alertaError" class="portal-alert portal-alert--error" style="display: none;"></div>
-      <div id="alertaExito" class="portal-alert portal-alert--success" style="display: none;"></div>
-
-      <!-- Bloque de consentimiento pendiente -->
       {consentimientoPendiente && textoConsentimiento && (
-        <div id="bloqueConsentimiento" class="nota-destacada" style="margin-bottom: 24px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="font-size: 18px;">📝</span>
-            <h2 style="font-size: 17px; font-weight: 700; color: var(--portal-azul); margin: 0;">
-              Consentimiento para tratamiento de datos y transferencia académica
-            </h2>
-          </div>
+        <section id="bloqueConsentimiento" class="exp-seccion exp-consentimiento" aria-labelledby="consentimientoTitulo" tabindex="-1">
+          <h2 id="consentimientoTitulo" class="exp-seccion__titulo">
+            Consentimiento para tratamiento de datos y transferencia académica
+          </h2>
 
           {textoConsentimiento.borrador && (
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--crema-2); color: var(--portal-cobre-texto); display: inline-block; padding: 2px 8px; border-radius: 4px; margin-bottom: 12px; border: 1px solid var(--portal-borde);">
-              Borrador institucional ({textoConsentimiento.version})
-            </div>
+            <p class="exp-consentimiento__borrador">Borrador institucional ({textoConsentimiento.version})</p>
           )}
 
-          <div style="font-size: 14px; color: var(--portal-texto); line-height: 1.5; white-space: pre-wrap; max-height: 180px; overflow-y: auto; background: #FFFFFF; padding: 12px; border-radius: 4px; border: 1px solid var(--portal-borde); margin-bottom: 14px;">
+          <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto del consentimiento">
             {textoConsentimiento.texto}
           </div>
 
@@ -229,137 +245,107 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
             id="btnAceptarConsentimiento"
             data-codigo={textoConsentimiento.codigo}
             data-version={textoConsentimiento.version}
-            class="portal-btn portal-btn--acento"
-            style="width: auto;"
+            class="portal-btn portal-btn--acento exp-boton"
           >
             Acepto el consentimiento y habilitar la carga
           </button>
-        </div>
+        </section>
       )}
 
-      <!-- Listado de requisitos -->
-      <div id="listaRequisitos" style={consentimientoPendiente ? 'opacity: 0.5; pointer-events: none;' : ''}>
-        {requisitos.length === 0 ? (
-          <div style="text-align: center; padding: 2rem; color: var(--portal-mutado);">
-            No hay requisitos documentales pendientes para esta vía.
-          </div>
-        ) : (
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-              {requisitos.map((req) => {
-                const vista = presentarEstadoDocumento(req);
-                const colorDetalle = (req.estado === 'OBSERVADO' || req.estado === 'REEMPLAZO_SOLICITADO')
-                  ? 'var(--portal-rojo)'
-                  : 'var(--portal-mutado)';
+      <section id="documentos" class="exp-seccion" aria-labelledby="documentosTitulo">
+        <div class="exp-seccion__cab">
+          <h2 id="documentosTitulo" class="exp-seccion__titulo">Documentos</h2>
+          {requisitos.length > 0 && <p class="exp-seccion__resumen">{resumenDocumentos}</p>}
+        </div>
 
-                return (
-                  <div
-                    class="requisito-item"
-                    data-requisito={req.codigo}
-                    style="border: 1.5px solid var(--portal-borde); border-radius: var(--portal-radio); padding: 20px 24px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 6px rgba(11, 27, 46, 0.03);"
-                  >
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
-                      <div>
-                        <h3 style="font-size: 18px; font-weight: 700; color: var(--portal-azul); margin: 0 0 4px 0; line-height: 1.25;">
-                          {req.nombre}
-                        </h3>
-                        {req.obligatorio ? (
-                          <span style="font-size: 11px; font-weight: 800; color: var(--portal-cobre-texto); text-transform: uppercase; letter-spacing: 0.08em; background: var(--crema-2, #F3EBDD); padding: 2px 8px; border-radius: 3px; display: inline-block;">
-                            Obligatorio para admisión
-                          </span>
-                        ) : (
-                          <span style="font-size: 11px; font-weight: 700; color: var(--portal-mutado); text-transform: uppercase; letter-spacing: 0.08em; background: #F1F5F9; padding: 2px 8px; border-radius: 3px; display: inline-block;">
-                            Documento opcional
-                          </span>
+        <div id="listaRequisitos" class={consentimientoPendiente ? 'exp-bloqueado' : ''} inert={consentimientoPendiente}>
+          {requisitos.length === 0 ? (
+            <p class="exp-vacio">No hay documentos pendientes para esta vía.</p>
+          ) : (
+            <ul class="exp-docs">
+              {filas.map(({ req, fila }) => (
+                <li
+                  class={`doc requisito-item doc--${fila.icono}`}
+                  id={`doc-${req.codigo}`}
+                  data-requisito={req.codigo}
+                  tabindex="-1"
+                >
+                  <div class="doc__principal">
+                    <h3 class="doc__nombre">
+                      {req.nombre}
+                      {fila.opcional && <span class="doc__opcional">Opcional</span>}
+                    </h3>
+                    <p class={`doc__estado doc__estado--${fila.icono}`}>
+                      <span class="doc__icono" aria-hidden="true">
+                        {fila.icono === 'pendiente' && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8.5"></circle></svg>
                         )}
-                      </div>
-
-                      <!-- Badge de estado -->
-                      <div>
-                        {req.estado === 'PENDIENTE' && (
-                          <span class="badge-acento" style="background: var(--crema-2, #F3EBDD); color: var(--portal-cobre-texto); border-color: #DFD5C3;">
-                            ○ Pendiente de carga
-                          </span>
+                        {fila.icono === 'recibido' && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><polyline points="8.5 12.5 11 15 15.5 9.5"></polyline></svg>
                         )}
-                        {req.estado === 'RECIBIDO' && (
-                          <span class="badge-acento" style="background: #E8F0FE; color: #174EA6; border-color: #D2E3FC;">
-                            ⏳ Recibido · En revisión
-                          </span>
+                        {fila.icono === 'validado' && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm4.6 7.6-5.2 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.5-4.7a1 1 0 0 1 1.4 1.4Z"></path></svg>
                         )}
-                        {req.estado === 'VALIDADO' && (
-                          <span class="badge-acento" style="background: var(--portal-verde-fondo); color: var(--portal-verde); border-color: #C4DEC8;">
-                            ✓ Validado por admisiones
-                          </span>
+                        {(fila.icono === 'observado' || fila.icono === 'reemplazo') && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><line x1="12" y1="7.5" x2="12" y2="12.5"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                         )}
-                        {req.estado === 'OBSERVADO' && (
-                          <span class="badge-acento" style="background: var(--portal-ambar-fondo); color: var(--portal-ambar); border-color: #F6DFB3;">
-                            ⚠️ Observado
-                          </span>
-                        )}
-                        {req.estado === 'REEMPLAZO_SOLICITADO' && (
-                          <span class="badge-acento" style="background: var(--portal-rojo-fondo); color: var(--portal-rojo); border-color: #F5C2C0;">
-                            ⚠️ Reemplazo solicitado
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <!-- Detalle o motivo con aviso destacado -->
-                    {vista.detalle && (
-                      <div class="nota-destacada" style={`font-size: 14px; color: ${colorDetalle}; line-height: 1.45; padding: 10px 14px; margin: 2px 0;`}>
-                        {vista.detalle}
-                      </div>
-                    )}
-
-                    <!-- Zona de acción para cargar o reemplazar archivo -->
-                    {vista.permiteSubida && !resumen.soloLectura && (
-                      <div style="margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--portal-borde); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                        <label
-                          class="boton boton--acento btn-cargar-archivo"
-                          tabindex="0"
-                          role="button"
-                          style="cursor: pointer; width: auto; font-size: 15px; min-height: 44px; padding: 10px 20px; display: inline-flex;"
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                          </svg>
-                          <span>{vista.textoBoton === 'Reemplazar' ? 'Subir reemplazo' : 'Cargar archivo (PDF o foto)'}</span>
-                          <input
-                            type="file"
-                            class="input-file-documento"
-                            data-requisito={req.codigo}
-                            accept="image/jpeg,image/png,application/pdf"
-                            style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;"
-                          />
-                        </label>
-                        <span style="font-size: 13px; color: var(--portal-mutado);">
-                          PDF, JPG o PNG · Hasta 10 MB
-                        </span>
-                        <span class="estado-subida" style="font-size: 14px; font-weight: 700; color: var(--portal-azul); display: none;"></span>
-                      </div>
-                    )}
+                      </span>
+                      {fila.estadoTexto}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+
+                  {fila.permiteSubida && (
+                    <div class="doc__accion">
+                      <label class="boton boton--contorno btn-cargar-archivo" tabindex="0" role="button">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span>{fila.textoBoton}</span>
+                        <input
+                          type="file"
+                          class="input-file-documento"
+                          data-requisito={req.codigo}
+                          accept="image/jpeg,image/png,application/pdf"
+                          aria-label={`${fila.textoBoton}: ${req.nombre}`}
+                        />
+                      </label>
+                      <p class="doc__formato">PDF, JPG o PNG · hasta 10 MB</p>
+                      <p class="estado-subida" role="status" aria-live="polite" style="display: none;"></p>
+                    </div>
+                  )}
+
+                  {fila.nota && (
+                    <p class={`doc__nota doc__nota--${fila.icono}`}>{fila.nota}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-      </div>
-    <CartaInteres carta={carta} error={errorCarta} claveSesion={claveSesion} soloLectura={resumen.soloLectura} />
-    </Fragment>
-  )}
 
-  <div class="portal-card" style="font-size: 0.8125rem; color: var(--portal-mutado); line-height: 1.45;">
-    <p style="margin: 0 0 0.5rem 0;">
-      <strong>¿Problemas al tomar la foto o con el formato?</strong>
-    </p>
-    <p style="margin: 0;">
-      Asegúrate de que la foto tenga buena luz, sin reflejos y con los bordes del documento visibles.
-      Si estás en un iPhone, las imágenes HEIC se convierten a formato compatible. En caso de interrupciones,
-      también puedes coordinar la entrega con tu asesora mediante el WhatsApp oficial de la Fundación.
-    </p>
-  </div>
+        {hayCarga && (
+          <details class="exp-ayuda">
+            <summary>¿Problemas con la foto o el formato?</summary>
+            <p>
+              Usa buena luz, sin reflejos y con los bordes del documento visibles. Las fotos HEIC de iPhone se convierten
+              a un formato compatible. Si no logras cargar un archivo, puedes coordinar la entrega con tu asesora
+              {whatsappHref ? (<Fragment> por <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a></Fragment>) : ' por el WhatsApp oficial de la Fundación'}.
+            </p>
+          </details>
+        )}
+      </section>
+
+      <CartaInteres
+        carta={carta}
+        error={errorCarta}
+        claveSesion={claveSesion}
+        soloLectura={resumen.soloLectura}
+        resumen={resumenCarta}
+      />
+    </div>
+  )}
 </PortalLayout>
 
 <script>
@@ -412,8 +398,8 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
         mostrarExito('Consentimiento registrado con éxito. Ya puedes cargar tus documentos.');
         if (bloqueConsentimiento) bloqueConsentimiento.style.display = 'none';
         if (listaRequisitos) {
-          listaRequisitos.style.opacity = '1';
-          listaRequisitos.style.pointerEvents = 'auto';
+          listaRequisitos.classList.remove('exp-bloqueado');
+          listaRequisitos.removeAttribute('inert');
         }
       } else {
         const data = await res.json();
@@ -481,10 +467,8 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
       function setEstado(texto: string, cargando: boolean = false) {
         if (!estadoSpan) return;
         estadoSpan.textContent = texto;
-        estadoSpan.style.display = 'inline';
-        if (cargando) {
-          estadoSpan.style.color = 'var(--portal-azul)';
-        }
+        estadoSpan.style.display = texto ? 'block' : 'none';
+        estadoSpan.dataset.cargando = cargando ? 'true' : 'false';
       }
 
       // 1. Validar en cliente
@@ -555,7 +539,7 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
 
         if (uploadRes.status === 202) {
           setEstado('✓ Documento recibido', false);
-          mostrarExito(`¡${file.name} recibido con éxito! El documento está en revisión preliminar.`);
+          mostrarExito(`Recibimos ${file.name}. Gracias.`);
           setTimeout(() => {
             window.location.reload();
           }, 1200);
@@ -574,6 +558,20 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
         setEstado('Error de subida', false);
         target.value = '';
       }
+    });
+  });
+
+  // El botón principal de la tarjeta lleva al primer pendiente y deja el foco ahí (el ancla sola no mueve el foco).
+  document.querySelectorAll<HTMLAnchorElement>('a[data-ir]').forEach((enlace) => {
+    enlace.addEventListener('click', (e) => {
+      const destino = document.querySelector<HTMLElement>(enlace.getAttribute('href') || '');
+      if (!destino) return;
+      e.preventDefault();
+      const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      destino.scrollIntoView({ behavior: sinMovimiento ? 'auto' : 'smooth', block: 'start' });
+      history.replaceState(null, '', enlace.getAttribute('href') || '');
+      const foco = destino.querySelector<HTMLElement>('.btn-cargar-archivo, #cartaTexto, #btnAceptarConsentimiento') ?? destino;
+      foco.focus({ preventScroll: true });
     });
   });
 
