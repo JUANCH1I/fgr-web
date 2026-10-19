@@ -75,6 +75,17 @@ export function img(id, { alt = '', ancho = 1200, clase = '', carga = 'lazy', al
     ' loading="' + carga + '" decoding="async">';
 }
 
+// Header photo as a real <img>: the browser finds it in the HTML (not after the CSS)
+// and downloads the width that fits the screen. It is the LCP element of the page.
+export function fotoCabecera(id) {
+  if (!id) return '';
+  const anchos = [800, 1280, 1920];
+  const urls = anchos.map((a) => urlImagen(id, a));
+  const srcset = urls[0] === urls[2] ? '' :
+    ' srcset="' + urls.map((u, i) => esc(u) + ' ' + anchos[i] + 'w').join(', ') + '" sizes="100vw"';
+  return '<img class="cabecera__foto" src="' + esc(urls[2]) + '"' + srcset + ' alt="" fetchpriority="high" decoding="async">';
+}
+
 // ---------- Enlaces y botones ----------
 
 export function boton(texto, url, tipo = 'principal') {

@@ -1,5 +1,5 @@
 // Fondos del PCEA, cursos de Formación continua y Microcertificaciones.
-import { esc, img, urlImagen, boton, enlaceFlecha, aSlug, fechaDeInicio } from './util.mjs';
+import { esc, img, urlImagen, fotoCabecera, boton, enlaceFlecha, aSlug, fechaDeInicio } from './util.mjs';
 
 // ---------- Fondos ----------
 
@@ -84,7 +84,8 @@ export function paginaFondo(sitio, f, carrerasPorSlug) {
   </div>
 </section>`;
 
-  const contenido = `<section class="cabecera cabecera--foto" style="--foto: url('${esc(urlImagen(f.imagenCabecera, 1920))}')">
+  const contenido = `<section class="cabecera cabecera--foto">
+  ${fotoCabecera(f.imagenCabecera)}
   <div class="contenedor">
     <nav class="migas migas--clara" aria-label="Ruta"><a href="/programa-de-cooperacion-y-excelencia-academica/">Programa de Cooperación y Excelencia Académica</a> <span aria-hidden="true">/</span> Fondos</nav>
     <p class="antetitulo">${esc(f.antetitulo)}</p>
@@ -180,7 +181,8 @@ export function paginaMaestria(sitio, m, carrerasPorSlug) {
   ].filter(([, v]) => v);
   const totalSeminarios = m.areas.reduce((n, a) => n + a.seminarios.length, 0);
 
-  const contenido = `<section class="cabecera cabecera--foto" style="--foto: url('${esc(urlImagen(m.imagen, 1920))}')">
+  const contenido = `<section class="cabecera cabecera--foto">
+  ${fotoCabecera(m.imagen)}
   <div class="contenedor">
     <nav class="migas migas--clara" aria-label="Ruta"><a href="/microcertificaciones/">Microcertificaciones</a> <span aria-hidden="true">/</span> Maestrías</nav>
     <p class="antetitulo">Microcertificaciones académicas</p>
