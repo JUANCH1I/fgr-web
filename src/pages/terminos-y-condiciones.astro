@@ -1,19 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PaginaLegal from "../components/PaginaLegal.astro";
 ---
 <Layout title="Términos y Condiciones" description="Términos y Condiciones de uso del sitio de la Fundación del Gran Rosario Ecuador." >
-  <Fragment set:html={`<section class="cabecera cabecera--simple">
-  <div class="contenedor">
-    <p class="antetitulo">Información legal</p>
-    <h1>Términos y Condiciones</h1>
-  </div>
-</section>
-
-<section class="seccion">
-  <div class="contenedor texto-legal">
-    <p>Estamos actualizando los Términos y Condiciones de uso de este sitio. Mientras tanto, puedes consultar nuestra <a href="/politicas-de-privacidad-del-sitio/">Política de Privacidad del Sitio Web</a> y nuestra política de <a href="/proteccion-de-datos/">Protección de datos</a>.</p>
-    <p>Si tienes una consulta sobre el uso del sitio, los programas o las postulaciones, escríbenos desde la página de <a href="/contacto/">Contacto</a>.</p>
-  </div>
-</section>
-`} />
+  <PaginaLegal slug="terminos-y-condiciones" />
 </Layout>

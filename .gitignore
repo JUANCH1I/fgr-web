@@ -23,3 +23,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# TinaCMS: panel de administración y archivos generados (tina/tina-lock.json SÍ se versiona)
+public/admin
+tina/__generated__
