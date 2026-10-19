@@ -1,0 +1,21 @@
+---
+// Cuerpo de las páginas legales: el texto vive en src/contenido/legales/<slug>.md (editable desde Tina).
+import { getEntry, render } from 'astro:content';
+
+const { slug } = Astro.props;
+const entrada = await getEntry('legales', slug);
+if (!entrada) throw new Error(`Falta el texto legal "${slug}" en src/contenido/legales/`);
+const { Content } = await render(entrada);
+---
+<section class="cabecera cabecera--simple">
+  <div class="contenedor">
+    <p class="antetitulo">Información legal</p>
+    <h1>{entrada.data.titulo}</h1>
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="contenedor texto-legal">
+    <Content />
+  </div>
+</section>

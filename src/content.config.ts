@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const customLoader = (filePath: string, key: string) => {
   return {
@@ -19,6 +20,10 @@ const customLoader = (filePath: string, key: string) => {
 };
 
 export const collections = {
+  legales: defineCollection({
+    loader: glob({ pattern: '*.md', base: './src/contenido/legales' }),
+    schema: z.object({ titulo: z.string() }),
+  }),
   carreras: defineCollection({
     loader: customLoader('src/datos/carreras.json', 'carreras'),
     schema: z.object({
