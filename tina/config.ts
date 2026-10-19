@@ -1,4 +1,5 @@
 import { defineConfig } from 'tinacms';
+import carrerasDatos from '../src/datos/carreras.json';
 
 // Tina Cloud: variables a definir en Vercel (ver README / AGENTS.md).
 const branch = process.env.VERCEL_GIT_COMMIT_REF || 'main';
@@ -135,7 +136,9 @@ export default defineConfig({
         path: 'src/datos',
         format: 'json',
         match: unico('carreras'),
-        ui: soloEdicion,
+        // Todas las carreras viven en UN documento, así que el router no puede elegir una:
+        // abre la primera en la vista previa; desde ahí se navega a las demás por los enlaces de la ficha.
+        ui: { ...soloEdicion, router: () => `/carreras/${carrerasDatos.carreras[0].slug}/` },
         fields: [
           nota('Carreras de las universidades aliadas. Cada una genera su ficha en /carreras/<slug>/. Para sumar una carrera, copia un bloque completo, cambia el slug (solo minúsculas, números y guiones) y completa los datos. "orden" define el orden en el listado.'),
           lista('carreras', 'Carreras', [

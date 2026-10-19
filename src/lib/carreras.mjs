@@ -154,7 +154,9 @@ ${destacado}
 <p>El ingreso lo define la universidad después de revisar tu documentación.</p>`;
 }
 
-export function ficha(sitio, c, { carreras, fondos, maestrias }) {
+// `campo(nombre)` devuelve el atributo data-tina-field de ese campo (edición visual de Tina);
+// por defecto no agrega nada.
+export function ficha(sitio, c, { carreras, fondos, maestrias, campo = () => '' }) {
   const afines = carreras.filter((x) => x.area === c.area && x.slug !== c.slug)
     .sort((a, b) => (a.nivel === c.nivel ? -1 : 0) - (b.nivel === c.nivel ? -1 : 0) || a.orden - b.orden)
     .slice(0, 3);
@@ -163,19 +165,19 @@ export function ficha(sitio, c, { carreras, fondos, maestrias }) {
   const modalidad = textoModalidad(c) + (c.detalleModalidad ? '. ' + c.detalleModalidad : '');
 
   const datos = [
-    ['Título', c.titulo],
-    ['Título intermedio', c.tituloIntermedio],
-    ['Modalidad', modalidad],
-    ['Duración', c.duracion],
-    ['Ingreso', c.viaIngreso],
+    ['Título', c.titulo, 'titulo'],
+    ['Título intermedio', c.tituloIntermedio, 'tituloIntermedio'],
+    ['Modalidad', modalidad, 'modalidad'],
+    ['Duración', c.duracion, 'duracion'],
+    ['Ingreso', c.viaIngreso, 'viaIngreso'],
     ['Resolución', c.resolucion],
     ['Universidad', c.universidad + ' (' + c.pais + ')']
   ].filter(([, v]) => Boolean(v));
 
   const pestañas = [
-    { id: 'plan', titulo: 'Plan de estudios', html: planDeEstudios(c) },
-    { id: 'ingreso', titulo: 'Requisitos de ingreso', html: ingreso(c) },
-    { id: 'perfil', titulo: 'Perfil del egresado', html: '<p>' + esc(c.perfil) + '</p>' },
+    { id: 'plan', titulo: 'Plan de estudios', html: planDeEstudios(c), campo: 'plan' },
+    { id: 'ingreso', titulo: 'Requisitos de ingreso', html: ingreso(c), campo: 'requisitos' },
+    { id: 'perfil', titulo: 'Perfil del egresado', html: '<p>' + esc(c.perfil) + '</p>', campo: 'perfil' },
     { id: 'postular', titulo: 'Cómo postular', html: pasosPostulacion(c) }
   ];
 
@@ -183,7 +185,7 @@ export function ficha(sitio, c, { carreras, fondos, maestrias }) {
   <div class="contenedor">
     <nav class="migas" aria-label="Ruta"><a href="/carreras/">Carreras</a> <span aria-hidden="true">/</span> ${esc(c.area)} <span aria-hidden="true">/</span> ${esc(c.nivel)}</nav>
     <p class="etiquetas"><span class="etiqueta">${esc(c.nivel)}</span><span class="etiqueta etiqueta--suave">${esc(c.area)}</span><span class="etiqueta etiqueta--suave">${esc(textoModalidad(c))}</span></p>
-    <h1>${esc(c.nombre)}</h1>
+    <h1${campo('nombre')}>${esc(c.nombre)}</h1>
     <p class="entrada">Carrera de la ${esc(c.universidad)} (${esc(c.pais)}). ${esc(c.viaIngreso)}.</p>
   </div>
 </section>
@@ -193,11 +195,11 @@ export function ficha(sitio, c, { carreras, fondos, maestrias }) {
       <div class="pestanas" role="tablist" aria-label="Secciones de la ficha" hidden>
         ${pestañas.map((p, i) => '<button type="button" role="tab" id="pestana-' + p.id + '" aria-controls="panel-' + p.id + '" aria-selected="' + (i === 0) + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(p.titulo) + '</button>').join('\n        ')}
       </div>
-      ${pestañas.map((p) => '<section class="panel" id="panel-' + p.id + '" role="tabpanel" aria-labelledby="pestana-' + p.id + '">\n        <h2 class="panel__titulo">' + esc(p.titulo) + '</h2>\n        ' + p.html + '\n      </section>').join('\n      ')}
+      ${pestañas.map((p) => '<section class="panel" id="panel-' + p.id + '" role="tabpanel" aria-labelledby="pestana-' + p.id + '"' + (p.campo ? campo(p.campo) : '') + '>\n        <h2 class="panel__titulo">' + esc(p.titulo) + '</h2>\n        ' + p.html + '\n      </section>').join('\n      ')}
     </div>
     <aside class="ficha__lateral" aria-label="Datos de la carrera">
       <dl class="datos">
-        ${datos.map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('\n        ')}
+        ${datos.map(([k, v, f]) => '<div><dt>' + esc(k) + '</dt><dd' + (f ? campo(f) : '') + '>' + esc(v) + '</dd></div>').join('\n        ')}
       </dl>
       <div class="botones botones--columna">
         ${boton('Evaluar mis estudios', '/continuidad-academica/#evaluar', 'oscuro')}

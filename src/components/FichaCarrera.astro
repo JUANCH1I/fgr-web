@@ -1,0 +1,22 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import sitio from '../datos/sitio.json';
+import carrerasJson from '../datos/carreras.json';
+import fondosJson from '../datos/fondos.json';
+import microJson from '../datos/microcertificaciones.json';
+import { ficha } from '../lib/carreras.mjs';
+
+// `carrera` viene de la consulta de Tina (con metadatos para tinaField).
+const { carrera } = Astro.props;
+const campo = (nombre: string) => {
+  const ruta = tinaField(carrera, nombre);
+  return ruta ? ` data-tina-field="${ruta}"` : '';
+};
+const pagina = ficha(sitio, carrera, {
+  carreras: carrerasJson.carreras,
+  fondos: fondosJson.fondos,
+  maestrias: microJson.maestrias,
+  campo,
+});
+---
+<Fragment set:html={pagina.contenido} />

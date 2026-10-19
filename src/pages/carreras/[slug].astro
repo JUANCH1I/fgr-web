@@ -5,6 +5,10 @@ import carrerasJson from '../../datos/carreras.json';
 import fondosJson from '../../datos/fondos.json';
 import microJson from '../../datos/microcertificaciones.json';
 import { ficha } from '../../lib/carreras.mjs';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import FichaCarrera from '../../components/FichaCarrera.astro';
+import { islas } from '../../lib/islas';
+import { consultaCarreras } from '../../lib/tina-carreras';
 
 const carreras = carrerasJson.carreras;
 const fondos = fondosJson.fondos;
@@ -20,6 +24,8 @@ export async function getStaticPaths() {
 
 const { carrera } = Astro.props;
 const pagina = ficha(sitio, carrera, { carreras, fondos, maestrias });
+const consulta = await consultaCarreras();
+const carreraTina = consulta.data.carreras.carreras.find((c: any) => c.slug === carrera.slug);
 
 // Course schema
 const courseSchema = {
@@ -69,5 +75,7 @@ const breadcrumbSchema = {
   type="course"
   schema={[courseSchema, breadcrumbSchema]}
 >
-  <Fragment set:html={pagina.contenido} />
+  <TinaIsland name="carrera" wrapper={islas.carrera.wrapper} params={{ slug: carrera.slug }} primary>
+    <FichaCarrera carrera={carreraTina} />
+  </TinaIsland>
 </Layout>
