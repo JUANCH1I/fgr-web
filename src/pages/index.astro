@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { fotoCabecera } from "../lib/util.mjs";
 
 const siteSearchSchema = {
   '@type': 'WebSite',
@@ -21,7 +22,8 @@ const siteSearchSchema = {
   description="La Fundación del Gran Rosario Ecuador te acompaña desde la primera consulta hasta la cursada, en carreras universitarias a distancia de una red de universidades aliadas."
   schema={siteSearchSchema}
 >
-  <Fragment set:html={`<section class="portada" style="--foto: url('https://static.wixstatic.com/media/64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.png/v1/fit/w_1920,h_5760,q_80,enc_jpg/64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.jpg')">
+  <Fragment set:html={`<section class="portada">
+  ${fotoCabecera('64d480_16a4476f20dd4455aba9924156b4ba1d~mv2.png')}
   <div class="contenedor">
     <div class="portada__texto">
       <p class="antetitulo">Articulación y continuidad universitaria</p>
