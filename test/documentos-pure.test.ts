@@ -41,6 +41,7 @@ function entrada(requisitos: RequisitoUI[], extra: Partial<EntradaTarjeta> = {})
 test('fila: un documento recibido no lleva nota ni subida (se quita la "verificación preliminar")', () => {
   const f = presentarFilaDocumento(req('A', 'RECIBIDO'), false);
   assert.equal(f.estadoTexto, 'Recibido');
+  assert.equal(f.tono, 'ok');
   assert.equal(f.nota, null);
   assert.equal(f.permiteSubida, false);
   assert.equal(f.textoBoton, null);
@@ -61,8 +62,9 @@ test('fila: solo los opcionales se marcan', () => {
 
 test('fila: observado trae el motivo y la acción', () => {
   const f = presentarFilaDocumento(req('A', 'OBSERVADO', { motivo: { texto: 'La foto está cortada' } }), false);
-  assert.equal(f.estadoTexto, 'Observado: revisa la nota');
+  assert.equal(f.estadoTexto, 'Observado');
   assert.equal(f.icono, 'observado');
+  assert.equal(f.tono, 'pendiente');
   assert.equal(f.nota, 'Observación: La foto está cortada. Sube un archivo nuevo para reemplazarlo.');
   assert.equal(f.permiteSubida, true);
   assert.equal(f.textoBoton, 'Subir reemplazo');
@@ -71,6 +73,7 @@ test('fila: observado trae el motivo y la acción', () => {
 test('fila: reemplazo solicitado trae el motivo y la acción', () => {
   const f = presentarFilaDocumento(req('A', 'REEMPLAZO_SOLICITADO', { motivo: { texto: 'Está vencido.' } }), false);
   assert.equal(f.estadoTexto, 'Reemplazo solicitado');
+  assert.equal(f.tono, 'error');
   assert.equal(f.nota, 'Necesitamos un archivo nuevo: Está vencido. Sube un archivo nuevo para reemplazarlo.');
 });
 
@@ -135,6 +138,7 @@ test('resumen de la carta según su estado', () => {
 test('tarjeta EN_PREPARACION: dice qué falta y lleva al primer pendiente', () => {
   const t = modelarTarjetaEstado(entrada([req('A', 'RECIBIDO'), req('B', 'PENDIENTE'), req('C', 'PENDIENTE')]));
   assert.equal(t.tono, 'preparacion');
+  assert.equal(t.etiqueta, 'Fase 2 en curso');
   assert.equal(t.titulo, 'Te faltan 2 documentos y tu carta de interés');
   assert.deepEqual(t.accion, { texto: 'Cargar el primer documento', href: '#doc-B' });
 });
@@ -187,7 +191,8 @@ test('tarjeta EN_REVISION: tranquiliza y no ofrece acciones', () => {
   const t = modelarTarjetaEstado(entrada([req('A', 'RECIBIDO')], { estado: 'EN_REVISION', cartaEnviada: true, cartaEditable: false }));
   assert.equal(t.tono, 'revision');
   assert.equal(t.titulo, 'Tu expediente está en revisión');
-  assert.equal(t.aviso, 'No necesitas hacer nada por ahora.');
+  assert.equal(t.etiqueta, 'En revisión de la Fundación');
+  assert.equal(t.aviso, 'No necesitas hacer nada por ahora; tu asesora te avisará si falta algo.');
   assert.equal(t.accion, null);
 });
 

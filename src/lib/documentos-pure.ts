@@ -10,9 +10,11 @@ import type { EstadoExpediente } from './carta-pure.ts';
 export type IconoFila = 'pendiente' | 'recibido' | 'validado' | 'observado' | 'reemplazo';
 
 export interface FilaDocumento {
-  /** Estado en lenguaje llano, una línea. */
+  /** Estado en lenguaje llano, una línea (va en la etiqueta de la fila). */
   estadoTexto: string;
   icono: IconoFila;
+  /** Color de la etiqueta según los estilos del panel: ok (verde), pendiente (ámbar) o error (rojo). */
+  tono: 'ok' | 'pendiente' | 'error';
   /** Solo los opcionales se marcan: la sección ya dice cuántos obligatorios hay. */
   opcional: boolean;
   /** Aviso con el motivo y la acción. Solo existe cuando el postulante tiene algo que hacer o leer. */
@@ -36,16 +38,17 @@ export function presentarFilaDocumento(req: RequisitoUI, soloLectura: boolean): 
   switch (req.estado) {
     case 'RECIBIDO':
     case 'REEMPLAZADO':
-      return { estadoTexto: 'Recibido', icono: 'recibido', opcional, nota: null, permiteSubida: false, textoBoton: null };
+      return { estadoTexto: 'Recibido', icono: 'recibido', tono: 'ok', opcional, nota: null, permiteSubida: false, textoBoton: null };
     case 'VALIDADO':
-      return { estadoTexto: 'Validado', icono: 'validado', opcional, nota: null, permiteSubida: false, textoBoton: null };
+      return { estadoTexto: 'Validado', icono: 'validado', tono: 'ok', opcional, nota: null, permiteSubida: false, textoBoton: null };
     case 'OBSERVADO':
     case 'REEMPLAZO_SOLICITADO': {
       const detalle = base.detalle ? cerrarFrase(base.detalle) : '';
       const accion = permiteSubida ? 'Sube un archivo nuevo para reemplazarlo.' : '';
       return {
-        estadoTexto: req.estado === 'OBSERVADO' ? 'Observado: revisa la nota' : 'Reemplazo solicitado',
+        estadoTexto: req.estado === 'OBSERVADO' ? 'Observado' : 'Reemplazo solicitado',
         icono: req.estado === 'OBSERVADO' ? 'observado' : 'reemplazo',
+        tono: req.estado === 'OBSERVADO' ? 'pendiente' : 'error',
         opcional,
         nota: [detalle, accion].filter(Boolean).join(' ') || null,
         permiteSubida,
@@ -56,6 +59,7 @@ export function presentarFilaDocumento(req: RequisitoUI, soloLectura: boolean): 
       return {
         estadoTexto: 'Pendiente',
         icono: 'pendiente',
+        tono: 'pendiente',
         opcional,
         nota: null,
         permiteSubida,
@@ -168,6 +172,8 @@ export interface AccionTarjeta {
 
 export interface TarjetaEstado {
   tono: TonoTarjeta;
+  /** Etiqueta corta sobre el título (la «fase en curso» del panel). */
+  etiqueta: string;
   titulo: string;
   texto: string | null;
   /** Frase corta que tranquiliza: «No necesitas hacer nada por ahora». */
@@ -189,6 +195,8 @@ export interface EntradaTarjeta {
   proximoPaso?: { codigo?: string | null; texto?: string | null } | null;
 }
 
+const ETIQUETA_PREPARACION = 'Fase 2 en curso';
+
 const PASOS_QUE_YA_NO_APLICAN: readonly string[] = ['CARGAR_DOCUMENTOS', 'SUBSANAR_DOCUMENTOS', 'ESCRIBIR_CARTA'];
 
 function plural(n: number, singular: string, pluralTexto: string): string {
@@ -199,9 +207,10 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
   if (e.estado === 'EN_REVISION') {
     return {
       tono: 'revision',
+      etiqueta: 'En revisión de la Fundación',
       titulo: 'Tu expediente está en revisión',
-      texto: 'La Fundación está revisando tus documentos y tu carta. Si hace falta algo, tu asesora te avisará.',
-      aviso: 'No necesitas hacer nada por ahora.',
+      texto: 'La Fundación está revisando tus documentos y tu carta.',
+      aviso: 'No necesitas hacer nada por ahora; tu asesora te avisará si falta algo.',
       accion: null
     };
   }
@@ -211,6 +220,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
     const mostrarPaso = Boolean(paso?.texto) && !PASOS_QUE_YA_NO_APLICAN.includes(paso?.codigo ?? '');
     return {
       tono: 'revisado',
+      etiqueta: 'Revisión terminada',
       titulo: 'Tu expediente está completo',
       texto: mostrarPaso
         ? `La revisión terminó. Siguiente paso: ${cerrarFrase(String(paso?.texto))}`
@@ -258,6 +268,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
   if (observados > 0) {
     return {
       tono: 'preparacion',
+      etiqueta: ETIQUETA_PREPARACION,
       titulo: observados === 1 ? 'Revisa 1 documento observado' : `Revisa ${observados} documentos observados`,
       texto: listaFaltantes
         ? `Después te ${variosFaltantes ? 'faltarán' : 'faltará'} ${listaFaltantes}. ${textoConsentimiento ?? ''}`.trim()
@@ -270,6 +281,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
   if (faltantes.length > 0) {
     return {
       tono: 'preparacion',
+      etiqueta: ETIQUETA_PREPARACION,
       titulo: `Te ${variosFaltantes ? 'faltan' : 'falta'} ${listaFaltantes}`,
       texto: textoConsentimiento ?? explicacion,
       aviso: null,
@@ -281,6 +293,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
     // El servidor dice que faltan documentos pero la lista no muestra ninguno pendiente: no se inventa un número.
     return {
       tono: 'preparacion',
+      etiqueta: ETIQUETA_PREPARACION,
       titulo: 'Aún faltan documentos para completar tu expediente',
       texto: explicacion,
       aviso: null,
@@ -292,6 +305,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
     // Documentos completos, pero la carta todavía no está habilitada (por ejemplo, sin país asignado).
     return {
       tono: 'preparacion',
+      etiqueta: ETIQUETA_PREPARACION,
       titulo: 'Tus documentos están completos',
       texto: 'Tu asesora te avisará cuando puedas escribir tu carta de interés.',
       aviso: null,
@@ -301,6 +315,7 @@ export function modelarTarjetaEstado(e: EntradaTarjeta): TarjetaEstado {
 
   return {
     tono: 'preparacion',
+      etiqueta: ETIQUETA_PREPARACION,
     titulo: 'Tu expediente está completo',
     texto: 'Pasará a revisión de la Fundación.',
     aviso: null,

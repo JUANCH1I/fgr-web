@@ -1,0 +1,62 @@
+---
+// Tarjeta "Asesoría Institucional": asesora asignada, contacto por WhatsApp y datos de la oficina.
+// Se usa en "Mi postulación" y en la página de documentos para que ambas muestren lo mismo.
+interface Props {
+  asesora?: { nombre?: string | null } | null;
+  whatsappHref?: string | null;
+}
+
+const { asesora, whatsappHref } = Astro.props;
+---
+
+<div class="aside-card">
+  <h3 class="aside-card__section-title">Asesoría Institucional</h3>
+
+  {asesora?.nombre ? (
+    <div class="advisor-profile">
+      <div class="advisor-avatar">
+        {asesora.nombre.slice(0, 2).toUpperCase()}
+      </div>
+      <div class="advisor-details">
+        <strong>{asesora.nombre}</strong>
+        <span>Admisiones Internacionales &middot; FGREC</span>
+      </div>
+    </div>
+  ) : (
+    <div class="advisor-profile">
+      <div class="advisor-avatar">FG</div>
+      <div class="advisor-details">
+        <strong>Equipo de Admisiones</strong>
+        <span>Coordinación Académica &middot; FGREC</span>
+      </div>
+    </div>
+  )}
+
+  <p class="advisor-desc">
+    Responsable del seguimiento de su expediente, verificación formal y coordinación con la secretaría académica de la universidad asociada.
+  </p>
+
+  {whatsappHref && (
+    <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="btn-contact">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.072-.497-1.745-.724-2.868-2.502-2.955-2.617-.087-.116-.708-.941-.708-1.794s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.35.491 1.199.534 1.286.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.087-.178.181-.077.355.101.173.449.741.964 1.201.662.591 1.221.774 1.394.861.173.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/>
+      </svg>
+      <span>Contactar vía WhatsApp</span>
+    </a>
+  )}
+
+  <div class="info-dl">
+    <div class="info-dl__item">
+      <span class="info-dl__label">Horario:</span>
+      <span>Lunes a Viernes 08:30 a 17:30</span>
+    </div>
+    <div class="info-dl__item">
+      <span class="info-dl__label">Sede:</span>
+      <span>Torre 1492, Of. 902, Quito</span>
+    </div>
+    <div class="info-dl__item">
+      <span class="info-dl__label">Régimen:</span>
+      <span>Convocatoria Marzo 2027</span>
+    </div>
+  </div>
+</div>

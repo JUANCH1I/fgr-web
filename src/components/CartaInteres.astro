@@ -40,27 +40,27 @@ const datos = editable
   : '';
 ---
 
-<section class="exp-seccion carta" id="carta" aria-labelledby="cartaTitulo" tabindex="-1">
-  <div class="exp-seccion__cab">
-    <h2 id="cartaTitulo" class="exp-seccion__titulo">Carta de interés</h2>
-    {resumen.linea && (
-      <p class={`exp-seccion__resumen carta__resumen carta__resumen--${resumen.estado.toLowerCase()}`}>
-        {enviada && (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm4.6 7.6-5.2 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.5-4.7a1 1 0 0 1 1.4 1.4Z"></path></svg>
-        )}
-        {resumen.linea}
-      </p>
-    )}
-  </div>
+<section class="section-card carta" id="carta" aria-labelledby="cartaTitulo" tabindex="-1">
+  <h2 id="cartaTitulo" class="section-card__title">Carta de interés</h2>
+  {resumen.linea && (
+    <p class={`section-card__resumen ${enviada ? 'section-card__resumen--ok' : ''}`}>
+      {enviada && (
+        <span class="audit-indicator audit-indicator--ok" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+        </span>
+      )}
+      {resumen.linea}
+    </p>
+  )}
 
   {error && sinPais && (
-    <p class="carta__aviso" role="status">
+    <p class="portal-alert portal-alert--info carta__aviso" role="status">
       {error.message || 'Todavía no podemos habilitar tu carta. Una asesora te avisará cuando puedas escribirla.'}
     </p>
   )}
 
   {error && !sinPais && (
-    <p class="carta__aviso carta__aviso--error" role="alert">
+    <p class="portal-alert portal-alert--error carta__aviso" role="alert">
       {error.status === 429
         ? 'Hay muchas solicitudes en este momento. Espera unos minutos y recarga la página para ver tu carta.'
         : 'Por ahora no podemos mostrar tu carta. Recarga la página en unos minutos; si el problema continúa, consulta con tu asesora.'}
@@ -69,7 +69,7 @@ const datos = editable
 
   {enviada && (
     <details class="carta__ver">
-      <summary>Ver mi carta</summary>
+      <summary class="btn-contact btn-contact--fila">Ver mi carta</summary>
       <div class="carta__lectura" tabindex="0" role="region" aria-label="Texto de la carta enviada">{carta.texto}</div>
       <p class="carta__ayuda">
         Ya forma parte de tu expediente y no se puede modificar.
@@ -80,7 +80,7 @@ const datos = editable
 
   {bloqueadaSinEnviar && tieneTexto && (
     <details class="carta__ver">
-      <summary>Ver mi borrador</summary>
+      <summary class="btn-contact btn-contact--fila">Ver mi borrador</summary>
       <div class="carta__lectura" tabindex="0" role="region" aria-label="Texto de tu borrador">{textoActual}</div>
     </details>
   )}
@@ -90,7 +90,7 @@ const datos = editable
       {guia?.texto && <p class="carta__intro">{guia.texto}</p>}
 
       {esNuevaVersion && (
-        <p class="carta__aviso" role="status">
+        <p class="portal-alert portal-alert--info carta__aviso" role="status">
           Puedes escribirla de nuevo{anterior ? ' o partir de lo que enviaste antes.' : '.'}
         </p>
       )}
@@ -109,14 +109,14 @@ const datos = editable
         <details class="carta__anterior">
           <summary>Ver la versión que enviaste{formatearFechaCarta(anterior.enviadaEn) ? ` el ${formatearFechaCarta(anterior.enviadaEn)}` : ''}</summary>
           <div class="carta__lectura" tabindex="0">{anterior.texto}</div>
-          <button type="button" id="btnUsarAnterior" class="boton boton--contorno carta__boton-sec">
+          <button type="button" id="btnUsarAnterior" class="btn-contact btn-contact--fila">
             Usar como punto de partida
           </button>
         </details>
       )}
 
       <div id="cartaAlerta" class="portal-alert portal-alert--error" style="display: none; margin: 14px 0 0;" role="alert"></div>
-      <p id="cartaRecuperada" class="carta__aviso" style="display: none;" role="status">
+      <p id="cartaRecuperada" class="portal-alert portal-alert--info carta__aviso" style="display: none;" role="status">
         Recuperamos el texto que habías escrito en este dispositivo y lo estamos guardando.
       </p>
 
@@ -140,8 +140,9 @@ const datos = editable
       </div>
 
       <div id="cartaAcciones" class="carta__acciones">
-        <button type="button" id="btnEnviarCarta" class="boton boton--acento">
-          Enviar mi carta
+        <button type="button" id="btnEnviarCarta" class="btn-primary">
+          <span>Enviar mi carta</span>
+          <span aria-hidden="true">&rarr;</span>
         </button>
         <span class="carta__ayuda">Tu borrador se guarda solo mientras escribes.</span>
       </div>
@@ -150,8 +151,8 @@ const datos = editable
         <p id="cartaConfirmarTitulo" class="carta__confirmar-titulo">¿Enviar tu carta ahora?</p>
         <p style="margin: 0 0 12px 0;">Una vez enviada no se puede modificar. Revisa tu texto antes de confirmar.</p>
         <div class="carta__acciones">
-          <button type="button" id="btnConfirmarEnvio" class="boton boton--acento">Sí, enviar carta</button>
-          <button type="button" id="btnCancelarEnvio" class="boton boton--contorno">Seguir editando</button>
+          <button type="button" id="btnConfirmarEnvio" class="btn-primary"><span>Sí, enviar carta</span></button>
+          <button type="button" id="btnCancelarEnvio" class="btn-contact btn-contact--fila">Seguir editando</button>
         </div>
       </div>
 
@@ -162,56 +163,37 @@ const datos = editable
 
 <style>
   .carta { scroll-margin-top: 96px; }
-  .carta__resumen { display: flex; align-items: center; gap: 6px; }
-  .carta__resumen--enviada { color: var(--portal-verde); font-weight: 600; }
-  .carta__intro { margin: 12px 0 0; color: var(--portal-texto); max-width: 65ch; }
-  .carta__aviso {
-    margin: 14px 0 0;
-    padding: 12px 16px;
-    background: var(--crema, #F2EBE0);
-    border: 1px solid var(--portal-borde);
-    border-radius: var(--portal-radio);
-    font-size: 15px;
-    line-height: 1.45;
-    color: var(--portal-texto);
-  }
-  .carta__aviso--error { background: var(--portal-rojo-fondo); border-color: #F5C2C0; color: var(--portal-rojo); font-weight: 600; }
-  .carta__guia, .carta__anterior, .carta__ver { margin: 14px 0 0; }
+  .carta__intro { margin: 0 0 14px; font-size: 14.5px; line-height: 1.6; color: var(--portal-mutado); max-width: 65ch; }
+  .carta__aviso { margin: 0 0 14px; font-size: 13.5px; }
+  .carta__guia, .carta__anterior, .carta__ver { margin: 0 0 14px; }
   .carta__guia {
-    background: var(--crema, #F2EBE0);
+    background: #FDFDFD;
     border: 1px solid var(--portal-borde);
-    border-radius: var(--portal-radio);
-    padding: 0 16px;
+    border-radius: 3px;
+    padding: 0 18px;
   }
   .carta__guia[open] { padding-bottom: 14px; }
-  .carta__guia ul { margin: 0 0 8px 0; padding-left: 20px; line-height: 1.5; font-size: 15px; }
+  .carta__guia ul { margin: 0 0 8px 0; padding-left: 20px; line-height: 1.55; font-size: 14px; color: var(--portal-azul); }
   .carta__guia li { margin-bottom: 4px; }
-  .carta__guia-nota { margin: 0; font-size: 14px; color: var(--portal-mutado); }
-  .carta__guia summary, .carta__anterior summary, .carta__ver summary {
+  .carta__guia-nota { margin: 0; font-size: 13px; color: var(--portal-mutado); }
+  .carta__guia summary, .carta__anterior summary {
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--portal-azul);
-    font-size: 15px;
+    font-size: 13.5px;
     min-height: 44px;
     display: flex;
     align-items: center;
   }
-  .carta__ver summary {
-    display: inline-flex;
-    padding: 0 18px;
-    border: 1.5px solid var(--portal-azul);
-    border-radius: 4px;
-    background: #FFFFFF;
-  }
-  .carta__ver summary:hover { background: var(--crema, #F2EBE0); }
+  .carta__ver summary { list-style: none; }
   .carta__ver[open] summary { margin-bottom: 12px; }
   .carta__guia summary::-webkit-details-marker, .carta__anterior summary::-webkit-details-marker, .carta__ver summary::-webkit-details-marker { display: none; }
   .carta__guia summary::before, .carta__anterior summary::before, .carta__ver summary::before {
     content: "";
     flex: none;
-    width: 7px;
-    height: 7px;
-    margin-right: 12px;
+    width: 6px;
+    height: 6px;
+    margin-right: 10px;
     border-right: 2px solid currentColor;
     border-bottom: 2px solid currentColor;
     transform: rotate(-45deg);
@@ -240,22 +222,22 @@ const datos = editable
     box-shadow: 0 0 0 3px rgba(201, 138, 75, 0.2);
   }
   .carta__barra { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-height: 22px; margin-bottom: 14px; }
-  .carta__estado { margin: 0; font-size: 14px; color: var(--portal-mutado); }
+  .carta__estado { margin: 0; font-size: 13.5px; color: var(--portal-mutado); }
   .carta__estado[data-tipo="error"] { color: var(--portal-rojo); font-weight: 600; }
   .carta__estado[data-tipo="ok"] { color: var(--portal-verde); }
-  .carta__contador { margin: 0; font-size: 14px; color: var(--portal-mutado); }
+  .carta__contador { margin: 0; font-size: 13.5px; color: var(--portal-mutado); }
   .carta__contador[data-limite="true"] { color: var(--portal-rojo); font-weight: 700; }
   .carta__acciones { display: flex; gap: 12px 16px; align-items: center; flex-wrap: wrap; }
-  .carta__ayuda { font-size: 14px; color: var(--portal-mutado); margin: 12px 0 0 0; }
+  .carta__ayuda { font-size: 13px; color: var(--portal-mutado); margin: 12px 0 0 0; }
   .carta__acciones .carta__ayuda { margin: 0; }
   .carta__confirmar {
     margin-top: 16px;
     padding: 16px 20px;
-    background: var(--crema, #F2EBE0);
-    border: 1px solid var(--portal-cobre);
-    border-radius: var(--portal-radio);
-    font-size: 15px;
-    line-height: 1.45;
+    background: #F3EBDD;
+    border: 1px solid var(--portal-borde);
+    border-radius: 3px;
+    font-size: 14px;
+    line-height: 1.5;
   }
   .carta__confirmar:focus { outline: 2px solid var(--portal-cobre); outline-offset: 2px; }
   .carta__confirmar-titulo { margin: 0 0 4px 0; font-weight: 700; color: var(--portal-azul); }
@@ -263,23 +245,22 @@ const datos = editable
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     line-height: 1.6;
-    font-size: 16px;
-    background: #FFFFFF;
+    font-size: 15px;
+    background: #FDFDFD;
     border: 1px solid var(--portal-borde);
-    border-radius: 4px;
-    padding: 14px;
+    border-radius: 3px;
+    padding: 14px 16px;
     max-height: 420px;
     overflow-y: auto;
     margin: 8px 0 12px 0;
   }
-  .carta__lectura:focus-visible, .carta summary:focus-visible, .carta__boton-sec:focus-visible {
+  .carta__lectura:focus-visible, .carta summary:focus-visible {
     outline: 3px solid var(--portal-cobre);
     outline-offset: 2px;
   }
-  .carta__boton-sec { min-height: 44px; padding: 8px 18px; font-size: 15px; }
   @media (max-width: 520px) {
     .carta__texto { min-height: 280px; }
-    .carta__acciones :global(.boton) { width: 100%; }
+    .carta__acciones :global(.btn-primary), .carta__acciones :global(.btn-contact) { width: 100%; box-sizing: border-box; }
   }
 </style>
 
