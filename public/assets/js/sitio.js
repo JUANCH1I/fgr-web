@@ -2,6 +2,12 @@
    Sin dependencias. Cada bloque se activa solo si la página tiene el elemento. */
 window.iniciarSitio = function () {
   'use strict';
+  // Called from DOMContentLoaded, astro:page-load (here and in Layout) and again by every
+  // inline copy of this script after a ClientRouter swap. Bind each page once: otherwise
+  // every form gets one submit handler per call (the precalificador jumped back to step 1
+  // and the contact form sent the same lead several times). The swap brings a new <body>.
+  if (document.body.hasAttribute('data-sitio-iniciado')) { return; }
+  document.body.setAttribute('data-sitio-iniciado', '');
 
   function $(selector, raiz) { return (raiz || document).querySelector(selector); }
   function $$(selector, raiz) { return Array.prototype.slice.call((raiz || document).querySelectorAll(selector)); }
