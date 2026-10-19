@@ -196,6 +196,17 @@ export const POST: APIRoute = async ({ request }) => {
         } else {
           const errText = await response.text();
           console.warn(`[FGREC Intake]: Falló respuesta con status ${response.status}:`, errText);
+          // Un teléfono inválido lo corrige la persona: no se responde éxito ni se envían correos de respaldo.
+          if (response.status === 400) {
+            let detalle: any = null;
+            try { detalle = JSON.parse(errText); } catch { /* cuerpo no JSON: sigue el respaldo por correo */ }
+            if (detalle?.code === 'INVALID_INPUT' && detalle?.field === 'contacto.whatsapp') {
+              return new Response(JSON.stringify({ error: detalle.message, campo: 'telefono' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+          }
         }
       } catch (err: any) {
         console.warn('[FGREC Intake]: Error o timeout en llamada a FGREC:', err.message);

@@ -359,7 +359,13 @@ window.iniciarSitio = function () {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(datos)
     }).then(function (r) {
-      if (!r.ok) { throw new Error('Respuesta ' + r.status); }
+      if (!r.ok) {
+        return r.json().catch(function () { return null; }).then(function (cuerpo) {
+          var err = new Error('Respuesta ' + r.status);
+          if (cuerpo) { err.campo = cuerpo.campo; err.mensaje = cuerpo.error; }
+          throw err;
+        });
+      }
       return r.json();
     });
   }
@@ -384,7 +390,7 @@ window.iniciarSitio = function () {
     DO: { prefijo: '+1', ejemplo: '+1 809 123 4567' },
     ES: { prefijo: '+34', ejemplo: '+34 612 345 678' },
     US: { prefijo: '+1', ejemplo: '+1 202 555 0123' },
-    OT: { prefijo: '+', ejemplo: '+...' }
+    OT: { prefijo: '+', ejemplo: '+505 8123 4567' }
   };
 
   function vincularPaisTelefono(selectPais, inputTel) {
@@ -491,6 +497,7 @@ window.iniciarSitio = function () {
         }
         exito.hidden = false;
       }).catch(function (err) {
+        if (err && err.campo === 'telefono') { return fallar(err.mensaje, f.telefono); }
         error.innerHTML = '';
         var p = document.createElement('span');
         p.textContent = 'Tuvimos un inconveniente al registrar tu consulta por este medio. Puedes escribirnos directamente por WhatsApp: ';
@@ -741,7 +748,8 @@ window.iniciarSitio = function () {
       boton.textContent = 'Enviando…';
       enviar(destino, envio).then(function (res) {
         resultado(sugerencias, notaFinal, res ? res.fgrec : null);
-      }).catch(function () {
+      }).catch(function (err) {
+        if (err && err.campo === 'telefono') { return fallar(err.mensaje, f.whatsapp); }
         error.innerHTML = '';
         var p = document.createElement('span');
         p.textContent = 'Tuvimos un inconveniente al enviar tu evaluación por el formulario. Puedes consultar directamente a un asesor por WhatsApp: ';
