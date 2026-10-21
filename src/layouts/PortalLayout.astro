@@ -315,6 +315,14 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       }
     }
 
+    /* En pantallas angostas el formulario va primero: es lo único que la persona vino a hacer. */
+    @media (max-width: 899px) {
+      .portal-auth-grid { gap: 28px; }
+      .portal-card--auth { order: -1; padding: 24px 20px; }
+      .portal-auth-title { font-size: 26px; }
+      .portal-auth-desc { font-size: 16px; }
+    }
+
     .portal-auth-info {
       display: flex;
       flex-direction: column;
