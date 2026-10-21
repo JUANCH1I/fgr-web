@@ -379,6 +379,20 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
             </a>
           </section>
 
+          <!-- MIS DATOS -->
+          <section class="aranceles-card" aria-labelledby="datos-titulo">
+            <div class="aranceles-card__header">
+              <h3 class="aranceles-card__title" id="datos-titulo">Mis datos</h3>
+            </div>
+            <p class="aranceles-card__text">
+              Revisa tus datos y carga tu documento y tu fecha de nacimiento.
+            </p>
+            <a href="/mi-postulacion/datos" class="aranceles-card__link">
+              <span>Ver y completar mis datos</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </section>
+
         </div>
 
         <!-- COLUMNA LATERAL (ASESORÍA INSTITUCIONAL) -->
@@ -568,6 +582,7 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
     padding: 24px;
     box-shadow: 0 1px 3px rgba(11, 27, 46, 0.03);
   }
+  .aranceles-card + .aranceles-card { margin-top: 24px; }
   .aranceles-card__header {
     display: flex;
     justify-content: space-between;

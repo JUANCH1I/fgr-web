@@ -1,0 +1,299 @@
+---
+export const prerender = false;
+
+// "Mis datos": el postulante verifica sus datos de contacto, avisa si el nombre está mal y carga su documento y su fecha
+// de nacimiento. El país no se muestra ni se edita. El sitio no valida el número: lo decide FGREC.
+import PortalLayout from '../../layouts/PortalLayout.astro';
+import {
+  COOKIE_SESION_NOMBRE,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  borrarSesionYContacto,
+  obtenerVariableEntorno
+} from '../../lib/fgrec-portal.ts';
+import { leerDatos, LARGO_MAX_DOCUMENTO, LARGO_MAX_COMENTARIO } from '../../lib/datos-pure.ts';
+
+const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+
+if (!sesionToken) {
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+const respuesta = await llamarFGRECPortal({
+  metodo: 'GET',
+  rutaRelativa: 'datos',
+  sesion: sesionToken,
+  contexto: extraerContextoVisitante(Astro.request)
+});
+
+if (respuesta.status === 401) {
+  borrarSesionYContacto(Astro.cookies);
+  return Astro.redirect('/mi-postulacion/ingresar', 302);
+}
+
+if (respuesta.status === 403) {
+  return Astro.redirect('/mi-postulacion/codigo', 302);
+}
+
+const statusError = !respuesta.ok ? respuesta.status : null;
+const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
+const whatsappHref = whatsappNumero
+  ? `https://wa.me/${whatsappNumero.replace(/^\+/, '')}?text=Hola,%20tengo%20una%20consulta%20sobre%20mis%20datos%20en%20el%20portal.`
+  : null;
+
+const datos = leerDatos(respuesta.data);
+const nombreCompleto = `${datos.nombre} ${datos.apellido}`.trim();
+const sinDato = 'Sin registrar';
+---
+
+<PortalLayout title="Mis datos | Fundación Gran Rosario" autenticado={true}>
+  {statusError !== null ? (
+    <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+      <h1 class="portal-title">{statusError === 429 ? 'Demasiados intentos' : 'Servicio no disponible'}</h1>
+      <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+        {statusError === 429
+          ? 'Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.'
+          : 'El servicio no está disponible; intenta de nuevo en unos minutos. Si necesitas atención inmediata, puedes escribir a nuestro canal oficial.'}
+      </p>
+      {whatsappHref && (
+        <div style="max-width: 320px; margin: 0 auto;">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-btn portal-btn--wa-full">
+            Contactar por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class="datos">
+      <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
+        <span aria-hidden="true">←</span> Volver a mi postulación
+      </a>
+      <p class="antetitulo" style="margin-bottom: 4px;">Parte de tu postulación</p>
+      <h1 class="portal-title" style="margin: 0 0 24px; font-size: 28px;">Mis datos</h1>
+
+      <section class="section-card" aria-labelledby="contacto-titulo">
+        <h2 class="section-card__title" id="contacto-titulo">Tus datos de contacto</h2>
+
+        <dl class="datos__lista">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{nombreCompleto || sinDato}</dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd>{datos.email || sinDato}</dd>
+          </div>
+          <div>
+            <dt>Teléfono</dt>
+            <dd>{datos.telefono || sinDato}</dd>
+          </div>
+        </dl>
+        <p class="datos__nota">Si tu correo o tu teléfono no son correctos, escríbele a tu asesora.</p>
+
+        <div id="nombre-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
+        <div id="nombre-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
+
+        <button type="button" id="nombre-abrir" class="portal-btn portal-btn--outline datos__accion" aria-expanded="false" aria-controls="nombre-form">
+          Mi nombre está mal
+        </button>
+
+        <form id="nombre-form" class="datos__form" hidden novalidate>
+          <div class="portal-input-group">
+            <label for="nombre-comentario" class="portal-label">Cuéntanos cómo debería escribirse (opcional)</label>
+            <textarea id="nombre-comentario" name="comentario" class="portal-input" rows="3" maxlength={LARGO_MAX_COMENTARIO}></textarea>
+          </div>
+          <button type="submit" id="nombre-enviar" class="portal-btn portal-btn--primary">Avisar a mi asesora</button>
+        </form>
+      </section>
+
+      <section class="section-card" aria-labelledby="documento-titulo">
+        <h2 class="section-card__title" id="documento-titulo">Tu documento y fecha de nacimiento</h2>
+
+        <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
+        <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
+
+        <form
+          id="datos-form"
+          novalidate
+          data-documento={datos.documento}
+          data-fecha={datos.fechaNacimiento}
+          data-editable={datos.documentoEditable ? '1' : '0'}
+        >
+          {datos.documentoEditable ? (
+            <div class="portal-input-group">
+              <label for="datos-documento" class="portal-label">Número de documento de identidad</label>
+              <input
+                type="text"
+                id="datos-documento"
+                name="documento"
+                class="portal-input"
+                maxlength={LARGO_MAX_DOCUMENTO}
+                autocomplete="off"
+                value={datos.documento}
+                aria-describedby="datos-documento-error"
+              />
+              <p id="datos-documento-error" class="datos__error" hidden></p>
+            </div>
+          ) : (
+            <div class="portal-input-group">
+              <p class="portal-label">Número de documento de identidad</p>
+              <p class="datos__valor">{datos.documento || sinDato}</p>
+              <p class="datos__nota">Tu expediente ya fue aprobado: para cambiar el número de documento, escríbele a tu asesora.</p>
+            </div>
+          )}
+
+          <div class="portal-input-group">
+            <label for="datos-fecha" class="portal-label">Fecha de nacimiento</label>
+            <input
+              type="date"
+              id="datos-fecha"
+              name="fechaNacimiento"
+              class="portal-input"
+              value={datos.fechaNacimiento}
+              aria-describedby="datos-fecha-error"
+            />
+            <p id="datos-fecha-error" class="datos__error" hidden></p>
+          </div>
+
+          <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">Guardar mis datos</button>
+        </form>
+      </section>
+    </div>
+  )}
+</PortalLayout>
+
+<style>
+  .datos { max-width: 760px; }
+  .datos__lista { margin: 0 0 12px; display: grid; gap: 12px; }
+  .datos__lista dt { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--portal-mutado); }
+  .datos__lista dd { margin: 2px 0 0; font-size: 16px; color: var(--portal-texto); overflow-wrap: anywhere; }
+  .datos__nota { margin: 0 0 16px; font-size: 13.5px; line-height: 1.5; color: var(--portal-mutado); }
+  .datos__valor { margin: 0 0 6px; font-size: 16px; color: var(--portal-texto); }
+  .datos__accion { width: auto; }
+  .datos__form { margin-top: 16px; }
+  .datos__error { margin: 6px 0 0; font-size: 13.5px; font-weight: 600; color: var(--portal-rojo); }
+  .portal-alert[hidden], .datos__error[hidden], .datos__form[hidden] { display: none; }
+  textarea.portal-input { resize: vertical; font-family: inherit; }
+</style>
+
+<script>
+  import { construirCambios, fechaLocalIso, mensajeErrorDatos, type ErrorDatos } from '../../lib/datos-pure.ts';
+
+  const REDIRECCION_LOGIN = '/mi-postulacion/ingresar';
+  const CABECERAS = { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' };
+  const ERROR_RED = 'No pudimos conectar con el servicio. Revisa tu conexión e inténtalo de nuevo.';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+
+  function mostrar(caja: HTMLElement | null, mensaje: string) {
+    if (!caja) return;
+    caja.textContent = mensaje;
+    caja.hidden = false;
+    caja.focus();
+  }
+  function ocultar(...cajas: Array<HTMLElement | null>) {
+    cajas.forEach((c) => { if (c) { c.hidden = true; c.textContent = ''; } });
+  }
+
+  /** POST JSON; devuelve status y cuerpo. Con 401 la sesión terminó: vuelve a ingresar. */
+  async function enviar(ruta: string, cuerpo: unknown): Promise<{ status: number; data: any } | null> {
+    try {
+      const res = await fetch(ruta, { method: 'POST', headers: CABECERAS, credentials: 'same-origin', body: JSON.stringify(cuerpo) });
+      if (res.status === 401) {
+        window.location.href = REDIRECCION_LOGIN;
+        return null;
+      }
+      let data: any = {};
+      try { data = await res.json(); } catch { /* sin cuerpo */ }
+      return { status: res.status, data };
+    } catch {
+      return { status: 0, data: null };
+    }
+  }
+
+  // --- Aviso de nombre ---
+  const abrir = el<HTMLButtonElement>('nombre-abrir');
+  const formNombre = el<HTMLFormElement>('nombre-form');
+  const comentario = el<HTMLTextAreaElement>('nombre-comentario');
+  const enviarNombre = el<HTMLButtonElement>('nombre-enviar');
+  const nombreEstado = el('nombre-estado');
+  const nombreError = el('nombre-error');
+
+  abrir?.addEventListener('click', () => {
+    if (!formNombre) return;
+    const abierto = formNombre.hidden;
+    formNombre.hidden = !abierto;
+    abrir.setAttribute('aria-expanded', String(abierto));
+    if (abierto) comentario?.focus();
+  });
+
+  formNombre?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    ocultar(nombreEstado, nombreError);
+    if (enviarNombre) enviarNombre.disabled = true;
+    const texto = comentario?.value.trim() ?? '';
+    const r = await enviar('/api/portal/datos/nombre', texto ? { comentario: texto } : {});
+    if (enviarNombre) enviarNombre.disabled = false;
+    if (!r) return;
+    if (r.status === 200 && r.data?.avisado) {
+      formNombre.hidden = true;
+      abrir?.setAttribute('aria-expanded', 'false');
+      if (comentario) comentario.value = '';
+      mostrar(nombreEstado, 'Le avisamos a tu asesora. Va a corregir tu nombre.');
+    } else {
+      mostrar(nombreError, r.status === 0 ? ERROR_RED : mensajeErrorDatos(r.status, r.data).mensaje);
+    }
+  });
+
+  // --- Documento y fecha de nacimiento ---
+  const form = el<HTMLFormElement>('datos-form');
+  const inputDocumento = el<HTMLInputElement>('datos-documento');
+  const inputFecha = el<HTMLInputElement>('datos-fecha');
+  const guardar = el<HTMLButtonElement>('datos-guardar');
+  const estado = el('datos-estado');
+  const error = el('datos-error');
+  const errorCampo = { documento: el('datos-documento-error'), fechaNacimiento: el('datos-fecha-error') };
+  const campos = { documento: inputDocumento, fechaNacimiento: inputFecha };
+
+  const editable = form?.dataset.editable === '1';
+  let actual = { documento: form?.dataset.documento ?? '', fechaNacimiento: form?.dataset.fecha ?? '' };
+  if (inputFecha) inputFecha.max = fechaLocalIso(new Date());
+
+  function limpiarErrores() {
+    ocultar(estado, error, errorCampo.documento, errorCampo.fechaNacimiento);
+    Object.values(campos).forEach((c) => c?.removeAttribute('aria-invalid'));
+  }
+
+  function mostrarError(e: ErrorDatos) {
+    const caja = e.campo === 'documento' || e.campo === 'fechaNacimiento' ? errorCampo[e.campo] : null;
+    if (e.campo === 'documento' || e.campo === 'fechaNacimiento') {
+      campos[e.campo]?.setAttribute('aria-invalid', 'true');
+      if (caja) { caja.textContent = e.mensaje; caja.hidden = false; }
+      campos[e.campo]?.focus();
+    } else {
+      mostrar(error, e.mensaje);
+    }
+  }
+
+  form?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    limpiarErrores();
+    const cambios = construirCambios(actual, { documento: inputDocumento?.value, fechaNacimiento: inputFecha?.value }, editable);
+    if (!Object.keys(cambios).length) {
+      mostrar(estado, 'No hay cambios para guardar.');
+      return;
+    }
+    if (guardar) guardar.disabled = true;
+    const r = await enviar('/api/portal/datos', cambios);
+    if (guardar) guardar.disabled = false;
+    if (!r) return;
+    if (r.status === 200) {
+      actual = { documento: r.data?.documento ?? '', fechaNacimiento: r.data?.fechaNacimiento ?? '' };
+      if (inputDocumento) inputDocumento.value = actual.documento;
+      if (inputFecha) inputFecha.value = actual.fechaNacimiento;
+      mostrar(estado, 'Guardamos tus datos.');
+    } else {
+      mostrarError(r.status === 0 ? { campo: null, mensaje: ERROR_RED } : mensajeErrorDatos(r.status, r.data));
+    }
+  });
+</script>
