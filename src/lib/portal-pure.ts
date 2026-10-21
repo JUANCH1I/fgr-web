@@ -272,3 +272,63 @@ export function cartaEnviadaEnPanel(postulacion: unknown, enRevision: boolean): 
   const expediente = (postulacion as { expediente?: { cartaEnviada?: unknown } } | null | undefined)?.expediente;
   return typeof expediente?.cartaEnviada === 'boolean' ? expediente.cartaEnviada : enRevision;
 }
+
+export interface LoQueSigue {
+  titulo: string;
+  texto: string;
+  /** La acción principal (un botón); null cuando no hay nada que hacer. */
+  accion: { href: string; etiqueta: string } | null;
+  /** Un enlace secundario, p. ej. para ver lo que ya se envió. */
+  enlace: { href: string; etiqueta: string } | null;
+  /** Ofrecer escribirle a la asesora. */
+  contacto: boolean;
+  etiqueta: string | null;
+}
+
+/**
+ * El bloque «Lo que sigue» del inicio: una sola acción, a partir del próximo paso que calcula FGREC
+ * (`proximoPaso.codigo`) y, cuando no hay nada que hacer, del estado del expediente. Una postulación
+ * en pausa sigue su próximo paso sin cartel propio.
+ */
+export function loQueSigue(p: any): LoQueSigue {
+  const documentos = p?.documentos ?? {};
+  const pendientes = Number(documentos.pendientes ?? 0);
+  const observados = Number(documentos.observados ?? 0);
+  const plural = (n: number, uno: string, varios: string) => (n === 1 ? uno : varios.replace('#', String(n)));
+  const paso = (titulo: string, texto: string, accion: LoQueSigue['accion'], extra: Partial<LoQueSigue> = {}): LoQueSigue =>
+    ({ titulo, texto, accion, enlace: null, contacto: false, etiqueta: null, ...extra });
+  const verEnviado = { href: '/mi-postulacion/documentos', etiqueta: 'Ver lo que enviaste' };
+
+  if (p?.situacion === 'CERRADA') {
+    return paso('Tu postulación está cerrada', 'Si quieres retomarla, escríbele a tu asesora.', null, { contacto: true, etiqueta: 'Cerrada' });
+  }
+  switch (p?.proximoPaso?.codigo) {
+    case 'SUBSANAR_DOCUMENTOS':
+      return paso('Revisa las observaciones de tus documentos',
+        plural(observados, 'Un documento necesita que lo vuelvas a enviar.', '# documentos necesitan que los vuelvas a enviar.'),
+        { href: '/mi-postulacion/documentos', etiqueta: 'Ver observaciones' },
+        { etiqueta: plural(observados, '1 documento observado', '# documentos observados') });
+    case 'CARGAR_DOCUMENTOS':
+      return paso('Carga los documentos que faltan',
+        plural(pendientes, 'Te falta 1 documento obligatorio.', 'Te faltan # documentos obligatorios.'),
+        { href: '/mi-postulacion/documentos', etiqueta: 'Cargar documentos' });
+    case 'ESCRIBIR_CARTA':
+      return paso('Escribe y envía tu carta de interés', 'Tu carta es parte del expediente que revisa la universidad.',
+        { href: '/mi-postulacion/documentos#carta', etiqueta: 'Escribir la carta' });
+    case 'ACEPTAR_CONVENIO':
+      return paso('Lee y acepta tu convenio de corresponsabilidad', 'Es el paso que formaliza tu inscripción.',
+        { href: '/mi-postulacion/convenio', etiqueta: 'Leer el convenio' });
+    case 'COMPLETAR_PRECALIFICADOR':
+      return paso('Responde las preguntas sobre tus estudios', 'Con tus respuestas te orientamos sobre las carreras que te corresponden.',
+        { href: '/mi-postulacion/precalificador', etiqueta: 'Responder las preguntas' });
+  }
+  if (p?.expediente?.estado === 'EN_REVISION') {
+    return paso('Estamos revisando tu expediente', 'Recibimos tus documentos y tu carta. Te avisamos cuando haya novedades.', null,
+      { enlace: verEnviado, etiqueta: 'En revisión' });
+  }
+  if (p?.paso?.codigo === 'EVALUACION_ACADEMICA') {
+    return paso('La universidad está evaluando tus estudios', 'No tienes que hacer nada por ahora.', null,
+      { enlace: verEnviado, etiqueta: 'En evaluación' });
+  }
+  return paso('Tu asesora te va a contactar con el próximo paso', 'Si quieres adelantar, escríbele.', null, { contacto: true });
+}

@@ -1,7 +1,6 @@
 ---
 export const prerender = false;
 
-import AsesoriaCard from '../../components/AsesoriaCard.astro';
 import PortalLayout from '../../layouts/PortalLayout.astro';
 import {
   COOKIE_SESION_NOMBRE,
@@ -10,7 +9,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
-import { cartaEnviadaEnPanel, resumirDocumentosPanel } from '../../lib/portal-pure.ts';
+import { cartaEnviadaEnPanel, loQueSigue, resumirDocumentosPanel } from '../../lib/portal-pure.ts';
 import { leerConvenio, formatearFechaConvenio } from '../../lib/convenio-pure.ts';
 import { datosFaltantes, leerDatos } from '../../lib/datos-pure.ts';
 
@@ -115,14 +114,30 @@ const accionConvenio = proximoPaso?.codigo === 'ACEPTAR_CONVENIO';
 // Un convenio pendiente tiene prioridad sobre el aviso de revisión: es lo único que el postulante puede hacer.
 const enRevision = pasoCodigo === 'DOCUMENTACION_COMPLETA' && !accionConvenio;
 const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
+
+// «Lo que sigue»: una sola acción según la etapa (src/lib/portal-pure.ts). Una postulación en pausa sigue su próximo paso.
+const siguiente = loQueSigue(postulacion);
+const FASES = ['Orientación y registro', 'Documentación y carta', 'Dictamen y admisión', 'Fondo Institucional', 'Matrícula y alta'];
+const estadoDatos = faltantes.length === 0 ? 'Completos'
+  : faltantes.length === 1 ? `Falta ${faltantes[0].replace(/^tu /, '')}` : `Faltan ${faltantes.length} datos`;
+const filas = [
+  { nombre: 'Documentos', ok: resumenDocumentos.completos, estado: resumenDocumentos.etiqueta, href: '/mi-postulacion/documentos', accion: resumenDocumentos.completos ? 'Ver documentos' : 'Cargar documentos' },
+  { nombre: 'Carta de interés', ok: cartaEnviada, estado: cartaEnviada ? 'Enviada' : 'Pendiente', href: '/mi-postulacion/documentos#carta', accion: cartaEnviada ? 'Ver la carta' : 'Escribir la carta' },
+  { nombre: 'Tus datos', ok: faltantes.length === 0, estado: estadoDatos, href: '/mi-postulacion/datos', accion: faltantes.length === 0 ? 'Ver mis datos' : 'Completar mis datos' },
+  ...(convenioPendiente || convenioAceptado
+    ? [{ nombre: 'Convenio de corresponsabilidad', ok: convenioAceptado, estado: convenioAceptado ? `Aceptado${fechaConvenio ? ` el ${fechaConvenio}` : ''}` : 'Por aceptar', href: '/mi-postulacion/convenio', accion: convenioAceptado ? 'Ver el convenio' : 'Leer el convenio' }]
+    : [])
+];
+// Lo que la barra lateral cuenta como pendiente en cada sección.
+const pendientesExpediente = Number(documentos.pendientes ?? 0) + Number(documentos.observados ?? 0) + (cartaEnviada ? 0 : 1) + (convenioPendiente ? 1 : 0);
 ---
 
-<PortalLayout title="Mi postulación | Fundación Gran Rosario" autenticado={true}>
+<PortalLayout title="Mi postulación | Fundación Gran Rosario" autenticado={true} pendientes={{ expediente: pendientesExpediente, datos: faltantes.length }}>
   {statusError === 429 ? (
     <div class="portal-card error-card">
       <h1 class="portal-title">Demasiados intentos</h1>
       <p class="portal-desc">
-        Ha realizado demasiadas solicitudes en poco tiempo. Por favor espere unos minutos antes de volver a ingresar.
+        Hiciste demasiadas solicitudes en poco tiempo. Espera unos minutos antes de volver a ingresar.
       </p>
       {whatsappHref && (
         <div style="max-width: 320px; margin: 0 auto;">
@@ -136,7 +151,7 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
     <div class="portal-card error-card">
       <h1 class="portal-title">Servicio no disponible</h1>
       <p class="portal-desc">
-        El servicio no está disponible temporalmente; intente de nuevo en unos minutos. Si requiere atención inmediata, puede contactar a nuestro canal oficial.
+        El servicio no está disponible por ahora; inténtalo de nuevo en unos minutos. Si necesitas ayuda ya, escríbenos por nuestro canal oficial.
       </p>
       {whatsappHref && (
         <div style="max-width: 320px; margin: 0 auto;">
@@ -147,280 +162,57 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
       )}
     </div>
   ) : (
-    <div class="postulacion-container">
-
-      <!-- FICHA DE EXPEDIENTE DEL POSTULANTE -->
-      <header class="applicant-bar">
-        <div class="applicant-bar__info">
-          <h1 class="applicant-bar__name">
-            {nombrePostulante ? nombrePostulante : 'Expediente del Postulante'}
-          </h1>
-          {situacion === 'ACTIVA' && (
-            <span class="badge-tag badge-tag--active">Postulación activa</span>
-          )}
-          {situacion === 'EN_PAUSA' && (
-            <span class="badge-tag badge-tag--pause">En pausa {postulacion.pausaHasta ? `hasta ${postulacion.pausaHasta}` : ''}</span>
-          )}
-          {situacion === 'CERRADA' && (
-            <span class="badge-tag badge-tag--closed">Postulación cerrada</span>
-          )}
+    <div class="inicio">
+      <header class="inicio__cabecera">
+        <div class="inicio__saludo">
+          <h1 class="inicio__titulo">{nombrePostulante ? `Hola, ${nombrePostulante}` : 'Mi postulación'}</h1>
+          {situacion === 'ACTIVA' && <span class="inicio__estado">Postulación activa</span>}
         </div>
-        <div class="applicant-bar__program">
-          Red Universitaria FGREC &middot; Universidad asociada: <strong>UGR</strong>
+        <div class="inicio__fase">
+          <span><strong>Fase {faseActiva} de 5</strong> · {FASES[faseActiva - 1]}</span>
+          <span class="inicio__puntos" role="img" aria-label={`Fase ${faseActiva} de 5`}>
+            {FASES.map((_, i) => <span class={i < faseActiva ? 'inicio__punto inicio__punto--hecho' : 'inicio__punto'} />)}
+          </span>
         </div>
       </header>
 
-      {faltantes.length > 0 && (
-        <div class="portal-alert portal-alert--info datos-faltantes" role="status">
-          <span>
-            Nos falta {faltantes.join(' y ')}.
-            <a href="/mi-postulacion/datos" class="datos-faltantes__link">Completar mis datos &rarr;</a>
-          </span>
+      <section class="inicio__sigue" aria-labelledby="sigue-titulo">
+        <div class="inicio__sigue-texto">
+          <span class="inicio__rotulo">Lo que sigue</span>
+          {siguiente.etiqueta && <span class="inicio__etiqueta">{siguiente.etiqueta}</span>}
+          <h2 class="inicio__sigue-titulo" id="sigue-titulo">{siguiente.titulo}</h2>
+          <p class="inicio__sigue-lead">{siguiente.texto}</p>
+          {siguiente.enlace && (
+            <a href={siguiente.enlace.href} class="inicio__enlace">{siguiente.enlace.etiqueta} <span aria-hidden="true">&rarr;</span></a>
+          )}
         </div>
-      )}
-
-      <!-- MAPA DE FASES / STEPPER FORMAL INSTITUCIONAL -->
-      <section class="stepper-card" aria-label="Fases del proceso de admisión académica">
-        <div class="stepper-card__header">
-          <h2 class="stepper-card__title">Proceso de Admisión Académica</h2>
-          <span class="stepper-card__legend">Campaña Ingreso Marzo 2027</span>
-        </div>
-
-        <ol class="stepper">
-          <!-- Fase 1 -->
-          <li class={`step ${faseActiva > 1 ? 'step--completed' : faseActiva === 1 ? 'step--active' : ''}`}>
-            <div class="step__marker" aria-hidden="true">
-              {faseActiva > 1 ? (
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              ) : '1'}
-            </div>
-            <span class="step__title">1. Orientación y Registro</span>
-            <span class="step__status">{faseActiva > 1 ? 'Completado' : 'En curso'}</span>
-          </li>
-
-          <!-- Fase 2 -->
-          <li class={`step ${faseActiva > 2 ? 'step--completed' : faseActiva === 2 ? 'step--active' : ''}`}>
-            <div class="step__marker" aria-hidden="true">
-              {faseActiva > 2 ? (
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              ) : '2'}
-            </div>
-            <span class="step__title">2. Documentación y Carta</span>
-            <span class="step__status">
-              {faseActiva > 2 ? 'Completado' : faseActiva === 2 ? (enRevision ? 'En revisión' : 'En curso') : 'Pendiente'}
-            </span>
-          </li>
-
-          <!-- Fase 3 -->
-          <li class={`step ${faseActiva > 3 ? 'step--completed' : faseActiva === 3 ? 'step--active' : ''}`}>
-            <div class="step__marker" aria-hidden="true">
-              {faseActiva > 3 ? (
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              ) : '3'}
-            </div>
-            <span class="step__title">3. Dictamen y Admisión</span>
-            <span class="step__status">{faseActiva > 3 ? 'Completado' : faseActiva === 3 ? 'En curso' : 'Pendiente'}</span>
-          </li>
-
-          <!-- Fase 4 -->
-          <li class={`step ${faseActiva > 4 ? 'step--completed' : faseActiva === 4 ? 'step--active' : ''}`}>
-            <div class="step__marker" aria-hidden="true">
-              {faseActiva > 4 ? (
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              ) : '4'}
-            </div>
-            <span class="step__title">4. Fondo Institucional</span>
-            <span class="step__status">{faseActiva > 4 ? 'Completado' : faseActiva === 4 ? 'En curso' : 'Pendiente'}</span>
-          </li>
-
-          <!-- Fase 5 -->
-          <li class={`step ${faseActiva === 5 ? 'step--active' : ''}`}>
-            <div class="step__marker" aria-hidden="true">5</div>
-            <span class="step__title">5. Matrícula y Alta</span>
-            <span class="step__status">{faseActiva === 5 ? 'En curso' : 'Final'}</span>
-          </li>
-        </ol>
+        {siguiente.accion ? (
+          <a href={siguiente.accion.href} class="btn-primary inicio__boton">
+            <span>{siguiente.accion.etiqueta}</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        ) : siguiente.contacto && whatsappHref ? (
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="inicio__wa">Escribir a mi asesora</a>
+        ) : null}
       </section>
 
-      <!-- GRID PRINCIPAL -->
-      <div class="postulacion-layout">
-
-        <!-- COLUMNA PRINCIPAL DE ACCIÓN -->
-        <div class="postulacion-main">
-
-          <!-- TARJETA PRINCIPAL DE ACCIÓN REQUERIDA -->
-          <article class="action-card">
-            <span class="action-card__tag">
-              {enRevision
-                ? 'Expediente remitido a secretaría'
-                : `Fase ${faseActiva} en curso · Requerimiento de admisión`}
-            </span>
-
-            <h2 class="action-card__heading">
-              {enRevision
-                ? 'Expediente formal en revisión institucional'
-                : proximoPaso?.codigo === 'CARGAR_DOCUMENTOS' || proximoPaso?.codigo === 'SUBSANAR_DOCUMENTOS'
-                ? 'Completar expediente de admisión institucional'
-                : proximoPaso?.codigo === 'ESCRIBIR_CARTA'
-                ? 'Presentar carta de interés institucional'
-                : proximoPaso?.codigo === 'ACEPTAR_CONVENIO'
-                ? 'Revisar y aceptar su convenio de corresponsabilidad'
-                : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR'
-                ? 'Completar registro de antecedentes previos'
-                : paso.nombre}
-            </h2>
-
-            <p class="action-card__lead">
-              {enRevision
-                ? 'Su documentación y carta de interés han sido recibidas y se encuentran bajo revisión de la Dirección de Admisiones y la universidad asociada.'
-                : proximoPaso?.texto
-                ? proximoPaso.texto
-                : 'Para remitir su legajo a la Dirección de Admisiones y al comité académico de la universidad asociada, es necesario consignar la documentación obligatoria requerida y su carta de interés institucional.'}
-            </p>
-
-            <!-- AUDITORÍA DE ELEMENTOS PENDIENTES -->
-            <div class="audit-list">
-              <div class="audit-list__row">
-                <div class="audit-list__col-left">
-                  <span class={`audit-indicator ${resumenDocumentos.completos ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
-                    {resumenDocumentos.completos && (
-                      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    )}
-                  </span>
-                  <span>Documentos de identidad y título habilitante</span>
-                </div>
-                <span class={`badge-status ${resumenDocumentos.completos ? 'badge-status--ok' : 'badge-status--pending'}`}>
-                  {resumenDocumentos.etiqueta}
-                </span>
-              </div>
-
-              <div class="audit-list__row">
-                <div class="audit-list__col-left">
-                  <span class={`audit-indicator ${cartaEnviada ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
-                    {cartaEnviada && (
-                      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    )}
-                  </span>
-                  <span>Carta de interés institucional</span>
-                </div>
-                {cartaEnviada ? (
-                  <span class="badge-status badge-status--ok">Enviada</span>
-                ) : (
-                  <span class="badge-status badge-status--pending">Borrador o pendiente</span>
+      <section class="inicio__expediente" aria-labelledby="expediente-titulo">
+        <h2 class="inicio__expediente-titulo" id="expediente-titulo">Tu expediente</h2>
+        <ul class="inicio__filas">
+          {filas.map((f) => (
+            <li class="inicio__fila">
+              <span class={f.ok ? 'inicio__marca inicio__marca--ok' : 'inicio__marca'} aria-hidden="true">
+                {f.ok && (
+                  <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                 )}
-              </div>
-
-              <div class="audit-list__row">
-                <div class="audit-list__col-left">
-                  <span class="audit-indicator audit-indicator--ok">
-                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </span>
-                  <span>Consentimiento para tratamiento de datos académicos</span>
-                </div>
-                <span class="badge-status badge-status--ok">Registrado</span>
-              </div>
-
-              {(convenioPendiente || convenioAceptado) && (
-                <div class="audit-list__row">
-                  <div class="audit-list__col-left">
-                    <span class={`audit-indicator ${convenioAceptado ? 'audit-indicator--ok' : 'audit-indicator--pending'}`}>
-                      {convenioAceptado && (
-                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                      )}
-                    </span>
-                    <span>Convenio de corresponsabilidad</span>
-                  </div>
-                  {convenioAceptado ? (
-                    <span class="badge-status badge-status--ok">Aceptado{fechaConvenio ? ` el ${fechaConvenio}` : ''}</span>
-                  ) : (
-                    <span class="badge-status badge-status--pending">Pendiente de aceptación</span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <!-- BOTÓN PRINCIPAL DE GESTIÓN -->
-            {enRevision ? (
-              <a href="/mi-postulacion/documentos" class="btn-primary">
-                <span>Ver expediente presentado</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            ) : proximoPaso?.codigo === 'ESCRIBIR_CARTA' ? (
-              <a href="/mi-postulacion/documentos#carta" class="btn-primary">
-                <span>Redactar carta de interés</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            ) : proximoPaso?.codigo === 'ACEPTAR_CONVENIO' ? (
-              <a href="/mi-postulacion/convenio" class="btn-primary">
-                <span>Leer y aceptar mi convenio</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            ) : proximoPaso?.codigo === 'COMPLETAR_PRECALIFICADOR' ? (
-              <a href="/mi-postulacion/precalificador" class="btn-primary">
-                <span>Completar preguntas previas</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            ) : (
-              <a href="/mi-postulacion/documentos" class="btn-primary">
-                <span>Gestionar documentación y carta de interés</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            )}
-          </article>
-
-          <!-- SEGUIMIENTO ARANCELARIO -->
-          <section class="aranceles-card" aria-labelledby="pagos-titulo">
-            <div class="aranceles-card__header">
-              <h3 class="aranceles-card__title" id="pagos-titulo">Aranceles y Registro de Pagos</h3>
-            </div>
-            <p class="aranceles-card__text">
-              Consulte los pagos que ya figuran en su postulación e informe uno nuevo adjuntando su comprobante. FGREC revisa cada envío antes de confirmarlo.
-            </p>
-            <a href="/mi-postulacion/pagos" class="aranceles-card__link">
-              <span>Ver mis pagos e informar un pago</span>
-              <span aria-hidden="true">&rarr;</span>
-            </a>
-          </section>
-
-          <!-- MIS DATOS -->
-          <section class="aranceles-card" aria-labelledby="datos-titulo">
-            <div class="aranceles-card__header">
-              <h3 class="aranceles-card__title" id="datos-titulo">Mis datos</h3>
-            </div>
-            <p class="aranceles-card__text">
-              Revisa tus datos y carga tu documento y tu fecha de nacimiento.
-            </p>
-            <a href="/mi-postulacion/datos" class="aranceles-card__link">
-              <span>Ver y completar mis datos</span>
-              <span aria-hidden="true">&rarr;</span>
-            </a>
-          </section>
-
-        </div>
-
-        <!-- COLUMNA LATERAL (ASESORÍA INSTITUCIONAL) -->
-        <aside class="postulacion-aside">
-          <AsesoriaCard asesora={asesora} whatsappHref={whatsappHref} />
-        </aside>
-
-      </div>
-
+              </span>
+              <span class="inicio__fila-nombre">{f.nombre}</span>
+              <span class={f.ok ? 'inicio__pastilla inicio__pastilla--ok' : 'inicio__pastilla'}>{f.estado}</span>
+              <a href={f.href} class="inicio__fila-accion">{f.accion} <span aria-hidden="true">&rarr;</span></a>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   )}
 </PortalLayout>
@@ -434,219 +226,60 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
     border-radius: var(--portal-radio);
   }
 
-  /* BARRA DE EXPEDIENTE DEL POSTULANTE */
-  .datos-faltantes__link {
-    margin-left: 6px;
-    font-weight: 600;
-    color: inherit;
-    white-space: nowrap;
+  .inicio { display: flex; flex-direction: column; gap: 24px; }
+
+  .inicio__cabecera { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; }
+  .inicio__saludo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .inicio__titulo { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 32px; line-height: 1.1; color: var(--portal-texto); text-wrap: balance; }
+  .inicio__estado { font-size: 12px; font-weight: 600; color: var(--portal-verde); background: var(--portal-verde-fondo); padding: 4px 10px; border-radius: 999px; }
+  .inicio__fase { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--portal-mutado); }
+  .inicio__fase strong { color: var(--portal-texto); font-weight: 600; }
+  .inicio__puntos { display: inline-flex; gap: 6px; }
+  .inicio__punto { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #B9AE9C; box-sizing: border-box; }
+  .inicio__punto--hecho { background: var(--portal-azul); border-color: var(--portal-azul); }
+
+  .inicio__sigue {
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    padding: 28px 32px; background: var(--portal-blanco); border: 1px solid var(--portal-borde); border-radius: 8px;
+  }
+  .inicio__sigue-texto { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; max-width: 560px; }
+  .inicio__rotulo { font-size: 13px; font-weight: 600; color: var(--portal-cobre-texto); }
+  .inicio__etiqueta { font-size: 12px; font-weight: 600; color: var(--portal-cobre-texto); background: var(--portal-ambar-fondo); padding: 4px 10px; border-radius: 999px; }
+  .inicio__sigue-titulo { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 1.2; color: var(--portal-texto); text-wrap: balance; }
+  .inicio__sigue-lead { margin: 0; font-size: 15px; line-height: 1.5; color: var(--portal-mutado); }
+  .inicio__enlace { font-size: 14px; font-weight: 600; color: var(--portal-cobre-texto); }
+  .inicio__boton { flex-shrink: 0; }
+  .inicio__wa {
+    flex-shrink: 0; min-height: 44px; padding: 0 20px; border-radius: var(--portal-radio);
+    display: inline-flex; align-items: center; background: var(--portal-verde); color: var(--portal-blanco);
+    font-size: 15px; font-weight: 600; text-decoration: none;
   }
 
-  .applicant-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding-bottom: 16px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--portal-borde);
+  .inicio__expediente { padding: 24px 32px 8px; background: var(--portal-blanco); border: 1px solid var(--portal-borde); border-radius: 8px; }
+  .inicio__expediente-titulo { margin: 0 0 8px; font-family: var(--serif); font-weight: 600; font-size: 20px; color: var(--portal-texto); }
+  .inicio__filas { list-style: none; margin: 0; padding: 0; }
+  .inicio__fila {
+    display: grid; grid-template-columns: 22px minmax(0, 1fr) auto 200px; align-items: center; gap: 14px;
+    padding: 14px 0; border-top: 1px solid #EFE9DE;
   }
-  .applicant-bar__info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+  .inicio__marca {
+    width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--portal-cobre-texto); box-sizing: border-box;
+    display: inline-flex; align-items: center; justify-content: center;
   }
-  .applicant-bar__name {
-    font-family: var(--serif);
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--portal-azul);
-    margin: 0;
-    letter-spacing: -0.01em;
-  }
-  .badge-tag {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 3px 9px;
-    border-radius: 3px;
-  }
-  .badge-tag--active {
-    background: var(--portal-verde-fondo);
-    color: var(--portal-verde);
-    border: 1px solid #C4DEC8;
-  }
-  .badge-tag--pause {
-    background: var(--portal-ambar-fondo);
-    color: var(--portal-ambar);
-    border: 1px solid #F6DFB3;
-  }
-  .badge-tag--closed {
-    background: var(--portal-rojo-fondo);
-    color: var(--portal-rojo);
-    border: 1px solid #F5C2C0;
-  }
-  .applicant-bar__program {
-    font-size: 13.5px;
-    color: var(--portal-mutado);
-  }
-  .applicant-bar__program strong {
-    color: var(--portal-azul);
-    font-weight: 600;
-  }
+  .inicio__marca--ok { background: var(--portal-verde); border-color: var(--portal-verde); color: var(--portal-blanco); }
+  .inicio__fila-nombre { font-size: 15px; color: var(--portal-texto); }
+  .inicio__pastilla { justify-self: start; font-size: 13px; font-weight: 600; color: var(--portal-cobre-texto); background: var(--portal-ambar-fondo); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .inicio__pastilla--ok { color: var(--portal-verde); background: var(--portal-verde-fondo); }
+  .inicio__fila-accion { justify-self: end; font-size: 14px; font-weight: 600; color: var(--portal-cobre-texto); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+  .inicio__fila-accion:hover { color: var(--portal-cobre-hover); text-decoration: underline; }
 
-  /* STEPPER FORMAL INSTITUCIONAL */
-  .stepper-card {
-    background: var(--portal-blanco);
-    border: 1px solid var(--portal-borde);
-    border-radius: 4px;
-    padding: 24px 28px;
-    margin-bottom: 28px;
-    box-shadow: 0 1px 3px rgba(11, 27, 46, 0.04);
-  }
-  .stepper-card__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 22px;
-  }
-  .stepper-card__title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--portal-cobre-texto);
-    margin: 0;
-  }
-  .stepper-card__legend {
-    font-size: 12px;
-    color: var(--portal-mutado);
-  }
-
-  .stepper {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    position: relative;
-    gap: 16px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .stepper::before {
-    content: "";
-    position: absolute;
-    top: 17px;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: #CBD5E1;
-    z-index: 1;
-  }
-  .step {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .step__marker {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    border: 2px solid #94A3B8;
-    color: #64748B;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    transition: all 0.2s;
-  }
-  .step--completed .step__marker {
-    background: var(--portal-verde);
-    border-color: var(--portal-verde);
-    color: #FFFFFF;
-  }
-  .step--active .step__marker {
-    background: var(--portal-azul);
-    border-color: var(--portal-cobre);
-    color: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(201, 138, 75, 0.2);
-  }
-  .step__title {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--portal-mutado);
-    line-height: 1.3;
-  }
-  .step--active .step__title {
-    color: var(--portal-azul);
-    font-weight: 700;
-  }
-  .step__status {
-    font-size: 10.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 4px;
-    color: #94A3B8;
-  }
-  .step--completed .step__status { color: var(--portal-verde); }
-  .step--active .step__status { color: var(--portal-cobre-texto); }
-
-  /* SECCIÓN ARANCELARIA */
-  .aranceles-card {
-    background: var(--portal-blanco);
-    border: 1px solid var(--portal-borde);
-    border-radius: 4px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(11, 27, 46, 0.03);
-  }
-  .aranceles-card + .aranceles-card { margin-top: 24px; }
-  .aranceles-card__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .aranceles-card__title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--portal-azul);
-    margin: 0;
-  }
-  .aranceles-card__text {
-    font-size: 13.5px;
-    color: var(--portal-mutado);
-    margin: 0 0 16px 0;
-    line-height: 1.5;
-  }
-  .aranceles-card__link {
-    color: var(--portal-azul);
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
-  }
-  .aranceles-card__link:hover {
-    border-color: var(--portal-azul);
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .stepper { display: flex; flex-direction: column; gap: 12px; }
-    .stepper::before { display: none; }
-    .step { flex-direction: row; text-align: left; gap: 14px; }
-    .step__marker { margin-bottom: 0; width: 30px; height: 30px; font-size: 12px; }
+  @media (max-width: 720px) {
+    .inicio__titulo { font-size: 28px; }
+    .inicio__sigue { flex-direction: column; align-items: stretch; padding: 20px; gap: 16px; }
+    .inicio__boton, .inicio__wa { justify-content: center; }
+    .inicio__sigue-titulo { font-size: 22px; }
+    .inicio__expediente { padding: 18px 20px 4px; }
+    .inicio__fila { grid-template-columns: 22px minmax(0, 1fr) auto; row-gap: 2px; }
+    .inicio__fila-accion { grid-column: 2 / -1; justify-self: start; min-height: 32px; }
   }
 </style>
