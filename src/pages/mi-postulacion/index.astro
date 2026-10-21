@@ -173,6 +173,15 @@ const pendientesExpediente = Number(documentos.pendientes ?? 0) + Number(documen
         </div>
       </header>
 
+      {faltantes.length > 0 && (
+        <div class="portal-alert portal-alert--info datos-faltantes" role="status">
+          <span>
+            Nos falta {faltantes.join(' y ')}.
+            <a href="/mi-postulacion/datos" class="datos-faltantes__link">Completar mis datos &rarr;</a>
+          </span>
+        </div>
+      )}
+
       <section class="stepper-card" aria-label="Fases del proceso de admisión académica">
         <div class="stepper-card__header">
           <h2 class="stepper-card__title">Proceso de Admisión Académica</h2>
@@ -304,6 +313,16 @@ const pendientesExpediente = Number(documentos.pendientes ?? 0) + Number(documen
   }
 
   .inicio { display: flex; flex-direction: column; }
+
+  .datos-faltantes { margin-bottom: 22px; }
+  .datos-faltantes__link {
+    margin-left: 6px;
+    font-weight: 600;
+    color: inherit;
+    white-space: nowrap;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 
   .inicio__cabecera { margin-bottom: 22px; }
   .inicio__antetitulo { margin-bottom: 8px; }

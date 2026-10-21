@@ -870,6 +870,95 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     button.btn-primary { font-family: inherit; cursor: pointer; }
     .btn-primary:focus-visible, .btn-contact:focus-visible { outline: 3px solid var(--portal-cobre); outline-offset: 2px; }
 
+    /* Sub-solapas de navegación interna en Mi Expediente */
+    .exp-solapas {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--portal-borde);
+    }
+    .exp-solapa {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--portal-mutado);
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: -1px;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .exp-solapa:hover {
+      color: var(--portal-azul);
+    }
+    .exp-solapa--activa,
+    .exp-solapa[aria-selected="true"] {
+      color: var(--portal-azul);
+      font-weight: 600;
+      border-bottom-color: var(--portal-cobre);
+    }
+    .exp-solapa svg {
+      flex-shrink: 0;
+      opacity: 0.75;
+      stroke: currentColor;
+    }
+    .exp-solapa--activa svg,
+    .exp-solapa[aria-selected="true"] svg {
+      opacity: 1;
+      color: var(--portal-cobre-texto);
+    }
+    .exp-solapa__contador {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.02em;
+    }
+    .exp-solapa__contador--alerta {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .exp-solapa__contador--ok {
+      background: var(--portal-verde-fondo);
+      color: var(--portal-verde);
+    }
+    .exp-solapa__contador--info {
+      background: #EFF6FF;
+      color: #1E40AF;
+    }
+    .exp-solapa:focus-visible {
+      outline: 2px solid var(--portal-cobre);
+      outline-offset: 2px;
+    }
+    @media (max-width: 640px) {
+      .exp-solapas {
+        flex-direction: column;
+        gap: 6px;
+        border-bottom: none;
+      }
+      .exp-solapa {
+        width: 100%;
+        justify-content: flex-start;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        padding: 10px 14px;
+        background: var(--portal-blanco);
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(11, 27, 46, 0.04);
+        margin-bottom: 0;
+      }
+      .exp-solapa--activa,
+      .exp-solapa[aria-selected="true"] {
+        border-left-color: var(--portal-cobre);
+        background: #F7F5F0;
+      }
+    }
+
     .section-card {
       background: var(--portal-blanco);
       border: 1px solid var(--portal-borde);
@@ -1025,9 +1114,13 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     .portal-sidebar__link {
       display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px;
       border-radius: var(--portal-radio); color: #C9C2B6; font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
     }
     .portal-sidebar__link:hover { background: #13253A; color: var(--portal-blanco); }
-    .portal-sidebar__link[aria-current="page"] { background: #1D3149; color: var(--portal-blanco); font-weight: 600; }
+    .portal-sidebar__link[aria-current="page"] { background: #1D3149; color: var(--portal-blanco); font-weight: 600; border-left: 3px solid var(--portal-cobre); }
+    .portal-sidebar__icono { flex-shrink: 0; opacity: 0.8; stroke: currentColor; }
+    .portal-sidebar__link:hover .portal-sidebar__icono { opacity: 1; }
+    .portal-sidebar__link[aria-current="page"] .portal-sidebar__icono { opacity: 1; color: var(--portal-cobre-claro); }
     .portal-sidebar__link:focus-visible, .portal-sidebar__salir:focus-visible, .portal-menu-btn:focus-visible { outline: 2px solid var(--portal-cobre-claro); outline-offset: 2px; }
     .portal-sidebar__texto { flex-grow: 1; }
     .portal-sidebar__contador {
@@ -1093,6 +1186,18 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       <nav class="portal-sidebar__nav" aria-label="Secciones">
         {secciones.map((s) => (
           <a href={s.href} class="portal-sidebar__link" aria-current={seccion === s.id ? 'page' : undefined}>
+            {s.id === 'inicio' && (
+              <svg class="portal-sidebar__icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            )}
+            {s.id === 'expediente' && (
+              <svg class="portal-sidebar__icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            )}
+            {s.id === 'datos' && (
+              <svg class="portal-sidebar__icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            )}
+            {s.id === 'pagos' && (
+              <svg class="portal-sidebar__icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            )}
             <span class="portal-sidebar__texto">{s.etiqueta}</span>
             {s.pendientes > 0 && (
               <span class="portal-sidebar__contador" aria-label={s.pendientes === 1 ? '1 pendiente' : `${s.pendientes} pendientes`}>{s.pendientes}</span>
