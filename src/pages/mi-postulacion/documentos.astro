@@ -174,10 +174,16 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
   ) : (
     <div class="postulacion-container">
       <header class="exp-cab">
-        <a class="enlace-flecha" href="/mi-postulacion"><span aria-hidden="true">←</span> Volver a mi postulación</a>
-        <p class="antetitulo">Fase 2 · Documentación y carta</p>
-        <h1 class="portal-title">Mi expediente</h1>
-        <p class="portal-desc">Reúne tus documentos y tu carta de interés; con ambos completos, la Fundación revisa tu expediente.</p>
+        <div class="exp-cab__bar">
+          <a class="enlace-flecha" href="/mi-postulacion"><span aria-hidden="true">&larr;</span> Volver al inicio</a>
+          <span class="antetitulo">Fase 2 &middot; Documentación y carta</span>
+        </div>
+        <div class="exp-cab__hero">
+          <div>
+            <h1 class="portal-title">Mi expediente</h1>
+            <p class="portal-desc">Reúne tus documentos exigidos y tu carta de interés para revisión.</p>
+          </div>
+        </div>
       </header>
 
       <div class="postulacion-layout">
@@ -185,42 +191,31 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
           <div id="alertaError" class="portal-alert portal-alert--error" role="alert" style="display: none;"></div>
           <div id="alertaExito" class="portal-alert portal-alert--success" role="status" style="display: none;"></div>
 
-          <article class="action-card" aria-labelledby="estadoTitulo" data-estado={resumen.estado}>
-            <span class="action-card__tag">{tarjeta.etiqueta}</span>
-            <div class="action-card__estado" role="status">
-              <h2 id="estadoTitulo" class="action-card__heading">{tarjeta.titulo}</h2>
-              {(tarjeta.texto || tarjeta.aviso) && (
-                <p class="action-card__lead">
-                  {tarjeta.texto}{tarjeta.texto && tarjeta.aviso ? ' ' : ''}{tarjeta.aviso && <strong>{tarjeta.aviso}</strong>}
-                </p>
-              )}
-            </div>
-            {tarjeta.accion && (
-              <a href={tarjeta.accion.href} class="btn-primary" data-ir>
-                <span>{tarjeta.accion.texto}</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            )}
-          </article>
-
           {consentimientoPendiente && textoConsentimiento && (
-            <section id="bloqueConsentimiento" class="section-card" aria-labelledby="consentimientoTitulo" tabindex="-1">
-              <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de datos</h2>
-              {textoConsentimiento.borrador && (
-                <p class="exp-consentimiento__borrador">Borrador institucional ({textoConsentimiento.version})</p>
-              )}
-              <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto del consentimiento">
-                {textoConsentimiento.texto}
+            <section id="bloqueConsentimiento" class="section-card exp-consentimiento-card" aria-labelledby="consentimientoTitulo" tabindex="-1">
+              <div class="exp-consentimiento-header">
+                <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de datos requerido</h2>
+                {textoConsentimiento.borrador && (
+                  <span class="exp-consentimiento__borrador">Borrador institucional ({textoConsentimiento.version})</span>
+                )}
               </div>
-              <button
-                type="button"
-                id="btnAceptarConsentimiento"
-                data-codigo={textoConsentimiento.codigo}
-                data-version={textoConsentimiento.version}
-                class="btn-primary"
-              >
-                <span>Acepto el consentimiento y habilitar la carga</span>
-              </button>
+              <div class="exp-consentimiento-body">
+                <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto del consentimiento">
+                  {textoConsentimiento.texto}
+                </div>
+                <div class="exp-consentimiento-action">
+                  <button
+                    type="button"
+                    id="btnAceptarConsentimiento"
+                    data-codigo={textoConsentimiento.codigo}
+                    data-version={textoConsentimiento.version}
+                    class="btn-primary"
+                  >
+                    <span>Aceptar y habilitar carga</span>
+                  </button>
+                  <span class="exp-consentimiento-hint">Requisito para subir archivos</span>
+                </div>
+              </div>
             </section>
           )}
 
@@ -263,27 +258,34 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
           </nav>
 
           <div id="panelDocs" role="tabpanel" aria-labelledby="tabBtnDocs">
-            <section id="documentos" class="section-card" aria-labelledby="documentosTitulo">
-              <h2 id="documentosTitulo" class="section-card__title">Documentos</h2>
-              {requisitos.length > 0 && (
-                <p class={`section-card__resumen ${resumen.documentosCompletos && conteo.conAccion === 0 ? 'section-card__resumen--ok' : ''}`}>
-                  {resumenDocumentos}
-                </p>
-              )}
+            <section id="documentos" class="section-card section-card--compact" aria-labelledby="documentosTitulo">
+              <div class="section-card__topbar">
+                <div>
+                  <h2 id="documentosTitulo" class="section-card__title" style="margin: 0; padding: 0; border: none;">Documentos exigidos</h2>
+                  {requisitos.length > 0 && (
+                    <p class={`section-card__resumen ${resumen.documentosCompletos && conteo.conAccion === 0 ? 'section-card__resumen--ok' : ''}`}>
+                      {resumenDocumentos}
+                    </p>
+                  )}
+                </div>
+                <div class="section-card__topbar-formatos">
+                  <span>Formatos: <strong>PDF, JPG, PNG</strong> &middot; hasta 10 MB</span>
+                </div>
+              </div>
 
               <div id="listaRequisitos" class={consentimientoPendiente ? 'exp-bloqueado' : ''} inert={consentimientoPendiente}>
                 {requisitos.length === 0 ? (
                   <p class="exp-vacio">No hay documentos pendientes para esta vía.</p>
                 ) : (
-                  <ul class="audit-list" style="list-style: none; padding: 0;">
+                  <ul class="audit-list audit-list--table" style="list-style: none; padding: 0;">
                     {filas.map(({ req, fila }) => (
                       <li
-                        class={`audit-list__row audit-list__row--expand requisito-item`}
+                        class={`audit-list__row audit-list__row--table requisito-item`}
                         id={`doc-${req.codigo}`}
                         data-requisito={req.codigo}
                         tabindex="-1"
                       >
-                        <div class="audit-list__col-left">
+                        <div class="audit-list__col-main">
                           <span class={`audit-indicator ${fila.tono === 'ok' ? 'audit-indicator--ok' : fila.tono === 'error' ? 'audit-indicator--error' : fila.icono === 'observado' ? 'audit-indicator--alert' : 'audit-indicator--pending'}`} aria-hidden="true">
                             {fila.tono === 'ok' && (
                               <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
@@ -297,36 +299,37 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
                             {fila.opcional && <span class="audit-list__opcional">Opcional</span>}
                           </h3>
                         </div>
-                        <span class={`badge-status ${fila.tono === 'ok' ? 'badge-status--ok' : fila.tono === 'error' ? 'badge-status--error' : 'badge-status--pending'}`}>
-                          {fila.estadoTexto}
-                        </span>
 
-                        {(fila.nota || fila.permiteSubida) && (
-                          <div class="audit-list__extra">
-                            {fila.nota && (
-                              <p class={`portal-alert ${fila.tono === 'error' ? 'portal-alert--error' : 'portal-alert--info'}`}>{fila.nota}</p>
-                            )}
-                            {fila.permiteSubida && (
-                              <div class="audit-list__accion">
-                                <label class="btn-contact btn-contact--fila btn-cargar-archivo" tabindex="0" role="button">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                  </svg>
-                                  <span>{fila.textoBoton}</span>
-                                  <input
-                                    type="file"
-                                    class="input-file-documento"
-                                    data-requisito={req.codigo}
-                                    accept="image/jpeg,image/png,application/pdf"
-                                    aria-label={`${fila.textoBoton}: ${req.nombre}`}
-                                  />
-                                </label>
-                                <span class="audit-list__formato">PDF, JPG o PNG · hasta 10 MB</span>
-                                <span class="estado-subida" role="status" aria-live="polite" style="display: none;"></span>
-                              </div>
-                            )}
+                        <div class="audit-list__col-actions">
+                          <span class={`badge-status ${fila.tono === 'ok' ? 'badge-status--ok' : fila.tono === 'error' ? 'badge-status--error' : 'badge-status--pending'}`}>
+                            {fila.estadoTexto}
+                          </span>
+
+                          {fila.permiteSubida && (
+                            <div class="audit-list__subida">
+                              <label class="btn-contact btn-contact--fila btn-cargar-archivo" tabindex="0" role="button">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                  <polyline points="17 8 12 3 7 8"></polyline>
+                                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>{fila.textoBoton}</span>
+                                <input
+                                  type="file"
+                                  class="input-file-documento"
+                                  data-requisito={req.codigo}
+                                  accept="image/jpeg,image/png,application/pdf"
+                                  aria-label={`${fila.textoBoton}: ${req.nombre}`}
+                                />
+                              </label>
+                              <span class="estado-subida" role="status" aria-live="polite" style="display: none;"></span>
+                            </div>
+                          )}
+                        </div>
+
+                        {fila.nota && (
+                          <div class="audit-list__nota">
+                            <p class={`portal-alert ${fila.tono === 'error' ? 'portal-alert--error' : 'portal-alert--info'}`}>{fila.nota}</p>
                           </div>
                         )}
                       </li>
@@ -360,6 +363,24 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
         </div>
 
         <aside class="postulacion-aside">
+          <article class="action-card action-card--aside" aria-labelledby="estadoTitulo" data-estado={resumen.estado}>
+            <span class="action-card__tag">{tarjeta.etiqueta}</span>
+            <div class="action-card__estado" role="status">
+              <h2 id="estadoTitulo" class="action-card__heading">{tarjeta.titulo}</h2>
+              {(tarjeta.texto || tarjeta.aviso) && (
+                <p class="action-card__lead">
+                  {tarjeta.texto}{tarjeta.texto && tarjeta.aviso ? ' ' : ''}{tarjeta.aviso && <strong>{tarjeta.aviso}</strong>}
+                </p>
+              )}
+            </div>
+            {tarjeta.accion && (
+              <a href={tarjeta.accion.href} class="btn-primary btn-primary--block" data-ir>
+                <span>{tarjeta.accion.texto}</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            )}
+          </article>
+
           <AsesoriaCard asesora={asesoraAsignada} whatsappHref={whatsappHref} />
         </aside>
       </div>
