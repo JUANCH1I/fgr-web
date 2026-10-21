@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   leerDatos,
+  datosFaltantes,
   construirCambios,
   fechaLocalIso,
   prepararCuerpoDatos,
@@ -70,4 +71,10 @@ test('mensajeErrorDatos: el campo y el texto salen del error de FGREC; 409 y 5xx
   assert.deepEqual(mensajeErrorDatos(429, { code: 'TOO_MANY_ATTEMPTS', field: 'documento', message: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' }),
     { campo: 'documento', mensaje: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' });
   assert.match(mensajeErrorDatos(503, null).mensaje, /no está disponible/);
+});
+
+test('datosFaltantes names what FGREC still lacks, in plain words, and nothing when all is there', () => {
+  assert.deepEqual(datosFaltantes(leerDatos({ documento: null, fechaNacimiento: null })), ['tu número de documento', 'tu fecha de nacimiento']);
+  assert.deepEqual(datosFaltantes(leerDatos({ documento: '0912345678', fechaNacimiento: null })), ['tu fecha de nacimiento']);
+  assert.deepEqual(datosFaltantes(leerDatos({ documento: '0912345678', fechaNacimiento: '1995-03-14' })), []);
 });
