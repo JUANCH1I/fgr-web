@@ -7,12 +7,29 @@ import { obtenerVariableEntorno } from '../lib/fgrec-portal.ts';
 interface Props {
   title?: string;
   autenticado?: boolean;
+  /** Pendientes que muestra la barra lateral junto a cada sección (solo las páginas que los conocen). */
+  pendientes?: { expediente?: number; datos?: number };
 }
 
 const {
   title = 'Portal del Postulante | Fundación Gran Rosario',
-  autenticado = false
+  autenticado = false,
+  pendientes = {}
 } = Astro.props;
+
+// Sección activa de la barra lateral, por la ruta: el convenio es parte del expediente y las preguntas previas, del inicio.
+const ruta = Astro.url.pathname.replace(/\/+$/, '');
+const seccion = ruta === '/mi-postulacion' || ruta.endsWith('/precalificador') ? 'inicio'
+  : ruta.endsWith('/documentos') || ruta.endsWith('/convenio') ? 'expediente'
+  : ruta.endsWith('/datos') ? 'datos'
+  : ruta.endsWith('/pagos') ? 'pagos'
+  : null;
+const secciones = [
+  { id: 'inicio', href: '/mi-postulacion', etiqueta: 'Inicio', pendientes: 0 },
+  { id: 'expediente', href: '/mi-postulacion/documentos', etiqueta: 'Mi expediente', pendientes: pendientes.expediente ?? 0 },
+  { id: 'datos', href: '/mi-postulacion/datos', etiqueta: 'Mis datos', pendientes: pendientes.datos ?? 0 },
+  { id: 'pagos', href: '/mi-postulacion/pagos', etiqueta: 'Mis pagos', pendientes: 0 }
+];
 
 // WhatsApp institucional configurado por variable de entorno
 const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
@@ -979,9 +996,114 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     .portal-footer-links a:hover {
       color: var(--portal-cobre-claro);
     }
+    /* Barra lateral del portal con sesión (escritorio fija; en pantallas angostas, desplegable) */
+    .portal-shell { display: flex; min-height: 100vh; }
+    .portal-sidebar {
+      width: 248px; flex-shrink: 0; box-sizing: border-box;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 28px; padding: 24px 16px;
+      background: var(--portal-azul); color: var(--portal-blanco);
+    }
+    .portal-sidebar__marca { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0 8px; text-decoration: none; }
+    .portal-sidebar__marca .portal-logo-img { width: 168px; height: auto; object-fit: contain; }
+    .portal-sidebar__nav { display: flex; flex-direction: column; gap: 4px; }
+    .portal-sidebar__link {
+      display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px;
+      border-radius: var(--portal-radio); color: #C9C2B6; font-size: 15px; font-weight: 500; text-decoration: none;
+    }
+    .portal-sidebar__link:hover { background: #13253A; color: var(--portal-blanco); }
+    .portal-sidebar__link[aria-current="page"] { background: #1D3149; color: var(--portal-blanco); font-weight: 600; }
+    .portal-sidebar__link:focus-visible, .portal-sidebar__salir:focus-visible, .portal-menu-btn:focus-visible { outline: 2px solid var(--portal-cobre-claro); outline-offset: 2px; }
+    .portal-sidebar__texto { flex-grow: 1; }
+    .portal-sidebar__contador {
+      min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--portal-azul); background: var(--portal-cobre-claro);
+    }
+    .portal-sidebar__pie { margin-top: auto; border-top: 1px solid var(--portal-linea); padding: 20px 8px 0; display: flex; flex-direction: column; gap: 12px; }
+    .portal-sidebar__titulo { font-size: 13px; color: #E3DCCF; }
+    .portal-sidebar__wa {
+      min-height: 44px; border-radius: var(--portal-radio); display: flex; align-items: center; justify-content: center;
+      background: var(--portal-verde); color: var(--portal-blanco); font-size: 14px; font-weight: 600; text-decoration: none;
+    }
+    .portal-sidebar__salir { min-height: 44px; padding: 0; border: 0; background: none; color: #C9C2B6; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+    .portal-sidebar__salir:hover { color: var(--portal-blanco); }
+    .portal-shell__contenido { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+    .portal-container--shell { max-width: 1040px; margin: 0 auto; padding: 36px 48px 48px; }
+    .portal-topbar { display: none; }
+    .portal-sidebar-fondo { position: fixed; inset: 0; z-index: 40; background: rgba(7, 18, 31, 0.5); }
+    .portal-sidebar-fondo[hidden] { display: none; }
+    @media (max-width: 899px) {
+      .portal-shell { display: block; }
+      .portal-topbar {
+        display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+        position: sticky; top: 0; z-index: 30; background: var(--portal-azul);
+      }
+      .portal-menu-btn {
+        display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; cursor: pointer;
+        border: 1px solid var(--portal-linea); border-radius: var(--portal-radio); background: none;
+        color: var(--portal-blanco); font: inherit; font-size: 14px; font-weight: 600;
+      }
+      .portal-topbar__logo { height: 32px; width: auto; }
+      .portal-sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0; height: auto; z-index: 50; width: min(280px, 85vw);
+        transform: translateX(-100%); visibility: hidden;
+        transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.25s;
+      }
+      .portal-sidebar--abierta { transform: none; visibility: visible; transition-delay: 0s; }
+      .portal-container--shell { padding: 20px 16px 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .portal-sidebar { transition: none; }
+    }
   </style>
 </head>
 <body class="portal-body">
+  {autenticado ? (
+  <div class="portal-shell">
+    <div class="portal-topbar">
+      <button type="button" class="portal-menu-btn" id="btnMenuPortal" aria-expanded="false" aria-controls="portalSidebar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <span>Menú</span>
+      </button>
+      <img class="portal-topbar__logo" src="https://static.wixstatic.com/media/64d480_878e9bae365142a8a7cfd49040026764~mv2.png" alt="Fundación del Gran Rosario Ecuador" width="140" height="40" />
+    </div>
+    <div class="portal-sidebar-fondo" id="portalSidebarFondo" hidden></div>
+
+    <aside class="portal-sidebar" id="portalSidebar" aria-label="Portal del postulante">
+      <a href="/" class="portal-sidebar__marca" title="Volver al inicio del sitio">
+        <img class="portal-logo-img" src="https://static.wixstatic.com/media/64d480_878e9bae365142a8a7cfd49040026764~mv2.png" alt="Fundación del Gran Rosario Ecuador" width="190" height="54" />
+        <span class="portal-badge-header">Portal del Postulante</span>
+      </a>
+      <nav class="portal-sidebar__nav" aria-label="Secciones">
+        {secciones.map((s) => (
+          <a href={s.href} class="portal-sidebar__link" aria-current={seccion === s.id ? 'page' : undefined}>
+            <span class="portal-sidebar__texto">{s.etiqueta}</span>
+            {s.pendientes > 0 && (
+              <span class="portal-sidebar__contador" aria-label={s.pendientes === 1 ? '1 pendiente' : `${s.pendientes} pendientes`}>{s.pendientes}</span>
+            )}
+          </a>
+        ))}
+      </nav>
+      <div class="portal-sidebar__pie">
+        {whatsappHref && (
+          <>
+            <span class="portal-sidebar__titulo">¿Dudas? Escríbele a tu asesora</span>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-sidebar__wa">Escribir por WhatsApp</a>
+          </>
+        )}
+        <button type="button" id="btnSalirPortal" class="portal-sidebar__salir">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <div class="portal-shell__contenido">
+      <main class="portal-container portal-container--shell">
+        <slot />
+      </main>
+    </div>
+  </div>
+  ) : (
+  <>
   <header class="portal-header">
     <div class="portal-header__inner">
       <a href="/" class="portal-logo-link" title="Volver al inicio del sitio">
@@ -994,18 +1116,15 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
           <span aria-hidden="true">←</span>
           <span>Volver al sitio</span>
         </a>
-        {autenticado && (
-          <button type="button" id="btnSalirPortal" class="portal-btn-sm portal-btn-sm--ghost">
-            Cerrar sesión
-          </button>
-        )}
       </div>
     </div>
   </header>
 
-  <main class={`portal-container ${!autenticado ? 'portal-container--auth' : ''}`}>
+  <main class="portal-container portal-container--auth">
     <slot />
   </main>
+  </>
+  )}
 
   <footer class="portal-footer">
     <div class="portal-footer__inner">
@@ -1023,6 +1142,23 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
   </footer>
 
   <script>
+    // Barra lateral desplegable en pantallas angostas: el botón abre y cierra; Escape y el fondo la cierran.
+    const btnMenu = document.getElementById('btnMenuPortal');
+    const sidebar = document.getElementById('portalSidebar');
+    const fondo = document.getElementById('portalSidebarFondo');
+    const abrirMenu = (abierto: boolean) => {
+      if (!btnMenu || !sidebar || !fondo) return;
+      btnMenu.setAttribute('aria-expanded', String(abierto));
+      sidebar.classList.toggle('portal-sidebar--abierta', abierto);
+      fondo.hidden = !abierto;
+      if (abierto) sidebar.querySelector<HTMLElement>('a, button')?.focus();
+    };
+    btnMenu?.addEventListener('click', () => abrirMenu(btnMenu.getAttribute('aria-expanded') !== 'true'));
+    fondo?.addEventListener('click', () => abrirMenu(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && btnMenu?.getAttribute('aria-expanded') === 'true') { abrirMenu(false); btnMenu.focus(); }
+    });
+
     const btnSalir = document.getElementById('btnSalirPortal');
     btnSalir?.addEventListener('click', async () => {
       try {

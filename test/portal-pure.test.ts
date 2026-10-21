@@ -1,7 +1,8 @@
-import { test } from 'node:test';
+import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   presentarEstadoDocumento,
+  loQueSigue,
   mensajeResultadoPrecalificador,
   validarArchivoCliente,
   validarUrlSubida,
@@ -164,4 +165,39 @@ test('resumirDocumentosPanel habla de obligatorios y no llama completos con un o
   // Sin `expediente` (backend anterior) se infiere de los conteos.
   assert.equal(resumirDocumentosPanel({ pendientes: 0, observados: 0, total: 3 }).completos, true);
   assert.equal(resumirDocumentosPanel(undefined).completos, false);
+});
+
+describe('loQueSigue: una sola acción por etapa en el inicio del portal', () => {
+  const base = { situacion: 'ACTIVA', paso: { codigo: 'ORIENTACION' }, proximoPaso: null, expediente: { estado: 'EN_PREPARACION' }, documentos: { pendientes: 0, observados: 0, total: 0 } };
+
+  test('cada próximo paso lleva su acción a la página que lo resuelve', () => {
+    const accion = (codigo, extra = {}) => loQueSigue({ ...base, ...extra, proximoPaso: { codigo } }).accion;
+    assert.deepEqual(accion('COMPLETAR_PRECALIFICADOR'), { href: '/mi-postulacion/precalificador', etiqueta: 'Responder las preguntas' });
+    assert.deepEqual(accion('CARGAR_DOCUMENTOS', { documentos: { pendientes: 3, observados: 0, total: 4 } }), { href: '/mi-postulacion/documentos', etiqueta: 'Cargar documentos' });
+    assert.deepEqual(accion('SUBSANAR_DOCUMENTOS', { documentos: { pendientes: 0, observados: 1, total: 4 } }), { href: '/mi-postulacion/documentos', etiqueta: 'Ver observaciones' });
+    assert.deepEqual(accion('ESCRIBIR_CARTA'), { href: '/mi-postulacion/documentos#carta', etiqueta: 'Escribir la carta' });
+    assert.deepEqual(accion('ACEPTAR_CONVENIO'), { href: '/mi-postulacion/convenio', etiqueta: 'Leer el convenio' });
+  });
+
+  test('los textos cuentan lo que falta, en singular o plural', () => {
+    assert.equal(loQueSigue({ ...base, proximoPaso: { codigo: 'CARGAR_DOCUMENTOS' }, documentos: { pendientes: 1, observados: 0, total: 4 } }).texto, 'Te falta 1 documento obligatorio.');
+    assert.equal(loQueSigue({ ...base, proximoPaso: { codigo: 'CARGAR_DOCUMENTOS' }, documentos: { pendientes: 3, observados: 0, total: 4 } }).texto, 'Te faltan 3 documentos obligatorios.');
+    assert.equal(loQueSigue({ ...base, proximoPaso: { codigo: 'SUBSANAR_DOCUMENTOS' }, documentos: { pendientes: 0, observados: 2, total: 4 } }).etiqueta, '2 documentos observados');
+  });
+
+  test('sin nada que hacer dice en qué está y ofrece hablar con la asesora', () => {
+    const revision = loQueSigue({ ...base, paso: { codigo: 'DOCUMENTACION' }, proximoPaso: { codigo: 'ESPERAR_ASESORA' }, expediente: { estado: 'EN_REVISION' } });
+    assert.deepEqual([revision.titulo, revision.accion, revision.enlace?.href, revision.etiqueta], ['Estamos revisando tu expediente', null, '/mi-postulacion/documentos', 'En revisión']);
+    const evaluacion = loQueSigue({ ...base, paso: { codigo: 'EVALUACION_ACADEMICA' }, proximoPaso: { codigo: 'ESPERAR_ASESORA' }, expediente: { estado: 'REVISADO' } });
+    assert.equal(evaluacion.titulo, 'La universidad está evaluando tus estudios');
+    const espera = loQueSigue({ ...base, proximoPaso: { codigo: 'ESPERAR_ASESORA' } });
+    assert.deepEqual([espera.titulo, espera.contacto], ['Tu asesora te va a contactar con el próximo paso', true]);
+  });
+
+  test('una postulación cerrada no ofrece acciones; una en pausa sigue su próximo paso, sin cartel', () => {
+    const cerrada = loQueSigue({ ...base, situacion: 'CERRADA', proximoPaso: null });
+    assert.deepEqual([cerrada.titulo, cerrada.accion, cerrada.contacto, cerrada.etiqueta], ['Tu postulación está cerrada', null, true, 'Cerrada']);
+    const pausa = loQueSigue({ ...base, situacion: 'EN_PAUSA', proximoPaso: { codigo: 'COMPLETAR_PRECALIFICADOR' } });
+    assert.deepEqual([pausa.titulo, pausa.etiqueta], ['Responde las preguntas sobre tus estudios', null]);
+  });
 });
