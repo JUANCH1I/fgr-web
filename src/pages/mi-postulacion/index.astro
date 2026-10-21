@@ -12,6 +12,7 @@ import {
 } from '../../lib/fgrec-portal.ts';
 import { cartaEnviadaEnPanel, resumirDocumentosPanel } from '../../lib/portal-pure.ts';
 import { leerConvenio, formatearFechaConvenio } from '../../lib/convenio-pure.ts';
+import { datosFaltantes, leerDatos } from '../../lib/datos-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -83,6 +84,15 @@ try {
   // Sin estado de convenio
 }
 const convenioPendiente = convenio.estado === 'GENERADO';
+
+// Lo que FGREC todavía no tiene del postulante: se avisa arriba, sin tener que bajar. Si la consulta falla, no se avisa.
+let faltantes: string[] = [];
+try {
+  const respDatos = await llamarFGRECPortal({ metodo: 'GET', rutaRelativa: 'datos', sesion: sesionToken, contexto });
+  if (respDatos.ok) faltantes = datosFaltantes(leerDatos(respDatos.data));
+} catch {
+  // Sin aviso de datos
+}
 const convenioAceptado = convenio.estado === 'ACEPTADO';
 const fechaConvenio = formatearFechaConvenio(convenio.aceptadoEn);
 
@@ -159,6 +169,15 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
           Red Universitaria FGREC &middot; Universidad asociada: <strong>UGR</strong>
         </div>
       </header>
+
+      {faltantes.length > 0 && (
+        <div class="portal-alert portal-alert--info datos-faltantes" role="status">
+          <span>
+            Nos falta {faltantes.join(' y ')}.
+            <a href="/mi-postulacion/datos" class="datos-faltantes__link">Completar mis datos &rarr;</a>
+          </span>
+        </div>
+      )}
 
       <!-- MAPA DE FASES / STEPPER FORMAL INSTITUCIONAL -->
       <section class="stepper-card" aria-label="Fases del proceso de admisión académica">
@@ -416,6 +435,13 @@ const cartaEnviada = cartaEnviadaEnPanel(postulacion, enRevision);
   }
 
   /* BARRA DE EXPEDIENTE DEL POSTULANTE */
+  .datos-faltantes__link {
+    margin-left: 6px;
+    font-weight: 600;
+    color: inherit;
+    white-space: nowrap;
+  }
+
   .applicant-bar {
     display: flex;
     justify-content: space-between;

@@ -31,6 +31,14 @@ export function leerDatos(data: any): DatosPostulante {
   };
 }
 
+/** Lo que FGREC todavía no tiene del postulante, para avisarle en el inicio del portal. */
+export function datosFaltantes(datos: DatosPostulante): string[] {
+  return [
+    ...(datos.documento ? [] : ['tu número de documento']),
+    ...(datos.fechaNacimiento ? [] : ['tu fecha de nacimiento'])
+  ];
+}
+
 /** Solo viajan los campos que el postulante cambió (el número, únicamente si todavía se puede editar). */
 export function construirCambios(
   actual: { documento: string; fechaNacimiento: string },
