@@ -64,116 +64,285 @@ const sinDato = 'Sin registrar';
       )}
     </div>
   ) : (
-    <div class="datos">
-      <a class="enlace-flecha" href="/mi-postulacion" style="margin-bottom: 8px; font-size: 14px;">
-        <span aria-hidden="true">←</span> Volver a mi postulación
-      </a>
-      <p class="antetitulo" style="margin-bottom: 4px;">Parte de tu postulación</p>
-      <h1 class="portal-title" style="margin: 0 0 24px; font-size: 28px;">Mis datos</h1>
+    <div class="datos-page">
+      <header class="datos-cabecera">
+        <a class="enlace-flecha" href="/mi-postulacion">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>Volver a mi postulación</span>
+        </a>
+        <div class="datos-cabecera__hero">
+          <span class="portal-badge portal-badge--neutral">Identificación y contacto</span>
+          <h1 class="portal-title">Mis datos personales</h1>
+          <p class="portal-desc">Verifica tu información registrada y completa los datos requeridos para la emisión de tus documentos académicos.</p>
+        </div>
+      </header>
 
-      <section class="section-card" aria-labelledby="contacto-titulo">
-        <h2 class="section-card__title" id="contacto-titulo">Tus datos de contacto</h2>
-
-        <dl class="datos__lista">
-          <div>
-            <dt>Nombre</dt>
-            <dd>{nombreCompleto || sinDato}</dd>
-          </div>
-          <div>
-            <dt>Correo</dt>
-            <dd>{datos.email || sinDato}</dd>
-          </div>
-          <div>
-            <dt>Teléfono</dt>
-            <dd>{datos.telefono || sinDato}</dd>
-          </div>
-        </dl>
-        <p class="datos__nota">Si tu correo o tu teléfono no son correctos, escríbele a tu asesora.</p>
-
-        <div id="nombre-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
-        <div id="nombre-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
-
-        <button type="button" id="nombre-abrir" class="portal-btn portal-btn--outline datos__accion" aria-expanded="false" aria-controls="nombre-form">
-          Mi nombre está mal
-        </button>
-
-        <form id="nombre-form" class="datos__form" hidden novalidate>
-          <div class="portal-input-group">
-            <label for="nombre-comentario" class="portal-label">Cuéntanos cómo debería escribirse (opcional)</label>
-            <textarea id="nombre-comentario" name="comentario" class="portal-input" rows="3" maxlength={LARGO_MAX_COMENTARIO}></textarea>
-          </div>
-          <button type="submit" id="nombre-enviar" class="portal-btn portal-btn--primary">Avisar a mi asesora</button>
-        </form>
-      </section>
-
-      <section class="section-card" aria-labelledby="documento-titulo">
-        <h2 class="section-card__title" id="documento-titulo">Tu documento y fecha de nacimiento</h2>
-
-        <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
-        <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
-
-        <form
-          id="datos-form"
-          novalidate
-          data-documento={datos.documento}
-          data-fecha={datos.fechaNacimiento}
-          data-editable={datos.documentoEditable ? '1' : '0'}
-        >
-          {datos.documentoEditable ? (
-            <div class="portal-input-group">
-              <label for="datos-documento" class="portal-label">Número de documento de identidad</label>
-              <input
-                type="text"
-                id="datos-documento"
-                name="documento"
-                class="portal-input"
-                maxlength={LARGO_MAX_DOCUMENTO}
-                autocomplete="off"
-                value={datos.documento}
-                aria-describedby="datos-documento-error"
-              />
-              <p id="datos-documento-error" class="datos__error" hidden></p>
+      <div class="datos-grid">
+        <!-- Columna Principal: Documento y Fecha de Nacimiento (Acción indispensable) -->
+        <div class="datos-col--main">
+          <section class="section-card datos-card--primary" aria-labelledby="documento-titulo">
+            <div class="datos-card__header">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <h2 class="section-card__title" id="documento-titulo">Documento y fecha de nacimiento</h2>
             </div>
-          ) : (
-            <div class="portal-input-group">
-              <p class="portal-label">Número de documento de identidad</p>
-              <p class="datos__valor">{datos.documento || sinDato}</p>
-              <p class="datos__nota">Tu expediente ya fue aprobado: para cambiar el número de documento, escríbele a tu asesora.</p>
+            <p class="datos-card__desc">Estos datos son indispensables para formalizar tu expediente ante la universidad.</p>
+
+            <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
+            <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
+
+            <form
+              id="datos-form"
+              class="datos-form-grid"
+              novalidate
+              data-documento={datos.documento}
+              data-fecha={datos.fechaNacimiento}
+              data-editable={datos.documentoEditable ? '1' : '0'}
+            >
+              {datos.documentoEditable ? (
+                <div class="portal-input-group">
+                  <label for="datos-documento" class="portal-label">
+                    <span>Número de documento de identidad</span>
+                    <span class="portal-label__tag">Requerido</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="datos-documento"
+                    name="documento"
+                    class="portal-input"
+                    maxlength={LARGO_MAX_DOCUMENTO}
+                    autocomplete="off"
+                    placeholder="Ej. Cédula, DNI o Pasaporte"
+                    value={datos.documento}
+                    aria-describedby="datos-documento-error"
+                  />
+                  <p id="datos-documento-error" class="datos__error" hidden></p>
+                </div>
+              ) : (
+                <div class="portal-input-group">
+                  <p class="portal-label">Número de documento de identidad</p>
+                  <div class="datos__valor-bloqueado">
+                    <span class="datos__valor-texto">{datos.documento || sinDato}</span>
+                    <span class="portal-badge portal-badge--neutral">Validado</span>
+                  </div>
+                  <p class="datos__nota">Tu expediente ya fue aprobado: para cambiar el número de documento, escríbele a tu asesora.</p>
+                </div>
+              )}
+
+              <div class="portal-input-group">
+                <label for="datos-fecha" class="portal-label">
+                  <span>Fecha de nacimiento</span>
+                  <span class="portal-label__tag">Requerido</span>
+                </label>
+                <input
+                  type="date"
+                  id="datos-fecha"
+                  name="fechaNacimiento"
+                  class="portal-input"
+                  value={datos.fechaNacimiento}
+                  aria-describedby="datos-fecha-error"
+                />
+                <p id="datos-fecha-error" class="datos__error" hidden></p>
+              </div>
+
+              <div class="datos-form__footer">
+                <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">
+                  Guardar mis datos
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <!-- Columna Secundaria: Ficha de contacto institucional y aviso de nombre -->
+        <div class="datos-col--side">
+          <section class="section-card datos-card--side" aria-labelledby="contacto-titulo">
+            <div class="datos-card__header">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <h2 class="section-card__title" id="contacto-titulo">Datos de contacto registrados</h2>
             </div>
-          )}
 
-          <div class="portal-input-group">
-            <label for="datos-fecha" class="portal-label">Fecha de nacimiento</label>
-            <input
-              type="date"
-              id="datos-fecha"
-              name="fechaNacimiento"
-              class="portal-input"
-              value={datos.fechaNacimiento}
-              aria-describedby="datos-fecha-error"
-            />
-            <p id="datos-fecha-error" class="datos__error" hidden></p>
-          </div>
+            <dl class="datos-contacto-lista">
+              <div class="datos-contacto-item">
+                <dt class="datos-contacto-label">Postulante</dt>
+                <dd class="datos-contacto-val">{nombreCompleto || sinDato}</dd>
+              </div>
+              <div class="datos-contacto-item">
+                <dt class="datos-contacto-label">Correo electrónico</dt>
+                <dd class="datos-contacto-val">{datos.email || sinDato}</dd>
+              </div>
+              <div class="datos-contacto-item">
+                <dt class="datos-contacto-label">Teléfono de contacto</dt>
+                <dd class="datos-contacto-val">{datos.telefono || sinDato}</dd>
+              </div>
+            </dl>
 
-          <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">Guardar mis datos</button>
-        </form>
-      </section>
+            <p class="datos__nota-contacto">
+              Si tu correo o teléfono presentan errores o cambiaron, solicítale su actualización a tu asesora de admisión.
+            </p>
+
+            <div class="datos-nombre-box">
+              <div id="nombre-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
+              <div id="nombre-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
+
+              <button type="button" id="nombre-abrir" class="portal-btn portal-btn--outline portal-btn--block" aria-expanded="false" aria-controls="nombre-form">
+                Mi nombre presenta un error
+              </button>
+
+              <form id="nombre-form" class="datos__form" hidden novalidate>
+                <div class="portal-input-group">
+                  <label for="nombre-comentario" class="portal-label">¿Cómo debe escribirse correctamente?</label>
+                  <textarea id="nombre-comentario" name="comentario" class="portal-input" rows="3" maxlength={LARGO_MAX_COMENTARIO} placeholder="Escribe tu nombre y apellidos según figuran en tu documento..."></textarea>
+                </div>
+                <button type="submit" id="nombre-enviar" class="portal-btn portal-btn--primary portal-btn--block">
+                  Avisar a mi asesora
+                </button>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   )}
 </PortalLayout>
 
 <style>
-  .datos { max-width: 760px; }
-  .datos__lista { margin: 0 0 12px; display: grid; gap: 12px; }
-  .datos__lista dt { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--portal-mutado); }
-  .datos__lista dd { margin: 2px 0 0; font-size: 16px; color: var(--portal-texto); overflow-wrap: anywhere; }
-  .datos__nota { margin: 0 0 16px; font-size: 13.5px; line-height: 1.5; color: var(--portal-mutado); }
-  .datos__valor { margin: 0 0 6px; font-size: 16px; color: var(--portal-texto); }
-  .datos__accion { width: auto; }
-  .datos__form { margin-top: 16px; }
-  .datos__error { margin: 6px 0 0; font-size: 13.5px; font-weight: 600; color: var(--portal-rojo); }
+  .datos-page { width: 100%; box-sizing: border-box; }
+  .datos-cabecera { margin-bottom: 24px; }
+  .datos-cabecera .enlace-flecha {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13.5px; font-weight: 500; color: var(--portal-cobre);
+    text-decoration: none; margin-bottom: 12px;
+  }
+  .datos-cabecera .enlace-flecha:hover { text-decoration: underline; }
+  .datos-cabecera__hero { display: flex; flex-direction: column; gap: 8px; }
+  .datos-cabecera__hero .portal-title { margin: 0; font-size: 26px; }
+  .datos-cabecera__hero .portal-desc { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--portal-mutado); max-width: 720px; }
+
+  /* Grilla de 2 columnas en desktop para aprovechar el ancho */
+  .datos-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .datos-card--primary {
+    border-top: 3px solid var(--portal-cobre);
+    padding: 24px;
+  }
+  .datos-card--side {
+    background: #FAF8F5;
+    border: 1px solid var(--portal-borde);
+    padding: 24px;
+  }
+  .datos-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--portal-azul);
+  }
+  .datos-card__header .section-card__title {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .datos-card__desc {
+    margin: 0 0 20px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--portal-mutado);
+  }
+
+  .portal-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--portal-azul);
+    margin-bottom: 6px;
+  }
+  .portal-label__tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--portal-cobre);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .datos-form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .datos-form__footer {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--portal-borde);
+  }
+
+  .datos__valor-bloqueado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #F1F5F9;
+    border: 1px solid var(--portal-borde);
+    border-radius: var(--portal-radio);
+  }
+  .datos__valor-texto { font-size: 15px; font-weight: 600; color: var(--portal-azul); }
+
+  /* Lista de contacto */
+  .datos-contacto-lista {
+    margin: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .datos-contacto-item {
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(11, 27, 46, 0.08);
+  }
+  .datos-contacto-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .datos-contacto-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--portal-mutado);
+    margin-bottom: 2px;
+  }
+  .datos-contacto-val {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--portal-azul);
+    overflow-wrap: anywhere;
+  }
+  .datos__nota-contacto {
+    margin: 0 0 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--portal-mutado);
+  }
+
+  .datos-nombre-box {
+    padding-top: 14px;
+    border-top: 1px solid var(--portal-borde);
+  }
+  .portal-btn--block { width: 100%; box-sizing: border-box; justify-content: center; }
+  .datos__form { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .datos__error { margin: 6px 0 0; font-size: 12.5px; font-weight: 600; color: var(--portal-rojo); }
+  .datos__nota { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--portal-mutado); }
   .portal-alert[hidden], .datos__error[hidden], .datos__form[hidden] { display: none; }
   textarea.portal-input { resize: vertical; font-family: inherit; }
+
+  @media (max-width: 899px) {
+    .datos-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
 </style>
 
 <script>

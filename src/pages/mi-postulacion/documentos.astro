@@ -194,27 +194,34 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
           {consentimientoPendiente && textoConsentimiento && (
             <section id="bloqueConsentimiento" class="section-card exp-consentimiento-card" aria-labelledby="consentimientoTitulo" tabindex="-1">
               <div class="exp-consentimiento-header">
-                <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de datos requerido</h2>
+                <div class="exp-consentimiento-title-group">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                  </svg>
+                  <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de transferencia y protección de datos</h2>
+                </div>
                 {textoConsentimiento.borrador && (
-                  <span class="exp-consentimiento__borrador">Borrador institucional ({textoConsentimiento.version})</span>
+                  <span class="portal-badge portal-badge--neutral">Borrador institucional ({textoConsentimiento.version})</span>
                 )}
               </div>
-              <div class="exp-consentimiento-body">
-                <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto del consentimiento">
-                  {textoConsentimiento.texto}
-                </div>
-                <div class="exp-consentimiento-action">
-                  <button
-                    type="button"
-                    id="btnAceptarConsentimiento"
-                    data-codigo={textoConsentimiento.codigo}
-                    data-version={textoConsentimiento.version}
-                    class="btn-primary"
-                  >
-                    <span>Aceptar y habilitar carga</span>
-                  </button>
-                  <span class="exp-consentimiento-hint">Requisito para subir archivos</span>
-                </div>
+              <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto legal del consentimiento informado">
+                {textoConsentimiento.texto}
+              </div>
+              <div class="exp-consentimiento-footer">
+                <p class="exp-consentimiento-hint">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  Al aceptar, autorizas el tratamiento de tu expediente para evaluación académica y comercial.
+                </p>
+                <button
+                  type="button"
+                  id="btnAceptarConsentimiento"
+                  data-codigo={textoConsentimiento.codigo}
+                  data-version={textoConsentimiento.version}
+                  class="btn-primary"
+                >
+                  <span>Aceptar y habilitar carga de documentos</span>
+                </button>
               </div>
             </section>
           )}

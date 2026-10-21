@@ -876,17 +876,64 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     .action-card--aside .action-card__lead { font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
     .btn-primary--block { width: 100%; box-sizing: border-box; justify-content: center; }
 
-    /* Consentimiento compacto */
-    .exp-consentimiento-card { padding: 16px 20px; margin-bottom: 16px; border-left: 3px solid var(--portal-cobre); }
-    .exp-consentimiento-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .exp-consentimiento-header .section-card__title { margin: 0; padding: 0; border: none; }
-    .exp-consentimiento-body { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
-    .exp-consentimiento__texto {
-      margin-bottom: 0; max-height: 64px; font-size: 12.5px; line-height: 1.45; padding: 8px 12px;
-      background: #FAF8F5; border: 1px solid var(--portal-borde); border-radius: 3px; overflow-y: auto;
+    /* Consentimiento legible y distinguido */
+    .exp-consentimiento-card {
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      border: 1px solid var(--portal-borde);
+      border-left: 4px solid var(--portal-cobre);
+      background: var(--portal-blanco);
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(11, 27, 46, 0.04);
     }
-    .exp-consentimiento-action { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-    .exp-consentimiento-hint { margin: 0; font-size: 11px; color: var(--portal-mutado); }
+    .exp-consentimiento-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .exp-consentimiento-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .exp-consentimiento-title-group .section-card__title {
+      margin: 0;
+      padding: 0;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--portal-azul);
+    }
+    .exp-consentimiento__texto {
+      margin-bottom: 16px;
+      max-height: 140px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #1E293B;
+      padding: 14px 16px;
+      background: #FAF8F5;
+      border: 1px solid var(--portal-borde);
+      border-radius: 4px;
+      overflow-y: auto;
+      white-space: pre-line;
+    }
+    .exp-consentimiento-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .exp-consentimiento-hint {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--portal-mutado);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     /* Sub-solapas de navegación interna en Mi Expediente */
     .exp-solapas {
@@ -1137,39 +1184,83 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     /* Barra lateral del portal con sesión (escritorio fija; en pantallas angostas, desplegable) */
     .portal-shell { display: flex; min-height: 100vh; }
     .portal-sidebar {
-      width: 248px; flex-shrink: 0; box-sizing: border-box;
+      width: 260px; flex-shrink: 0; box-sizing: border-box;
       position: sticky; top: 0; height: 100vh; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 28px; padding: 24px 16px;
-      background: var(--portal-azul); color: var(--portal-blanco);
+      display: flex; flex-direction: column; gap: 24px; padding: 24px 16px 20px;
+      background: #091524; color: var(--portal-blanco);
+      border-right: 1px solid rgba(226, 181, 135, 0.12);
     }
-    .portal-sidebar__marca { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0 8px; text-decoration: none; }
+    .portal-sidebar__marca {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+      padding: 0 8px 12px; text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
     .portal-sidebar__marca .portal-logo-img { width: 168px; height: auto; object-fit: contain; }
+    .portal-sidebar__badge {
+      display: inline-flex; align-items: center;
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: #E2B587; background: rgba(201, 138, 75, 0.12);
+      border: 1px solid rgba(201, 138, 75, 0.25);
+      border-radius: 3px; padding: 3px 8px;
+    }
     .portal-sidebar__nav { display: flex; flex-direction: column; gap: 4px; }
     .portal-sidebar__link {
-      display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px;
-      border-radius: var(--portal-radio); color: #C9C2B6; font-size: 15px; font-weight: 500; text-decoration: none;
-      transition: background 0.15s ease, color 0.15s ease;
+      display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 14px;
+      border-radius: 6px; color: #A0B0C0; font-size: 14.5px; font-weight: 500; text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: background 0.15s ease, color 0.15s ease, border-left-color 0.15s ease;
     }
-    .portal-sidebar__link:hover { background: #13253A; color: var(--portal-blanco); }
-    .portal-sidebar__link[aria-current="page"] { background: #1D3149; color: var(--portal-blanco); font-weight: 600; border-left: 3px solid var(--portal-cobre); }
-    .portal-sidebar__icono { flex-shrink: 0; opacity: 0.8; stroke: currentColor; }
+    .portal-sidebar__link:hover { background: rgba(255, 255, 255, 0.05); color: var(--portal-blanco); }
+    .portal-sidebar__link[aria-current="page"] {
+      background: linear-gradient(90deg, rgba(201, 138, 75, 0.16) 0%, rgba(201, 138, 75, 0.04) 100%);
+      color: var(--portal-blanco); font-weight: 600; border-left-color: var(--portal-cobre);
+    }
+    .portal-sidebar__icono { flex-shrink: 0; opacity: 0.75; stroke: currentColor; transition: opacity 0.15s ease, color 0.15s ease; }
     .portal-sidebar__link:hover .portal-sidebar__icono { opacity: 1; }
     .portal-sidebar__link[aria-current="page"] .portal-sidebar__icono { opacity: 1; color: var(--portal-cobre-claro); }
     .portal-sidebar__link:focus-visible, .portal-sidebar__salir:focus-visible, .portal-menu-btn:focus-visible { outline: 2px solid var(--portal-cobre-claro); outline-offset: 2px; }
     .portal-sidebar__texto { flex-grow: 1; }
     .portal-sidebar__contador {
-      min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px;
+      min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px;
       display: inline-flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: var(--portal-azul); background: var(--portal-cobre-claro);
+      font-size: 11.5px; font-weight: 700; color: #FFFFFF; background: var(--portal-cobre);
     }
-    .portal-sidebar__pie { margin-top: auto; border-top: 1px solid var(--portal-linea); padding: 20px 8px 0; display: flex; flex-direction: column; gap: 12px; }
-    .portal-sidebar__titulo { font-size: 13px; color: #E3DCCF; }
+    .portal-sidebar__pie {
+      margin-top: auto; padding-top: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .portal-sidebar__asesor-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .portal-sidebar__asesor-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #E2B587;
+    }
+    .portal-sidebar__asesor-icon { flex-shrink: 0; }
+    .portal-sidebar__asesor-title { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .portal-sidebar__asesor-text { margin: 0; font-size: 12px; line-height: 1.45; color: #8F9CAE; }
     .portal-sidebar__wa {
-      min-height: 44px; border-radius: var(--portal-radio); display: flex; align-items: center; justify-content: center;
-      background: var(--portal-verde); color: var(--portal-blanco); font-size: 14px; font-weight: 600; text-decoration: none;
+      min-height: 38px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: #1B7A43; color: var(--portal-blanco); font-size: 13px; font-weight: 600; text-decoration: none;
+      transition: background 0.15s ease;
     }
-    .portal-sidebar__salir { min-height: 44px; padding: 0; border: 0; background: none; color: #C9C2B6; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
-    .portal-sidebar__salir:hover { color: var(--portal-blanco); }
+    .portal-sidebar__wa:hover { background: #229954; }
+    .portal-sidebar__salir {
+      min-height: 40px; padding: 0 12px; border: 0; background: none; color: #8F9CAE; font: inherit; font-size: 13.5px;
+      display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .portal-sidebar__salir:hover { color: var(--portal-blanco); background: rgba(255, 255, 255, 0.04); }
+    .portal-sidebar__salir svg { opacity: 0.7; }
+    .portal-sidebar__salir:hover svg { opacity: 1; }
     .portal-shell__contenido { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
     .portal-container--shell {
       max-width: 1440px;
@@ -1221,7 +1312,7 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     <aside class="portal-sidebar" id="portalSidebar" aria-label="Portal del postulante">
       <a href="/" class="portal-sidebar__marca" title="Volver al inicio del sitio">
         <img class="portal-logo-img" src="https://static.wixstatic.com/media/64d480_878e9bae365142a8a7cfd49040026764~mv2.png" alt="Fundación del Gran Rosario Ecuador" width="190" height="54" />
-        <span class="portal-badge-header">Portal del Postulante</span>
+        <span class="portal-sidebar__badge">Portal del Postulante</span>
       </a>
       <nav class="portal-sidebar__nav" aria-label="Secciones">
         {secciones.map((s) => (
@@ -1247,12 +1338,22 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       </nav>
       <div class="portal-sidebar__pie">
         {whatsappHref && (
-          <>
-            <span class="portal-sidebar__titulo">¿Dudas? Escríbele a tu asesora</span>
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-sidebar__wa">Escribir por WhatsApp</a>
-          </>
+          <div class="portal-sidebar__asesor-box">
+            <div class="portal-sidebar__asesor-meta">
+              <svg class="portal-sidebar__asesor-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="portal-sidebar__asesor-title">Asesoría Académica</span>
+            </div>
+            <p class="portal-sidebar__asesor-text">Acompañamiento personalizado en tu postulación.</p>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="portal-sidebar__wa">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.41a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.64c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.25-1.5-1.4-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.47c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.71 4.31 3.8.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/></svg>
+              <span>Escribir por WhatsApp</span>
+            </a>
+          </div>
         )}
-        <button type="button" id="btnSalirPortal" class="portal-sidebar__salir">Cerrar sesión</button>
+        <button type="button" id="btnSalirPortal" class="portal-sidebar__salir">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     </aside>
 
