@@ -66,5 +66,8 @@ test('mensajeErrorDatos: el campo y el texto salen del error de FGREC; 409 y 5xx
   assert.deepEqual(mensajeErrorDatos(409, { code: 'DOCUMENT_REVIEW', message: 'Tu asesora lo va a revisar.' }), { campo: null, mensaje: 'Tu asesora lo va a revisar.' });
   assert.match(mensajeErrorDatos(409, { code: 'DOCUMENT_LOCKED' }).mensaje, /asesora/);
   assert.match(mensajeErrorDatos(429, null).mensaje, /muchas solicitudes/);
+  // The daily cap of document numbers (FGREC TOO_MANY_ATTEMPTS) keeps its own message, next to the field.
+  assert.deepEqual(mensajeErrorDatos(429, { code: 'TOO_MANY_ATTEMPTS', field: 'documento', message: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' }),
+    { campo: 'documento', mensaje: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' });
   assert.match(mensajeErrorDatos(503, null).mensaje, /no está disponible/);
 });

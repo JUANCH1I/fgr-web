@@ -95,9 +95,11 @@ export interface ErrorDatos {
 
 /** Traduce un error de FGREC (o del proxy) a una frase para el postulante. */
 export function mensajeErrorDatos(status: number, data: { code?: string; message?: string; field?: string } | null | undefined): ErrorDatos {
+  const mensaje = typeof data?.message === 'string' ? data.message.trim() : '';
+  // The daily cap of document numbers: FGREC says when to try again.
+  if (status === 429 && data?.code === 'TOO_MANY_ATTEMPTS' && mensaje) return { campo: 'documento', mensaje };
   if (status === 429) return { campo: null, mensaje: 'Realizaste muchas solicitudes en poco tiempo. Espera unos minutos e inténtalo de nuevo.' };
   if (status >= 500) return { campo: null, mensaje: 'El servicio no está disponible por ahora. Inténtalo de nuevo en unos minutos.' };
-  const mensaje = typeof data?.message === 'string' ? data.message.trim() : '';
   if (status === 400) {
     const campo = data?.field === 'documento' || data?.field === 'fechaNacimiento' || data?.field === 'comentario' ? data.field : null;
     return { campo, mensaje: mensaje || 'No pudimos procesar esos datos. Revisa lo que escribiste e inténtalo de nuevo.' };
