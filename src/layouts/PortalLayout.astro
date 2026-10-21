@@ -315,12 +315,19 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       }
     }
 
-    /* En pantallas angostas el formulario va primero: es lo único que la persona vino a hacer. */
+    /* En pantallas angostas: insignia y título, enseguida la tarjeta de ingreso y después las ventajas, compactas.
+       El bloque informativo se disuelve en la grilla para poder intercalar la tarjeta entre sus partes. */
     @media (max-width: 899px) {
-      .portal-auth-grid { gap: 28px; }
-      .portal-card--auth { order: -1; padding: 24px 20px; }
-      .portal-auth-title { font-size: 26px; }
-      .portal-auth-desc { font-size: 16px; }
+      .portal-auth-grid { gap: 14px; }
+      .portal-auth-grid .portal-auth-info { display: contents; }
+      .portal-auth-grid .portal-auth-badge { order: 1; font-size: 12px; }
+      .portal-auth-grid .portal-auth-title { order: 2; font-size: 26px; }
+      .portal-auth-grid .portal-auth-desc { display: none; }
+      .portal-auth-grid .portal-card--auth { order: 3; margin-top: 8px; padding: 26px 20px; }
+      .portal-auth-grid .portal-auth-features { order: 4; margin-top: 10px; gap: 10px; }
+      .portal-auth-grid .portal-auth-feature { padding: 12px 14px; align-items: center; }
+      .portal-auth-grid .portal-auth-feature p { display: none; }
+      .portal-auth-grid .portal-auth-feature strong { margin-bottom: 0; font-size: 15px; }
     }
 
     .portal-auth-info {
