@@ -138,9 +138,10 @@ const resumenDocumentos = resumirSeccionDocumentos(conteo);
 const resumenCarta = resumirCarta({ carta, soloLectura: resumen.soloLectura });
 const filas = requisitos.map((req) => ({ req, fila: presentarFilaDocumento(req, resumen.soloLectura) }));
 const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
+const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.observados ?? 0) + (cartaEnviadaFinal ? 0 : 1);
 ---
 
-<PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
+<PortalLayout title="Mi expediente | Fundación Gran Rosario" autenticado={true} pendientes={{ expediente: pendientesExpediente }}>
   {statusError === 429 ? (
     <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; display: block;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -175,7 +176,6 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
     <div class="postulacion-container">
       <header class="exp-cab">
         <div class="exp-cab__bar">
-          <a class="enlace-flecha" href="/mi-postulacion"><span aria-hidden="true">&larr;</span> Volver al inicio</a>
           <span class="antetitulo">Fase 2 &middot; Documentación y carta</span>
         </div>
         <div class="exp-cab__hero">

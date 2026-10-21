@@ -11,7 +11,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
-import { leerDatos, LARGO_MAX_DOCUMENTO, LARGO_MAX_COMENTARIO } from '../../lib/datos-pure.ts';
+import { leerDatos, datosFaltantes, LARGO_MAX_DOCUMENTO, LARGO_MAX_COMENTARIO } from '../../lib/datos-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -44,9 +44,10 @@ const whatsappHref = whatsappNumero
 const datos = leerDatos(respuesta.data);
 const nombreCompleto = `${datos.nombre} ${datos.apellido}`.trim();
 const sinDato = 'Sin registrar';
+const faltantes = datosFaltantes(datos);
 ---
 
-<PortalLayout title="Mis datos | Fundación Gran Rosario" autenticado={true}>
+<PortalLayout title="Mis datos | Fundación Gran Rosario" autenticado={true} pendientes={{ datos: faltantes.length }}>
   {statusError !== null ? (
     <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
       <h1 class="portal-title">{statusError === 429 ? 'Demasiados intentos' : 'Servicio no disponible'}</h1>
@@ -66,10 +67,6 @@ const sinDato = 'Sin registrar';
   ) : (
     <div class="datos-page">
       <header class="datos-cabecera">
-        <a class="enlace-flecha" href="/mi-postulacion">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          <span>Volver a mi postulación</span>
-        </a>
         <div class="datos-cabecera__hero">
           <span class="portal-badge portal-badge--neutral">Identificación y contacto</span>
           <h1 class="portal-title">Mis datos personales</h1>

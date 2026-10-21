@@ -2,12 +2,18 @@
 // Layout exclusivo para el Portal del Postulante (/mi-postulacion)
 // Aislado del sitio de marketing: CERO scripts de terceros, CERO analítica ni píxeles, CSP estricta y noindex.
 
-import { obtenerVariableEntorno } from '../lib/fgrec-portal.ts';
+import {
+  obtenerVariableEntorno,
+  llamarFGRECPortal,
+  extraerContextoVisitante,
+  COOKIE_SESION_NOMBRE
+} from '../lib/fgrec-portal.ts';
+import { leerDatos, datosFaltantes } from '../lib/datos-pure.ts';
 
 interface Props {
   title?: string;
   autenticado?: boolean;
-  /** Pendientes que muestra la barra lateral junto a cada sección (solo las páginas que los conocen). */
+  /** Pendientes que muestra la barra lateral junto a cada sección. Si se omiten o faltan, se resuelven automáticamente. */
   pendientes?: { expediente?: number; datos?: number };
 }
 
@@ -16,6 +22,45 @@ const {
   autenticado = false,
   pendientes = {}
 } = Astro.props;
+
+const contadores = {
+  expediente: pendientes.expediente,
+  datos: pendientes.datos
+};
+
+// Si el usuario está autenticado y faltan contadores de pendientes para la barra lateral,
+// se resuelven de forma centralizada para que la barra lateral conserve siempre sus indicadores consistentes.
+if (autenticado && (contadores.expediente === undefined || contadores.datos === undefined)) {
+  const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
+  if (sesionToken) {
+    const contexto = extraerContextoVisitante(Astro.request);
+    const necesitaExpediente = contadores.expediente === undefined;
+    const necesitaDatos = contadores.datos === undefined;
+
+    try {
+      const [respPostulacion, respConvenio, respDatos] = await Promise.all([
+        necesitaExpediente ? llamarFGRECPortal({ metodo: 'GET', rutaRelativa: 'postulacion', sesion: sesionToken, contexto }) : null,
+        necesitaExpediente ? llamarFGRECPortal({ metodo: 'GET', rutaRelativa: 'convenio', sesion: sesionToken, contexto }) : null,
+        necesitaDatos ? llamarFGRECPortal({ metodo: 'GET', rutaRelativa: 'datos', sesion: sesionToken, contexto }) : null
+      ]);
+
+      if (necesitaExpediente && respPostulacion?.ok) {
+        const post = respPostulacion.data || {};
+        const docs = post.documentos || { pendientes: 0, observados: 0 };
+        const cartaEnv = Boolean(post.expediente?.cartaEnviada);
+        const convPend = respConvenio?.ok && respConvenio.data?.estado === 'GENERADO';
+        contadores.expediente = Number(docs.pendientes ?? 0) + Number(docs.observados ?? 0) + (cartaEnv ? 0 : 1) + (convPend ? 1 : 0);
+      }
+
+      if (necesitaDatos && respDatos?.ok) {
+        const d = leerDatos(respDatos.data);
+        contadores.datos = datosFaltantes(d).length;
+      }
+    } catch {
+      // Si la consulta auxiliar falla, no bloquea el render de la página
+    }
+  }
+}
 
 // Sección activa de la barra lateral, por la ruta: el convenio es parte del expediente y las preguntas previas, del inicio.
 const ruta = Astro.url.pathname.replace(/\/+$/, '');
@@ -26,8 +71,8 @@ const seccion = ruta === '/mi-postulacion' || ruta.endsWith('/precalificador') ?
   : null;
 const secciones = [
   { id: 'inicio', href: '/mi-postulacion', etiqueta: 'Inicio', pendientes: 0 },
-  { id: 'expediente', href: '/mi-postulacion/documentos', etiqueta: 'Mi expediente', pendientes: pendientes.expediente ?? 0 },
-  { id: 'datos', href: '/mi-postulacion/datos', etiqueta: 'Mis datos', pendientes: pendientes.datos ?? 0 },
+  { id: 'expediente', href: '/mi-postulacion/documentos', etiqueta: 'Mi expediente', pendientes: contadores.expediente ?? 0 },
+  { id: 'datos', href: '/mi-postulacion/datos', etiqueta: 'Mis datos', pendientes: contadores.datos ?? 0 },
   { id: 'pagos', href: '/mi-postulacion/pagos', etiqueta: 'Mis pagos', pendientes: 0 }
 ];
 
