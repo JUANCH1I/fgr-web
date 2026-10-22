@@ -122,13 +122,14 @@ const cartaEnviadaFinal = resumen.cartaEnviada;
 // Modelo de la página: tarjeta de estado, filas de documentos y resumen de cada sección
 const conteo = contarDocumentos(requisitos);
 const cartaEditable = Boolean(carta) && carta.puedeEditar !== false && !resumen.soloLectura;
+const tieneTexto = typeof carta?.texto === 'string' && carta.texto.trim().length > 0;
 const tarjeta = modelarTarjetaEstado({
   estado: resumen.estado,
   conteo,
   documentosCompletos: resumen.documentosCompletos,
   cartaEnviada: cartaEnviadaFinal,
   cartaEditable,
-  cartaTieneTexto: typeof carta?.texto === 'string' && carta.texto.trim().length > 0,
+  cartaTieneTexto: tieneTexto,
   cartaNuevaVersion: cartaEditable && Number(carta?.version) > 1,
   consentimientoPendiente: consentimientoPendiente && Boolean(textoConsentimiento),
   proximoPaso
@@ -137,12 +138,13 @@ const resumenDocumentos = resumirSeccionDocumentos(conteo);
 const resumenCarta = resumirCarta({ carta, soloLectura: resumen.soloLectura });
 const filas = requisitos.map((req) => ({ req, fila: presentarFilaDocumento(req, resumen.soloLectura) }));
 const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
+const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.observados ?? 0) + (cartaEnviadaFinal ? 0 : 1);
 ---
 
-<PortalLayout title="Documentos de la postulación | Fundación Gran Rosario" autenticado={true}>
+<PortalLayout title="Mi expediente | Fundación Gran Rosario" autenticado={true} pendientes={{ expediente: pendientesExpediente }}>
   {statusError === 429 ? (
     <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
-      <div style="font-size: 2.5rem; margin-bottom: 1rem;">⏳</div>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; display: block;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <h1 class="portal-title">Demasiados intentos</h1>
       <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
         Has realizado demasiadas solicitudes en poco tiempo. Por favor espera unos minutos antes de volver a ingresar.
@@ -157,7 +159,7 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
     </div>
   ) : statusError !== null ? (
     <div class="portal-card" style="text-align: center; padding: 2.25rem 1.5rem;">
-      <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; display: block;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <h1 class="portal-title">Servicio no disponible</h1>
       <p class="portal-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
         El servicio no está disponible; intenta de nuevo en unos minutos. Si necesitas enviar tus documentos con urgencia, puedes coordinar la entrega por WhatsApp.
@@ -173,10 +175,15 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
   ) : (
     <div class="postulacion-container">
       <header class="exp-cab">
-        <a class="enlace-flecha" href="/mi-postulacion"><span aria-hidden="true">←</span> Volver a mi postulación</a>
-        <p class="antetitulo">Fase 2 · Documentación y carta</p>
-        <h1 class="portal-title">Mi expediente</h1>
-        <p class="portal-desc">Reúne tus documentos y tu carta de interés; con ambos completos, la Fundación revisa tu expediente.</p>
+        <div class="exp-cab__bar">
+          <span class="antetitulo">Fase 2 &middot; Documentación y carta</span>
+        </div>
+        <div class="exp-cab__hero">
+          <div>
+            <h1 class="portal-title">Mi expediente</h1>
+            <p class="portal-desc">Reúne tus documentos exigidos y tu carta de interés para revisión.</p>
+          </div>
+        </div>
       </header>
 
       <div class="postulacion-layout">
@@ -184,92 +191,131 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
           <div id="alertaError" class="portal-alert portal-alert--error" role="alert" style="display: none;"></div>
           <div id="alertaExito" class="portal-alert portal-alert--success" role="status" style="display: none;"></div>
 
-          <article class="action-card" aria-labelledby="estadoTitulo" data-estado={resumen.estado}>
-            <span class="action-card__tag">{tarjeta.etiqueta}</span>
-            <div class="action-card__estado" role="status">
-              <h2 id="estadoTitulo" class="action-card__heading">{tarjeta.titulo}</h2>
-              {(tarjeta.texto || tarjeta.aviso) && (
-                <p class="action-card__lead">
-                  {tarjeta.texto}{tarjeta.texto && tarjeta.aviso ? ' ' : ''}{tarjeta.aviso && <strong>{tarjeta.aviso}</strong>}
-                </p>
-              )}
-            </div>
-            {tarjeta.accion && (
-              <a href={tarjeta.accion.href} class="btn-primary" data-ir>
-                <span>{tarjeta.accion.texto}</span>
-                <span aria-hidden="true">&rarr;</span>
-              </a>
-            )}
-          </article>
-
           {consentimientoPendiente && textoConsentimiento && (
-            <section id="bloqueConsentimiento" class="section-card" aria-labelledby="consentimientoTitulo" tabindex="-1">
-              <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de datos</h2>
-              {textoConsentimiento.borrador && (
-                <p class="exp-consentimiento__borrador">Borrador institucional ({textoConsentimiento.version})</p>
-              )}
-              <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto del consentimiento">
+            <section id="bloqueConsentimiento" class="section-card exp-consentimiento-card" aria-labelledby="consentimientoTitulo" tabindex="-1">
+              <div class="exp-consentimiento-header">
+                <div class="exp-consentimiento-title-group">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                  </svg>
+                  <h2 id="consentimientoTitulo" class="section-card__title">Consentimiento de transferencia y protección de datos</h2>
+                </div>
+                {textoConsentimiento.borrador && (
+                  <span class="portal-badge portal-badge--neutral">Borrador institucional ({textoConsentimiento.version})</span>
+                )}
+              </div>
+              <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto legal del consentimiento informado">
                 {textoConsentimiento.texto}
               </div>
-              <button
-                type="button"
-                id="btnAceptarConsentimiento"
-                data-codigo={textoConsentimiento.codigo}
-                data-version={textoConsentimiento.version}
-                class="btn-primary"
-              >
-                <span>Acepto el consentimiento y habilitar la carga</span>
-              </button>
+              <div class="exp-consentimiento-footer">
+                <p class="exp-consentimiento-hint">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  Al aceptar, autorizas el tratamiento de tu expediente para evaluación académica y comercial.
+                </p>
+                <button
+                  type="button"
+                  id="btnAceptarConsentimiento"
+                  data-codigo={textoConsentimiento.codigo}
+                  data-version={textoConsentimiento.version}
+                  class="btn-primary"
+                >
+                  <span>Aceptar y habilitar carga de documentos</span>
+                </button>
+              </div>
             </section>
           )}
 
-          <section id="documentos" class="section-card" aria-labelledby="documentosTitulo">
-            <h2 id="documentosTitulo" class="section-card__title">Documentos</h2>
-            {requisitos.length > 0 && (
-              <p class={`section-card__resumen ${resumen.documentosCompletos && conteo.conAccion === 0 ? 'section-card__resumen--ok' : ''}`}>
-                {resumenDocumentos}
-              </p>
-            )}
+          <nav class="exp-solapas" role="tablist" aria-label="Secciones de tu expediente">
+            <button
+              type="button"
+              role="tab"
+              id="tabBtnDocs"
+              class="exp-solapa exp-solapa--activa"
+              aria-selected="true"
+              aria-controls="panelDocs"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>1. Documentos exigidos</span>
+              {conteo.conAccion > 0 ? (
+                <span class="exp-solapa__contador exp-solapa__contador--alerta">{conteo.conAccion} pendiente{conteo.conAccion > 1 ? 's' : ''}</span>
+              ) : resumen.documentosCompletos ? (
+                <span class="exp-solapa__contador exp-solapa__contador--ok">Completos</span>
+              ) : null}
+            </button>
 
-            <div id="listaRequisitos" class={consentimientoPendiente ? 'exp-bloqueado' : ''} inert={consentimientoPendiente}>
-              {requisitos.length === 0 ? (
-                <p class="exp-vacio">No hay documentos pendientes para esta vía.</p>
+            <button
+              type="button"
+              role="tab"
+              id="tabBtnCarta"
+              class="exp-solapa"
+              aria-selected="false"
+              aria-controls="panelCarta"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+              <span>2. Carta de interés</span>
+              {cartaEnviadaFinal ? (
+                <span class="exp-solapa__contador exp-solapa__contador--ok">Enviada</span>
+              ) : tieneTexto ? (
+                <span class="exp-solapa__contador exp-solapa__contador--info">Borrador</span>
               ) : (
-                <ul class="audit-list" style="list-style: none; padding: 0;">
-                  {filas.map(({ req, fila }) => (
-                    <li
-                      class={`audit-list__row audit-list__row--expand requisito-item`}
-                      id={`doc-${req.codigo}`}
-                      data-requisito={req.codigo}
-                      tabindex="-1"
-                    >
-                      <div class="audit-list__col-left">
-                        <span class={`audit-indicator ${fila.tono === 'ok' ? 'audit-indicator--ok' : fila.tono === 'error' ? 'audit-indicator--error' : fila.icono === 'observado' ? 'audit-indicator--alert' : 'audit-indicator--pending'}`} aria-hidden="true">
-                          {fila.tono === 'ok' && (
-                            <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                          )}
-                          {(fila.icono === 'observado' || fila.icono === 'reemplazo') && '!'}
-                        </span>
-                        <h3 class="audit-list__nombre">
-                          {req.nombre}
-                          {fila.opcional && <span class="audit-list__opcional">Opcional</span>}
-                        </h3>
-                      </div>
-                      <span class={`badge-status ${fila.tono === 'ok' ? 'badge-status--ok' : fila.tono === 'error' ? 'badge-status--error' : 'badge-status--pending'}`}>
-                        {fila.estadoTexto}
-                      </span>
+                <span class="exp-solapa__contador exp-solapa__contador--alerta">Pendiente</span>
+              )}
+            </button>
+          </nav>
 
-                      {(fila.nota || fila.permiteSubida) && (
-                        <div class="audit-list__extra">
-                          {fila.nota && (
-                            <p class={`portal-alert ${fila.tono === 'error' ? 'portal-alert--error' : 'portal-alert--info'}`}>{fila.nota}</p>
-                          )}
+          <div id="panelDocs" role="tabpanel" aria-labelledby="tabBtnDocs">
+            <section id="documentos" class="section-card section-card--compact" aria-labelledby="documentosTitulo">
+              <div class="section-card__topbar">
+                <div>
+                  <h2 id="documentosTitulo" class="section-card__title" style="margin: 0; padding: 0; border: none;">Documentos exigidos</h2>
+                  {requisitos.length > 0 && (
+                    <p class={`section-card__resumen ${resumen.documentosCompletos && conteo.conAccion === 0 ? 'section-card__resumen--ok' : ''}`}>
+                      {resumenDocumentos}
+                    </p>
+                  )}
+                </div>
+                <div class="section-card__topbar-formatos">
+                  <span>Formatos: <strong>PDF, JPG, PNG</strong> &middot; hasta 10 MB</span>
+                </div>
+              </div>
+
+              <div id="listaRequisitos" class={consentimientoPendiente ? 'exp-bloqueado' : ''} inert={consentimientoPendiente}>
+                {requisitos.length === 0 ? (
+                  <p class="exp-vacio">No hay documentos pendientes para esta vía.</p>
+                ) : (
+                  <ul class="audit-list audit-list--table" style="list-style: none; padding: 0;">
+                    {filas.map(({ req, fila }) => (
+                      <li
+                        class={`audit-list__row audit-list__row--table requisito-item`}
+                        id={`doc-${req.codigo}`}
+                        data-requisito={req.codigo}
+                        tabindex="-1"
+                      >
+                        <div class="audit-list__col-main">
+                          <span class={`audit-indicator ${fila.tono === 'ok' ? 'audit-indicator--ok' : fila.tono === 'error' ? 'audit-indicator--error' : fila.icono === 'observado' ? 'audit-indicator--alert' : 'audit-indicator--pending'}`} aria-hidden="true">
+                            {fila.tono === 'ok' && (
+                              <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                              </svg>
+                            )}
+                            {(fila.icono === 'observado' || fila.icono === 'reemplazo') && '!'}
+                          </span>
+                          <h3 class="audit-list__nombre">
+                            {req.nombre}
+                            {fila.opcional && <span class="audit-list__opcional">Opcional</span>}
+                          </h3>
+                        </div>
+
+                        <div class="audit-list__col-actions">
+                          <span class={`badge-status ${fila.tono === 'ok' ? 'badge-status--ok' : fila.tono === 'error' ? 'badge-status--error' : 'badge-status--pending'}`}>
+                            {fila.estadoTexto}
+                          </span>
+
                           {fila.permiteSubida && (
-                            <div class="audit-list__accion">
+                            <div class="audit-list__subida">
                               <label class="btn-contact btn-contact--fila btn-cargar-archivo" tabindex="0" role="button">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                   <polyline points="17 8 12 3 7 8"></polyline>
                                   <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -283,40 +329,65 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
                                   aria-label={`${fila.textoBoton}: ${req.nombre}`}
                                 />
                               </label>
-                              <span class="audit-list__formato">PDF, JPG o PNG · hasta 10 MB</span>
                               <span class="estado-subida" role="status" aria-live="polite" style="display: none;"></span>
                             </div>
                           )}
                         </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+
+                        {fila.nota && (
+                          <div class="audit-list__nota">
+                            <p class={`portal-alert ${fila.tono === 'error' ? 'portal-alert--error' : 'portal-alert--info'}`}>{fila.nota}</p>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {hayCarga && (
+                <details class="exp-ayuda">
+                  <summary>¿Problemas con la foto o el formato?</summary>
+                  <p>
+                    Usa buena luz, sin reflejos y con los bordes del documento visibles. Las fotos HEIC de iPhone se convierten
+                    a un formato compatible. Si no logras cargar un archivo, puedes coordinar la entrega con tu asesora
+                    {whatsappHref ? (<Fragment> por <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a></Fragment>) : ' por el WhatsApp oficial de la Fundación'}.
+                  </p>
+                </details>
               )}
-            </div>
+            </section>
+          </div>
 
-            {hayCarga && (
-              <details class="exp-ayuda">
-                <summary>¿Problemas con la foto o el formato?</summary>
-                <p>
-                  Usa buena luz, sin reflejos y con los bordes del documento visibles. Las fotos HEIC de iPhone se convierten
-                  a un formato compatible. Si no logras cargar un archivo, puedes coordinar la entrega con tu asesora
-                  {whatsappHref ? (<Fragment> por <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a></Fragment>) : ' por el WhatsApp oficial de la Fundación'}.
-                </p>
-              </details>
-            )}
-          </section>
-
-          <CartaInteres
-            carta={carta}
-            error={errorCarta}
-            claveSesion={claveSesion}
-            soloLectura={resumen.soloLectura}
-            resumen={resumenCarta}
-          />
+          <div id="panelCarta" role="tabpanel" aria-labelledby="tabBtnCarta" hidden>
+            <CartaInteres
+              carta={carta}
+              error={errorCarta}
+              claveSesion={claveSesion}
+              soloLectura={resumen.soloLectura}
+              resumen={resumenCarta}
+            />
+          </div>
         </div>
 
         <aside class="postulacion-aside">
+          <article class="action-card action-card--aside" aria-labelledby="estadoTitulo" data-estado={resumen.estado}>
+            <span class="action-card__tag">{tarjeta.etiqueta}</span>
+            <div class="action-card__estado" role="status">
+              <h2 id="estadoTitulo" class="action-card__heading">{tarjeta.titulo}</h2>
+              {(tarjeta.texto || tarjeta.aviso) && (
+                <p class="action-card__lead">
+                  {tarjeta.texto}{tarjeta.texto && tarjeta.aviso ? ' ' : ''}{tarjeta.aviso && <strong>{tarjeta.aviso}</strong>}
+                </p>
+              )}
+            </div>
+            {tarjeta.accion && (
+              <a href={tarjeta.accion.href} class="btn-primary btn-primary--block" data-ir>
+                <span>{tarjeta.accion.texto}</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            )}
+          </article>
+
           <AsesoriaCard asesora={asesoraAsignada} whatsappHref={whatsappHref} />
         </aside>
       </div>
@@ -537,15 +608,85 @@ const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
     });
   });
 
+  // Manejo de pestañas de expediente (Documentos exigidos / Carta de interés)
+  const tabBtnDocs = document.getElementById('tabBtnDocs') as HTMLButtonElement | null;
+  const tabBtnCarta = document.getElementById('tabBtnCarta') as HTMLButtonElement | null;
+  const panelDocs = document.getElementById('panelDocs') as HTMLElement | null;
+  const panelCarta = document.getElementById('panelCarta') as HTMLElement | null;
+
+  function seleccionarSolapa(solapa: 'docs' | 'carta', actualizarHash = false) {
+    if (!tabBtnDocs || !tabBtnCarta || !panelDocs || !panelCarta) return;
+
+    if (solapa === 'carta') {
+      tabBtnCarta.setAttribute('aria-selected', 'true');
+      tabBtnCarta.classList.add('exp-solapa--activa');
+      tabBtnDocs.setAttribute('aria-selected', 'false');
+      tabBtnDocs.classList.remove('exp-solapa--activa');
+      panelDocs.hidden = true;
+      panelCarta.hidden = false;
+      if (actualizarHash) {
+        history.replaceState(null, '', '#carta');
+      }
+    } else {
+      tabBtnDocs.setAttribute('aria-selected', 'true');
+      tabBtnDocs.classList.add('exp-solapa--activa');
+      tabBtnCarta.setAttribute('aria-selected', 'false');
+      tabBtnCarta.classList.remove('exp-solapa--activa');
+      panelDocs.hidden = false;
+      panelCarta.hidden = true;
+      if (actualizarHash && window.location.hash === '#carta') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+  }
+
+  tabBtnDocs?.addEventListener('click', () => seleccionarSolapa('docs', true));
+  tabBtnCarta?.addEventListener('click', () => seleccionarSolapa('carta', true));
+
+  tabBtnDocs?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      tabBtnCarta?.focus();
+      seleccionarSolapa('carta', true);
+    }
+  });
+  tabBtnCarta?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      tabBtnDocs?.focus();
+      seleccionarSolapa('docs', true);
+    }
+  });
+
+  // Si la URL viene con hash #carta, abrir la solapa correspondiente
+  if (window.location.hash === '#carta') {
+    seleccionarSolapa('carta');
+  }
+
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#carta') {
+      seleccionarSolapa('carta');
+    } else if (window.location.hash === '#documentos' || window.location.hash.startsWith('#doc-')) {
+      seleccionarSolapa('docs');
+    }
+  });
+
   // El botón principal de la tarjeta lleva al primer pendiente y deja el foco ahí (el ancla sola no mueve el foco).
   document.querySelectorAll<HTMLAnchorElement>('a[data-ir]').forEach((enlace) => {
     enlace.addEventListener('click', (e) => {
-      const destino = document.querySelector<HTMLElement>(enlace.getAttribute('href') || '');
+      const href = enlace.getAttribute('href') || '';
+      if (href === '#carta') {
+        seleccionarSolapa('carta', true);
+      } else if (href === '#documentos' || href.startsWith('#doc-')) {
+        seleccionarSolapa('docs', true);
+      }
+
+      const destino = document.querySelector<HTMLElement>(href);
       if (!destino) return;
       e.preventDefault();
       const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       destino.scrollIntoView({ behavior: sinMovimiento ? 'auto' : 'smooth', block: 'start' });
-      history.replaceState(null, '', enlace.getAttribute('href') || '');
+      history.replaceState(null, '', href);
       const foco = destino.querySelector<HTMLElement>('.btn-cargar-archivo, #cartaTexto, #btnAceptarConsentimiento') ?? destino;
       foco.focus({ preventScroll: true });
     });
