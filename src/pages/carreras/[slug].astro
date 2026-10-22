@@ -19,6 +19,21 @@ export async function getStaticPaths() {
 }
 
 const { carrera } = Astro.props;
+
+const SITIOS_UNIVERSIDAD: Record<string, string> = {
+  'Universidad del Gran Rosario': 'https://ugr.edu.ar/'
+};
+// schema.org timeRequired must be an ISO 8601 duration.
+const DURACIONES_ISO: Record<string, string> = {
+  '1 año y medio': 'P18M',
+  '2 años': 'P2Y',
+  '2 años de cursado más tesis': 'P2Y',
+  '2 años y medio': 'P30M',
+  '4 años': 'P4Y'
+};
+// "a distancia" is the search term; add it only while the title still fits in Google (~60 with " | FGREC").
+const conModalidad = `${carrera.nombre} a distancia`;
+const tituloPagina = conModalidad.length + 8 <= 60 ? conModalidad : carrera.nombre;
 const pagina = ficha(sitio, carrera, { carreras, fondos, maestrias });
 
 // Course schema
@@ -30,11 +45,11 @@ const courseSchema = {
   'provider': {
     '@type': 'EducationalOrganization',
     'name': carrera.universidad,
-    'sameAs': 'https://www.fgrec.org'
+    'sameAs': SITIOS_UNIVERSIDAD[carrera.universidad]
   },
   'educationalCredentialAwarded': carrera.titulo || carrera.nombre,
   'courseMode': carrera.instanciasPresenciales ? 'Blended' : 'Online',
-  'timeRequired': carrera.duracion,
+  'timeRequired': DURACIONES_ISO[carrera.duracion],
   'inLanguage': 'es'
 };
 
@@ -63,7 +78,7 @@ const breadcrumbSchema = {
 };
 ---
 <Layout 
-  title={pagina.titulo || carrera.nombre} 
+  title={tituloPagina} 
   description={pagina.descripcion || carrera.resumen || `${carrera.nombre} a distancia.`}
   image={carrera.imagenTarjeta}
   type="course"

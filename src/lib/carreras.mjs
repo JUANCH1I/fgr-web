@@ -99,8 +99,8 @@ ${sigueAqui([
 ])}`;
   return {
     ruta: '/carreras/',
-    titulo: 'Carreras',
-    descripcion: 'Las ' + carreras.length + ' carreras a distancia de la red de universidades aliadas: tecnicaturas, ciclos de licenciatura, licenciaturas y posgrados. Busca y filtra por área, nivel y modalidad.',
+    titulo: 'Carreras universitarias a distancia',
+    descripcion: 'Las ' + carreras.length + ' carreras a distancia de la red de universidades aliadas, con acompañamiento desde Ecuador: tecnicaturas, ciclos de licenciatura, licenciaturas y posgrados.',
     contenido
   };
 }
@@ -184,7 +184,7 @@ export function ficha(sitio, c, { carreras, fondos, maestrias }) {
     <nav class="migas" aria-label="Ruta"><a href="/carreras/">Carreras</a> <span aria-hidden="true">/</span> ${esc(c.area)} <span aria-hidden="true">/</span> ${esc(c.nivel)}</nav>
     <p class="etiquetas"><span class="etiqueta">${esc(c.nivel)}</span><span class="etiqueta etiqueta--suave">${esc(c.area)}</span><span class="etiqueta etiqueta--suave">${esc(textoModalidad(c))}</span></p>
     <h1>${esc(c.nombre)}</h1>
-    <p class="entrada">Carrera de la ${esc(c.universidad)} (${esc(c.pais)}). ${esc(c.viaIngreso)}.</p>
+    <p class="entrada">Carrera de la ${esc(c.universidad)} (${esc(c.pais)}), con el acompañamiento de la ${esc(sitio.nombre)}. ${esc(c.viaIngreso)}.</p>
   </div>
 </section>
 <section class="seccion">
@@ -221,7 +221,7 @@ ${afines.length ? `<section class="seccion seccion--crema" aria-labelledby="afin
   return {
     ruta: '/carreras/' + c.slug + '/',
     titulo: c.nombre,
-    descripcion: c.resumen || c.nombre + ' a distancia en ' + c.universidad + '.',
+    descripcion: c.resumen || c.nombre + ', ' + textoModalidad(c).toLowerCase() + ', de la ' + c.universidad + '. Duración: ' + c.duracion + '. Te acompañamos desde Ecuador en la postulación y la cursada.',
     contenido
   };
 }
