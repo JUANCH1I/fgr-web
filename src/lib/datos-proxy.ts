@@ -1,4 +1,4 @@
-// Proxy de "Mis datos": leer (GET), guardar documento y fecha de nacimiento (POST) y avisar a la asesora que el nombre está mal.
+// Proxy de "Mis datos": leer (GET), guardar el documento (POST) y avisar a la asesora que el nombre está mal.
 // Misma cadena que el resto de /api/portal/*: sesión en cookie HttpOnly, llamada firmada a FGREC (nivel 2) y limpieza de
 // cookie ante 401. Las escrituras llevan además la protección CSRF; la lectura (GET) no cambia nada.
 
@@ -71,7 +71,7 @@ async function reenviar(
 /** GET: los datos que FGREC tiene del postulante. */
 export const manejarLecturaDatos = (o: OpcionesProxyDatos) => reenviar(o, { metodo: 'GET', rutaRelativa: 'datos' });
 
-/** POST: documento y/o fecha de nacimiento. */
+/** POST: número de documento. */
 export const manejarGuardadoDatos = (o: OpcionesProxyDatos) => reenviar(o, { metodo: 'POST', rutaRelativa: 'datos', preparar: prepararCuerpoDatos });
 
 /** POST: avisa a la asesora que el nombre está mal (comentario opcional). */

@@ -10,8 +10,6 @@ export interface DatosPostulante {
   email: string;
   telefono: string;
   documento: string;
-  /** 'YYYY-MM-DD' o vacío. */
-  fechaNacimiento: string;
   documentoEditable: boolean;
 }
 
@@ -25,7 +23,6 @@ export function leerDatos(data: any): DatosPostulante {
     email: texto(data?.email),
     telefono: texto(data?.telefono),
     documento: texto(data?.documento),
-    fechaNacimiento: texto(data?.fechaNacimiento),
     // Ante la duda no se deja cambiar el número: FGREC lo vuelve a validar de todos modos.
     documentoEditable: data?.documentoEditable === true
   };
@@ -33,54 +30,30 @@ export function leerDatos(data: any): DatosPostulante {
 
 /** Lo que FGREC todavía no tiene del postulante, para avisarle en el inicio del portal. */
 export function datosFaltantes(datos: DatosPostulante): string[] {
-  return [
-    ...(datos.documento ? [] : ['tu número de documento']),
-    ...(datos.fechaNacimiento ? [] : ['tu fecha de nacimiento'])
-  ];
+  return datos.documento ? [] : ['tu número de documento'];
 }
 
-/** Solo viajan los campos que el postulante cambió (el número, únicamente si todavía se puede editar). */
+/** Solo viaja el número si cambió y todavía se puede editar. */
 export function construirCambios(
-  actual: { documento: string; fechaNacimiento: string },
-  nuevo: { documento?: string; fechaNacimiento?: string },
+  actual: { documento: string },
+  nuevo: { documento?: string },
   documentoEditable: boolean
-): { documento?: string; fechaNacimiento?: string } {
-  const out: { documento?: string; fechaNacimiento?: string } = {};
+): { documento?: string } {
   const documento = (nuevo.documento ?? '').trim();
-  const fecha = (nuevo.fechaNacimiento ?? '').trim();
-  if (documentoEditable && documento !== actual.documento.trim()) out.documento = documento;
-  if (fecha !== actual.fechaNacimiento) out.fechaNacimiento = fecha;
-  return out;
-}
-
-/** Fecha local del navegador en 'YYYY-MM-DD' (para el `max` del campo de fecha). */
-export function fechaLocalIso(d: Date): string {
-  const dos = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
+  return documentoEditable && documento !== actual.documento.trim() ? { documento } : {};
 }
 
 export type CuerpoPreparado<T> = { ok: true; cuerpo: T } | { ok: false; field: string; message: string };
 
-/** Valida lo mínimo antes de molestar a FGREC; el detalle (formato del número, edad) lo decide FGREC. */
-export function prepararCuerpoDatos(body: any): CuerpoPreparado<{ documento?: string; fechaNacimiento?: string }> {
-  const cuerpo: { documento?: string; fechaNacimiento?: string } = {};
-  if (body?.documento !== undefined) {
-    const documento = typeof body.documento === 'string' ? body.documento.trim() : '';
-    if (!documento) return { ok: false, field: 'documento', message: 'Escribe tu número de documento.' };
-    if (documento.length > LARGO_MAX_DOCUMENTO) {
-      return { ok: false, field: 'documento', message: `El número de documento no puede superar ${LARGO_MAX_DOCUMENTO} caracteres.` };
-    }
-    cuerpo.documento = documento;
+/** Valida lo mínimo antes de molestar a FGREC; el detalle (formato del número) lo decide FGREC. */
+export function prepararCuerpoDatos(body: any): CuerpoPreparado<{ documento: string }> {
+  if (body?.documento === undefined) return { ok: false, field: 'datos', message: 'Indica al menos un dato para guardar.' };
+  const documento = typeof body.documento === 'string' ? body.documento.trim() : '';
+  if (!documento) return { ok: false, field: 'documento', message: 'Escribe tu número de documento.' };
+  if (documento.length > LARGO_MAX_DOCUMENTO) {
+    return { ok: false, field: 'documento', message: `El número de documento no puede superar ${LARGO_MAX_DOCUMENTO} caracteres.` };
   }
-  if (body?.fechaNacimiento !== undefined) {
-    const fecha = typeof body.fechaNacimiento === 'string' ? body.fechaNacimiento.trim() : '';
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, field: 'fechaNacimiento', message: 'Indica una fecha de nacimiento válida.' };
-    cuerpo.fechaNacimiento = fecha;
-  }
-  if (cuerpo.documento === undefined && cuerpo.fechaNacimiento === undefined) {
-    return { ok: false, field: 'datos', message: 'Indica al menos un dato para guardar.' };
-  }
-  return { ok: true, cuerpo };
+  return { ok: true, cuerpo: { documento } };
 }
 
 /** El comentario del aviso de nombre es opcional: sin texto, el cuerpo viaja vacío. */
@@ -97,7 +70,7 @@ export function prepararCuerpoNombre(body: any): CuerpoPreparado<{ comentario?: 
 
 export interface ErrorDatos {
   /** Campo junto al que se muestra el mensaje; null cuando va en la alerta general. */
-  campo: 'documento' | 'fechaNacimiento' | 'comentario' | null;
+  campo: 'documento' | 'comentario' | null;
   mensaje: string;
 }
 
@@ -109,7 +82,7 @@ export function mensajeErrorDatos(status: number, data: { code?: string; message
   if (status === 429) return { campo: null, mensaje: 'Realizaste muchas solicitudes en poco tiempo. Espera unos minutos e inténtalo de nuevo.' };
   if (status >= 500) return { campo: null, mensaje: 'El servicio no está disponible por ahora. Inténtalo de nuevo en unos minutos.' };
   if (status === 400) {
-    const campo = data?.field === 'documento' || data?.field === 'fechaNacimiento' || data?.field === 'comentario' ? data.field : null;
+    const campo = data?.field === 'documento' || data?.field === 'comentario' ? data.field : null;
     return { campo, mensaje: mensaje || 'No pudimos procesar esos datos. Revisa lo que escribiste e inténtalo de nuevo.' };
   }
   if (status === 409) return { campo: null, mensaje: mensaje || 'No pudimos guardar el número de documento. Escríbele a tu asesora.' };
