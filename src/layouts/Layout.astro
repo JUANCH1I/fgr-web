@@ -13,6 +13,7 @@ interface Props {
   cierre?: boolean | { titulo?: string; texto?: string };
   schema?: Record<string, any> | Array<Record<string, any>>;
   type?: 'website' | 'article' | 'course';
+  noindex?: boolean;
 }
 
 const {
@@ -22,15 +23,17 @@ const {
   class: className,
   cierre = true,
   schema,
-  type = 'website'
+  type = 'website',
+  noindex = false
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
 const ruta = pathname === '' ? '/' : pathname;
 
+// Short brand suffix: Google cuts titles at ~60 characters and the full name took 35 of them.
 const tituloCompleto = ruta === '/'
-  ? `${sitio.nombre} | Carreras universitarias a distancia`
-  : `${title} | ${sitio.nombre}`;
+  ? 'Fundación Gran Rosario Ecuador: carreras a distancia'
+  : `${title} | FGREC`;
 
 const canonicalURL = new URL(ruta, Astro.site || 'https://www.fgrec.org');
 const imagenURL = resolverImagen(image, 1200);
@@ -99,6 +102,7 @@ const jsonLd = {
   <title>{tituloCompleto}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalURL} />
+  {noindex && <meta name="robots" content="noindex, follow" />}
 
   <!-- Open Graph -->
   <meta property="og:type" content={type === 'course' ? 'website' : type} />

@@ -22,7 +22,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404') && !page.includes('/mi-postulacion')
+      filter: (page) => !page.includes('/404') && !page.includes('/mi-postulacion') && !page.includes('/terminos-y-condiciones')
     })
   ]
 });
