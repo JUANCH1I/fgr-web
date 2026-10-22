@@ -1,8 +1,7 @@
 ---
 export const prerender = false;
 
-// "Mis datos": el postulante verifica sus datos de contacto, avisa si el nombre está mal y carga su documento y su fecha
-// de nacimiento. El país no se muestra ni se edita. El sitio no valida el número: lo decide FGREC.
+// "Mis datos": el postulante verifica sus datos de contacto, avisa si el nombre está mal y carga su documento. El país no se muestra ni se edita. El sitio no valida el número: lo decide FGREC.
 import PortalLayout from '../../layouts/PortalLayout.astro';
 import {
   COOKIE_SESION_NOMBRE,
@@ -75,14 +74,14 @@ const faltantes = datosFaltantes(datos);
       </header>
 
       <div class="datos-grid">
-        <!-- Columna Principal: Documento y Fecha de Nacimiento (Acción indispensable) -->
+        <!-- Columna Principal: Documento (Acción indispensable) -->
         <div class="datos-col--main">
           <section class="section-card datos-card--primary" aria-labelledby="documento-titulo">
             <div class="datos-card__header">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <h2 class="section-card__title" id="documento-titulo">Documento y fecha de nacimiento</h2>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><path d="M16 10h2"/><path d="M16 14h2"/></svg>
+              <h2 class="section-card__title" id="documento-titulo">Documento de identidad</h2>
             </div>
-            <p class="datos-card__desc">Estos datos son indispensables para formalizar tu expediente ante la universidad.</p>
+            <p class="datos-card__desc">Este dato es indispensable para formalizar tu expediente ante la universidad.</p>
 
             <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
             <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
@@ -92,7 +91,6 @@ const faltantes = datosFaltantes(datos);
               class="datos-form-grid"
               novalidate
               data-documento={datos.documento}
-              data-fecha={datos.fechaNacimiento}
               data-editable={datos.documentoEditable ? '1' : '0'}
             >
               {datos.documentoEditable ? (
@@ -125,27 +123,13 @@ const faltantes = datosFaltantes(datos);
                 </div>
               )}
 
-              <div class="portal-input-group">
-                <label for="datos-fecha" class="portal-label">
-                  <span>Fecha de nacimiento</span>
-                  <span class="portal-label__tag">Requerido</span>
-                </label>
-                <input
-                  type="date"
-                  id="datos-fecha"
-                  name="fechaNacimiento"
-                  class="portal-input"
-                  value={datos.fechaNacimiento}
-                  aria-describedby="datos-fecha-error"
-                />
-                <p id="datos-fecha-error" class="datos__error" hidden></p>
-              </div>
-
-              <div class="datos-form__footer">
-                <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">
-                  Guardar mis datos
-                </button>
-              </div>
+              {datos.documentoEditable && (
+                <div class="datos-form__footer">
+                  <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">
+                    Guardar mis datos
+                  </button>
+                </div>
+              )}
             </form>
           </section>
         </div>
@@ -343,7 +327,7 @@ const faltantes = datosFaltantes(datos);
 </style>
 
 <script>
-  import { construirCambios, fechaLocalIso, mensajeErrorDatos, type ErrorDatos } from '../../lib/datos-pure.ts';
+  import { construirCambios, mensajeErrorDatos, type ErrorDatos } from '../../lib/datos-pure.ts';
 
   const REDIRECCION_LOGIN = '/mi-postulacion/ingresar';
   const CABECERAS = { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' };
@@ -411,31 +395,27 @@ const faltantes = datosFaltantes(datos);
     }
   });
 
-  // --- Documento y fecha de nacimiento ---
+  // --- Documento ---
   const form = el<HTMLFormElement>('datos-form');
   const inputDocumento = el<HTMLInputElement>('datos-documento');
-  const inputFecha = el<HTMLInputElement>('datos-fecha');
   const guardar = el<HTMLButtonElement>('datos-guardar');
   const estado = el('datos-estado');
   const error = el('datos-error');
-  const errorCampo = { documento: el('datos-documento-error'), fechaNacimiento: el('datos-fecha-error') };
-  const campos = { documento: inputDocumento, fechaNacimiento: inputFecha };
+  const errorDocumento = el('datos-documento-error');
 
   const editable = form?.dataset.editable === '1';
-  let actual = { documento: form?.dataset.documento ?? '', fechaNacimiento: form?.dataset.fecha ?? '' };
-  if (inputFecha) inputFecha.max = fechaLocalIso(new Date());
+  let actual = { documento: form?.dataset.documento ?? '' };
 
   function limpiarErrores() {
-    ocultar(estado, error, errorCampo.documento, errorCampo.fechaNacimiento);
-    Object.values(campos).forEach((c) => c?.removeAttribute('aria-invalid'));
+    ocultar(estado, error, errorDocumento);
+    inputDocumento?.removeAttribute('aria-invalid');
   }
 
   function mostrarError(e: ErrorDatos) {
-    const caja = e.campo === 'documento' || e.campo === 'fechaNacimiento' ? errorCampo[e.campo] : null;
-    if (e.campo === 'documento' || e.campo === 'fechaNacimiento') {
-      campos[e.campo]?.setAttribute('aria-invalid', 'true');
-      if (caja) { caja.textContent = e.mensaje; caja.hidden = false; }
-      campos[e.campo]?.focus();
+    if (e.campo === 'documento') {
+      inputDocumento?.setAttribute('aria-invalid', 'true');
+      if (errorDocumento) { errorDocumento.textContent = e.mensaje; errorDocumento.hidden = false; }
+      inputDocumento?.focus();
     } else {
       mostrar(error, e.mensaje);
     }
@@ -444,7 +424,7 @@ const faltantes = datosFaltantes(datos);
   form?.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     limpiarErrores();
-    const cambios = construirCambios(actual, { documento: inputDocumento?.value, fechaNacimiento: inputFecha?.value }, editable);
+    const cambios = construirCambios(actual, { documento: inputDocumento?.value }, editable);
     if (!Object.keys(cambios).length) {
       mostrar(estado, 'No hay cambios para guardar.');
       return;
@@ -454,9 +434,8 @@ const faltantes = datosFaltantes(datos);
     if (guardar) guardar.disabled = false;
     if (!r) return;
     if (r.status === 200) {
-      actual = { documento: r.data?.documento ?? '', fechaNacimiento: r.data?.fechaNacimiento ?? '' };
+      actual = { documento: r.data?.documento ?? '' };
       if (inputDocumento) inputDocumento.value = actual.documento;
-      if (inputFecha) inputFecha.value = actual.fechaNacimiento;
       mostrar(estado, 'Guardamos tus datos.');
     } else {
       mostrarError(r.status === 0 ? { campo: null, mensaje: ERROR_RED } : mensajeErrorDatos(r.status, r.data));

@@ -23,7 +23,7 @@ function peticion(ruta: string, cuerpo: unknown, headers: Record<string, string>
 
 const lectura = () => new Request('https://www.fgrec.org/api/portal/datos', { method: 'GET', headers: { 'x-forwarded-for': '1.2.3.4', 'user-agent': 'UA/1' } });
 
-const DATOS = { nombre: 'Ana', apellido: 'Paz', email: 'a@x.ec', telefono: '+593999', documento: '0912345678', fechaNacimiento: '1990-05-01', documentoEditable: true };
+const DATOS = { nombre: 'Ana', apellido: 'Paz', email: 'a@x.ec', telefono: '+593999', documento: '0912345678', documentoEditable: true };
 
 test('guardar: rechaza sin CSRF, sin sesión, con JSON inválido y con cuerpo vacío o inválido, sin llamar a FGREC', async () => {
   let llamadas = 0;
@@ -36,14 +36,14 @@ test('guardar: rechaza sin CSRF, sin sesión, con JSON inválido y con cuerpo va
   assert.equal((await manejarGuardadoDatos({ request: peticion('datos', '{no'), cookies: cookiesFalsas('s'), llamar })).status, 400);
   const vacio = await manejarGuardadoDatos({ request: peticion('datos', {}), cookies: cookiesFalsas('s'), llamar });
   assert.equal(vacio.status, 400);
-  const mala = await manejarGuardadoDatos({ request: peticion('datos', { fechaNacimiento: 'ayer' }), cookies: cookiesFalsas('s'), llamar });
-  assert.equal(mala.status, 400);
-  assert.equal((await mala.json()).field, 'fechaNacimiento');
+  const soloFecha = await manejarGuardadoDatos({ request: peticion('datos', { fechaNacimiento: '1990-05-01' }), cookies: cookiesFalsas('s'), llamar });
+  assert.equal(soloFecha.status, 400);
+  assert.equal((await soloFecha.json()).field, 'datos');
 
   assert.equal(llamadas, 0);
 });
 
-test('guardar: reenvía solo documento y fecha, con la sesión y el contexto del visitante; devuelve el cuerpo de FGREC', async () => {
+test('guardar: reenvía solo el documento, con la sesión y el contexto del visitante; devuelve el cuerpo de FGREC', async () => {
   let recibido: any;
   const llamar = (async (o: any) => { recibido = o; return { ok: true, status: 200, data: DATOS }; }) as any;
   const res = await manejarGuardadoDatos({ request: peticion('datos', { documento: ' 0912345678 ', fechaNacimiento: '1990-05-01', pais: 'EC' }), cookies: cookiesFalsas('tok-1'), llamar });
@@ -51,7 +51,7 @@ test('guardar: reenvía solo documento y fecha, con la sesión y el contexto del
   assert.deepEqual(await res.json(), DATOS);
   assert.equal(recibido.metodo, 'POST');
   assert.equal(recibido.rutaRelativa, 'datos');
-  assert.deepEqual(recibido.cuerpo, { documento: '0912345678', fechaNacimiento: '1990-05-01' });
+  assert.deepEqual(recibido.cuerpo, { documento: '0912345678' });
   assert.equal(recibido.sesion, 'tok-1');
   assert.deepEqual(recibido.contexto, { ip: '1.2.3.4', ua: 'UA/1' });
 });
