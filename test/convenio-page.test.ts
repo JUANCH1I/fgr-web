@@ -20,3 +20,13 @@ test('el convenio aceptado lleva al siguiente paso: informar el primer pago en P
   assert.match(bloque, /href="\/mi-postulacion\/pagos"/);
   assert.match(bloque, /Ir a Pagos/);
 });
+
+test('un botón deshabilitado del convenio se ve deshabilitado (no parece activo sin las casillas)', () => {
+  assert.match(page, /\.convenio__acciones \.portal-btn:disabled\s*\{[^}]*opacity:[^}]*cursor:\s*not-allowed/);
+});
+
+test('el error del clickwrap se muestra junto a los botones del paso en curso, no arriba del formulario', () => {
+  assert.match(page, /const destino = paso\.hidden \? btnEnviar\.closest\('\.convenio__acciones'\) : btnAceptar\.closest\('\.convenio__acciones'\);/);
+  assert.match(page, /destino\.parentElement\?\.insertBefore\(alerta, destino\)/);
+  assert.match(page, /alerta\.scrollIntoView\(\{ block: 'nearest' \}\)/);
+});
