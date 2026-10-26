@@ -179,6 +179,15 @@ describe('loQueSigue: una sola acción por etapa en el inicio del portal', () =>
     assert.deepEqual(accion('ACEPTAR_CONVENIO'), { href: '/mi-postulacion/convenio', etiqueta: 'Leer el convenio' });
   });
 
+  test('con el convenio aceptado, el próximo paso lleva directo a Pagos', () => {
+    const pagar = loQueSigue({ ...base, proximoPaso: { codigo: 'INFORMAR_PAGO' } });
+    assert.deepEqual([pagar.titulo, pagar.accion], ['Realiza tu primer pago', { href: '/mi-postulacion/pagos', etiqueta: 'Ir a Pagos' }]);
+    assert.equal(pagar.texto, 'Paga tu primera cuota y adjunta el comprobante en Pagos.');
+    const revision = loQueSigue({ ...base, proximoPaso: { codigo: 'PAGO_EN_REVISION' } });
+    assert.deepEqual([revision.titulo, revision.accion, revision.enlace, revision.etiqueta],
+      ['Tu pago está en revisión', null, { href: '/mi-postulacion/pagos', etiqueta: 'Ver mis pagos' }, 'En revisión']);
+  });
+
   test('los textos cuentan lo que falta, en singular o plural', () => {
     assert.equal(loQueSigue({ ...base, proximoPaso: { codigo: 'CARGAR_DOCUMENTOS' }, documentos: { pendientes: 1, observados: 0, total: 4 } }).texto, 'Te falta 1 documento obligatorio.');
     assert.equal(loQueSigue({ ...base, proximoPaso: { codigo: 'CARGAR_DOCUMENTOS' }, documentos: { pendientes: 3, observados: 0, total: 4 } }).texto, 'Te faltan 3 documentos obligatorios.');
