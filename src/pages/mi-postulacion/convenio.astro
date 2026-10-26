@@ -14,6 +14,7 @@ import {
 import {
   DECLARACION_ACEPTACION,
   RUTA_ACEPTAR_CONVENIO,
+  RUTA_CODIGO_CONVENIO,
   RUTA_PDF_CONVENIO,
   cuerpoAceptacion,
   formatearFechaConvenio,
@@ -124,7 +125,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
             o <a class="enlace-flecha" href={`${RUTA_PDF_CONVENIO}?descargar=1`} download={convenio.nombreArchivo || 'convenio.pdf'}>descargarlo</a>.
           </p>
 
-          {pendiente && aceptacion && (
+          {pendiente && aceptacion && !convenio.clickwrap && (
             <form id="formAceptar" class="convenio__aceptar" novalidate data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256}>
               <div id="convenioAlerta" class="portal-alert portal-alert--error" style="display: none; margin-bottom: 14px;" role="alert"></div>
               <label class="convenio__casilla" for="chkAcepto">
@@ -142,6 +143,56 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
               <p id="ayudaAceptar" class="carta__ayuda" style="margin-top: 8px;">
                 Para habilitar este botón, marca primero la casilla que confirma que leíste y aceptas el convenio.
               </p>
+            </form>
+          )}
+          {pendiente && aceptacion && convenio.clickwrap && (
+            <form id="formClickwrap" class="convenio__aceptar" novalidate data-ruta-codigo={RUTA_CODIGO_CONVENIO} data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256}>
+              <div id="clickwrapAlerta" class="portal-alert portal-alert--error" style="display: none; margin-bottom: 14px;" role="alert"></div>
+              <div class="portal-alert portal-alert--info" style="margin-bottom: 14px;" role="note">
+                <span>{convenio.clickwrap.avisoElectronico}</span>
+              </div>
+              <label class="convenio__casilla" for="chkMedios">
+                <input type="checkbox" id="chkMedios" name="aceptoMediosElectronicos" />
+                <span>{convenio.clickwrap.consentimientoElectronico}</span>
+              </label>
+              <label class="convenio__casilla" for="chkConvenio">
+                <input type="checkbox" id="chkConvenio" name="aceptoConvenio" />
+                <span>{convenio.clickwrap.consentimientoContractual}</span>
+              </label>
+              <div class="convenio__acciones" style="margin-top: 14px;">
+                <button type="button" id="btnEnviarCodigo" class="portal-btn portal-btn--acento" style="width: auto;" disabled aria-describedby="ayudaCodigo">
+                  Enviarme el código
+                </button>
+              </div>
+              <p id="ayudaCodigo" class="carta__ayuda" style="margin-top: 8px;">
+                Marca las dos casillas para pedir el código: te lo enviamos por correo y con él confirmas tu aceptación.
+              </p>
+
+              <div id="pasoCodigo" hidden style="margin-top: 18px;">
+                <div id="clickwrapEnviado" class="portal-alert portal-alert--success" style="margin-bottom: 14px;" role="status"></div>
+                <label for="codigoConvenio" class="convenio__subtitulo" style="display: block; margin-top: 0;">Código de 6 dígitos</label>
+                <input
+                  type="text"
+                  id="codigoConvenio"
+                  name="codigo"
+                  class="portal-input"
+                  inputmode="numeric"
+                  pattern="[0-9]{6}"
+                  maxlength="6"
+                  placeholder="••••••"
+                  autocomplete="one-time-code"
+                  style="font-size: 2.25rem; letter-spacing: 0.35em; text-align: center; font-weight: 700; height: 3.75rem; max-width: 320px;"
+                />
+                <p class="carta__ayuda" style="margin-top: 8px;">Tienes hasta 5 intentos antes de que el código expire.</p>
+                <div class="convenio__acciones" style="margin-top: 14px;">
+                  <button type="submit" id="btnAceptar" class="portal-btn portal-btn--acento" style="width: auto;" disabled>
+                    Confirmar mi aceptación
+                  </button>
+                  <button type="button" id="btnReenviar" class="portal-btn portal-btn--outline" style="width: auto;" disabled>
+                    Reenviar código
+                  </button>
+                </div>
+              </div>
             </form>
           )}
         </>
@@ -175,6 +226,17 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
 </style>
 
 <script>
+  import {
+    cuerpoClickwrap,
+    esCodigo,
+    interpretarErrorConvenio,
+    mensajeCodigoEnviado,
+    segundosParaReenvio,
+    validarConsentimientos,
+    ESPERA_REENVIO_SEGUNDOS,
+    type ErrorConvenioUI
+  } from '../../lib/convenio-pure.ts';
+
   const formulario = document.getElementById('formAceptar') as HTMLFormElement | null;
   if (formulario) {
     const casilla = document.getElementById('chkAcepto') as HTMLInputElement;
@@ -241,6 +303,141 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
       boton.textContent = 'Confirmar mi aceptación';
       casilla.disabled = false;
       boton.disabled = !casilla.checked;
+    });
+  }
+
+  const clickwrap = document.getElementById('formClickwrap') as HTMLFormElement | null;
+  if (clickwrap) {
+    const porId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const medios = porId<HTMLInputElement>('chkMedios');
+    const contrato = porId<HTMLInputElement>('chkConvenio');
+    const btnEnviar = porId<HTMLButtonElement>('btnEnviarCodigo');
+    const btnReenviar = porId<HTMLButtonElement>('btnReenviar');
+    const btnAceptar = porId<HTMLButtonElement>('btnAceptar');
+    const paso = porId<HTMLElement>('pasoCodigo');
+    const entrada = porId<HTMLInputElement>('codigoConvenio');
+    const alerta = porId<HTMLElement>('clickwrapAlerta');
+    const enviado = porId<HTMLElement>('clickwrapEnviado');
+    const rutaCodigo = clickwrap.dataset.rutaCodigo || '';
+    const rutaAceptar = clickwrap.dataset.ruta || '';
+    const version = Number(clickwrap.dataset.version);
+    const sha256 = clickwrap.dataset.sha256 || '';
+    let temporizador: number | undefined;
+    let ocupado = false;
+
+    const ocultarAlerta = () => { alerta.style.display = 'none'; };
+    const mostrar = (error: ErrorConvenioUI | string) => {
+      const e = typeof error === 'string' ? null : error;
+      alerta.textContent = e ? e.mensaje : (error as string);
+      if (e?.cambio) {
+        const enlace = document.createElement('a');
+        enlace.href = window.location.pathname;
+        enlace.textContent = ' Abrir el convenio vigente';
+        enlace.className = 'enlace-flecha';
+        alerta.appendChild(enlace);
+      }
+      alerta.style.display = 'flex';
+    };
+    const actualizar = () => {
+      btnEnviar.disabled = ocupado || !(medios.checked && contrato.checked);
+      btnAceptar.disabled = ocupado || !esCodigo(entrada.value);
+    };
+
+    const iniciarCuenta = () => {
+      const desde = Date.now();
+      window.clearInterval(temporizador);
+      const pintar = () => {
+        const faltan = segundosParaReenvio(desde, Date.now());
+        btnReenviar.disabled = ocupado || faltan > 0;
+        btnReenviar.textContent = faltan > 0 ? `Reenviar código (${faltan} s)` : 'Reenviar código';
+        if (faltan === 0) window.clearInterval(temporizador);
+      };
+      pintar();
+      temporizador = window.setInterval(pintar, 1000);
+    };
+
+    // Resultado de una llamada con error: sesión vencida y convenio ya aceptado salen de la pantalla; el resto se muestra.
+    const resolverError = (status: number, datos: any) => {
+      const e = interpretarErrorConvenio(status, datos?.code, datos?.message, datos?.intentosRestantes);
+      if (e.sesionVencida) { window.location.href = '/mi-postulacion/ingresar'; return; }
+      if (e.yaAceptado) { window.location.reload(); return; }
+      mostrar(e);
+      if (datos?.code === 'RATE_LIMITED') iniciarCuenta();
+    };
+
+    const enviarJson = async (ruta: string, cuerpo: unknown) => {
+      const res = await fetch(ruta, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' },
+        body: JSON.stringify(cuerpo)
+      });
+      let datos: any = {};
+      try { datos = await res.json(); } catch {}
+      return { res, datos };
+    };
+
+    const pedirCodigo = async () => {
+      const consentimientos = validarConsentimientos({ medios: medios.checked, convenio: contrato.checked });
+      if (!consentimientos.ok) { mostrar(consentimientos.message); return; }
+      ocupado = true;
+      ocultarAlerta();
+      btnEnviar.textContent = 'Enviando el código…';
+      actualizar();
+      try {
+        const { res, datos } = await enviarJson(rutaCodigo, cuerpoClickwrap(version, sha256));
+        if (res.ok) {
+          // Las casillas quedan fijas: el código se pidió con ellas marcadas.
+          medios.disabled = true;
+          contrato.disabled = true;
+          btnEnviar.style.display = 'none';
+          porId<HTMLElement>('ayudaCodigo').hidden = true;
+          enviado.textContent = mensajeCodigoEnviado(datos.enviadoA);
+          paso.hidden = false;
+          entrada.value = '';
+          entrada.focus();
+          ocupado = false;
+          iniciarCuenta();
+        } else {
+          resolverError(res.status, datos);
+        }
+      } catch {
+        mostrar('No pudimos conectar para enviarte el código. Inténtalo de nuevo.');
+      }
+      ocupado = false;
+      btnEnviar.textContent = 'Enviarme el código';
+      actualizar();
+    };
+
+    medios.addEventListener('change', () => { ocultarAlerta(); actualizar(); });
+    contrato.addEventListener('change', () => { ocultarAlerta(); actualizar(); });
+    entrada.addEventListener('input', () => {
+      entrada.value = entrada.value.replace(/\D/g, '').slice(0, 6);
+      ocultarAlerta();
+      actualizar();
+    });
+    btnEnviar.addEventListener('click', pedirCodigo);
+    btnReenviar.addEventListener('click', pedirCodigo);
+
+    clickwrap.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const consentimientos = validarConsentimientos({ medios: medios.checked, convenio: contrato.checked });
+      if (!consentimientos.ok) { mostrar(consentimientos.message); return; }
+      if (!esCodigo(entrada.value)) { mostrar('Ingresa el código de 6 dígitos que te enviamos por correo.'); return; }
+      ocupado = true;
+      ocultarAlerta();
+      btnAceptar.textContent = 'Registrando tu aceptación…';
+      actualizar();
+      try {
+        const { res, datos } = await enviarJson(rutaAceptar, { ...cuerpoClickwrap(version, sha256), codigo: entrada.value });
+        if (res.ok) { window.location.reload(); return; }
+        resolverError(res.status, datos);
+        if (interpretarErrorConvenio(res.status, datos?.code, datos?.message, datos?.intentosRestantes).nuevoCodigo) entrada.value = '';
+      } catch {
+        mostrar('No pudimos conectar para registrar tu aceptación. Inténtalo de nuevo.');
+      }
+      ocupado = false;
+      btnAceptar.textContent = 'Confirmar mi aceptación';
+      actualizar();
     });
   }
 </script>
