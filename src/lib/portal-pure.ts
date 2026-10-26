@@ -318,6 +318,12 @@ export function loQueSigue(p: any): LoQueSigue {
     case 'ACEPTAR_CONVENIO':
       return paso('Lee y acepta tu convenio de corresponsabilidad', 'Es el paso que formaliza tu inscripción.',
         { href: '/mi-postulacion/convenio', etiqueta: 'Leer el convenio' });
+    case 'INFORMAR_PAGO':
+      return paso('Realiza tu primer pago', 'Paga tu primera cuota y adjunta el comprobante en Pagos.',
+        { href: '/mi-postulacion/pagos', etiqueta: 'Ir a Pagos' });
+    case 'PAGO_EN_REVISION':
+      return paso('Tu pago está en revisión', 'Recibimos tu comprobante. Te avisamos cuando se confirme.', null,
+        { enlace: { href: '/mi-postulacion/pagos', etiqueta: 'Ver mis pagos' }, etiqueta: 'En revisión' });
     case 'COMPLETAR_PRECALIFICADOR':
       return paso('Responde las preguntas sobre tus estudios', 'Con tus respuestas te orientamos sobre las carreras que te corresponden.',
         { href: '/mi-postulacion/precalificador', etiqueta: 'Responder las preguntas' });

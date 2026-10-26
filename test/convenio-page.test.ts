@@ -14,3 +14,9 @@ test('agreement page omits the draft notice without removing the PDF or acceptan
   assert.match(page, /id="chkAcepto"/);
   assert.match(page, /id="btnAceptar"[^>]+disabled/);
 });
+
+test('el convenio aceptado lleva al siguiente paso: informar el primer pago en Pagos', () => {
+  const bloque = page.slice(page.indexOf('{aceptado && ('), page.indexOf('<h2 class="convenio__subtitulo">Documento</h2>'));
+  assert.match(bloque, /href="\/mi-postulacion\/pagos"/);
+  assert.match(bloque, /Ir a Pagos/);
+});

@@ -107,6 +107,12 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
               Aceptado el {fechaAceptacion || 'día de su aceptación'}. Ya forma parte de tu expediente y no se puede modificar.
             </p>
           )}
+          {aceptado && (
+            <div class="convenio__acciones" style="margin-top: 12px;">
+              <a class="portal-btn portal-btn--acento" style="width: auto;" href="/mi-postulacion/pagos">Ir a Pagos</a>
+              <p class="carta__ayuda" style="margin: 0;">El siguiente paso es tu primer pago: infórmalo con su comprobante.</p>
+            </div>
+          )}
 
           <h2 class="convenio__subtitulo">Documento</h2>
           <div class="convenio__acciones">
