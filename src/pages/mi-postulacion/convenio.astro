@@ -214,6 +214,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
 </PortalLayout>
 
 <style>
+  .convenio__acciones .portal-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
   .convenio__subtitulo { font-size: 18px; color: var(--portal-azul); margin: 24px 0 10px 0; }
   .convenio__acciones { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .convenio__visor { display: block; width: 100%; height: 520px; margin-top: 14px; border: 1px solid var(--portal-borde); border-radius: var(--portal-radio); background: #FFFFFF; }
@@ -333,6 +334,9 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
 
     const ocultarAlerta = () => { alerta.style.display = 'none'; };
     const mostrar = (error: ErrorConvenioUI | string) => {
+      // Next to the buttons of the step in course, where the applicant is looking.
+      const destino = paso.hidden ? btnEnviar.closest('.convenio__acciones') : btnAceptar.closest('.convenio__acciones');
+      if (destino) destino.parentElement?.insertBefore(alerta, destino);
       const e = typeof error === 'string' ? null : error;
       alerta.textContent = e ? e.mensaje : (error as string);
       if (e?.cambio) {
@@ -343,6 +347,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
         alerta.appendChild(enlace);
       }
       alerta.style.display = 'flex';
+      alerta.scrollIntoView({ block: 'nearest' });
     };
     const actualizar = () => {
       btnEnviar.disabled = ocupado || !(medios.checked && contrato.checked);
