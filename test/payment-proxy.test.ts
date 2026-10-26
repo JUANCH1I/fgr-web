@@ -5,8 +5,8 @@ import { COOKIE_SESION_NOMBRE } from '../src/lib/fgrec-portal.ts';
 import { GET } from '../src/pages/api/portal/pagos/index.ts';
 import { POST } from '../src/pages/api/portal/pagos/subida.ts';
 
-const body = { cotizacionId: 1, medioPagoId: 2, cuentaReceptoraId: 3, importeBrutoCentavos: 12345, moneda: 'USD', fechaPago: '2026-10-10', referencia: 'OP-123', nombreArchivo: 'recibo.pdf', tipo: 'application/pdf', tamano: 300 };
-const catalog = { pagos: [], cotizaciones: [], medios: [], cuentas: [], puedeRegistrar: false, maxBytes: 10485760 };
+const body = { nombreArchivo: 'recibo.pdf', tipo: 'application/pdf', tamano: 300 };
+const catalog = { pagos: [], puedeRegistrar: false, maxBytes: 10485760 };
 function cookies(session = 'session-test') {
   const cleared: any[] = [];
   return { cleared, get: (name: string) => name === COOKIE_SESION_NOMBRE && session ? { value: session } : undefined, delete: (...args: any[]) => { cleared.push(args); }, set: (...args: any[]) => { cleared.push(args); } };
@@ -27,14 +27,14 @@ test('payment proxy requires cookie session and mutation CSRF before contacting 
 test('payment proxy validates JSON, file metadata, extra fields and body size locally', async () => {
   let calls = 0;
   const call = (async () => { calls++; throw new Error('unexpected'); }) as any;
-  for (const payload of ['{', ' '.repeat(8193), { ...body, tamano: 10485761 }, { ...body, tipo: 'text/html' }, { ...body, estado: 'CONFIRMADO' }]) {
+  for (const payload of ['{', ' '.repeat(8193), { ...body, tamano: 10485761 }, { ...body, tipo: 'text/html' }, { ...body, estado: 'CONFIRMADO' }, { ...body, cotizacionId: 1 }, { ...body, importeBrutoCentavos: 12345 }]) {
     const result = await handlePaymentProxy({ request: request(payload), cookies: cookies(), authorize: true, call, uploadOrigin: 'https://upload.test' });
     assert.equal(result.status, 400);
   }
   assert.equal(calls, 0);
 });
 
-test('payment proxy forwards signed context, selected IDs and exact cents to authorization', async () => {
+test('payment proxy forwards signed context and only the three receipt fields to authorization', async () => {
   let received: any;
   const call = (async (options: any) => { received = options; return { ok: true, status: 200, data: { token: 'secret', url: 'https://upload.test/fgrec/api/portal/pagos/subidas', tipo: 'application/pdf', expira: '2026-10-16T23:00:00Z', maxBytes: 10485760, internal: 'never' } }; }) as any;
   const response = await handlePaymentProxy({ request: request(), cookies: cookies(), authorize: true, call, uploadOrigin: 'https://upload.test' });
