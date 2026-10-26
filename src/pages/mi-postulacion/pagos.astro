@@ -2,7 +2,7 @@
 export const prerender = false;
 import PortalLayout from '../../layouts/PortalLayout.astro';
 import { COOKIE_SESION_NOMBRE, llamarFGRECPortal, extraerContextoVisitante, borrarSesionYContacto } from '../../lib/fgrec-portal.ts';
-import { publicPaymentContext, registrationUnavailable, formatPaymentAmount, formatPaymentDate, paymentToday, type PaymentContext } from '../../lib/payment-pure.ts';
+import { publicPaymentContext, registrationUnavailable, paymentSummary, type PaymentContext } from '../../lib/payment-pure.ts';
 
 Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 const session = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
@@ -15,7 +15,6 @@ if (response.status === 401) {
 if (response.status === 403) return Astro.redirect('/mi-postulacion/codigo', 302);
 const context = response.ok && response.data ? publicPaymentContext(response.data) : null;
 const unavailable = context ? registrationUnavailable(context) : null;
-const availableMethods = context?.medios.filter(method => context.cuentas.some(account => account.moneda === method.moneda)) || [];
 ---
 
 <PortalLayout title="Mis pagos | Fundación Gran Rosario" autenticado={true}>
@@ -38,77 +37,39 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
         <p class="payment-help">Un pago pendiente de confirmación todavía no acredita su recepción.</p>
         <p id="payment-empty" hidden={context.pagos.length > 0}>Aún no tienes pagos informados.</p>
         <ol id="payment-list" class="payment-list">
-          {context.pagos.map(payment => (
-            <li class="payment-item">
-              <div class="payment-item-heading"><h3>{formatPaymentAmount(payment.importeCentavos, payment.moneda)}</h3><span class="payment-state" data-state={payment.estado}>{payment.estadoTexto}</span></div>
-              <dl><div><dt>Fecha del pago</dt><dd>{formatPaymentDate(payment.fechaPago)}</dd></div><div><dt>Medio de pago</dt><dd>{payment.medioPago}</dd></div><div><dt>Referencia</dt><dd>{payment.referencia}</dd></div><div><dt>Cotización</dt><dd>{payment.cotizacion}</dd></div></dl>
-              <p class="payment-help">{payment.comprobanteRecibido ? 'Comprobante recibido' : 'Sin comprobante registrado'}</p>
-              {payment.motivo && <p class="payment-reason">{payment.motivo}</p>}
-            </li>
-          ))}
+          {context.pagos.map(payment => {
+            const summary = paymentSummary(payment);
+            return (
+              <li class="payment-item">
+                <div class="payment-item-heading"><h3>{summary.title}</h3><span class="payment-state" data-state={payment.estado}>{payment.estadoTexto}</span></div>
+                <dl>{summary.details.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+                <p class="payment-help">{payment.comprobanteRecibido ? 'Comprobante recibido' : 'Sin comprobante registrado'}</p>
+                {payment.motivo && <p class="payment-reason">{payment.motivo}</p>}
+              </li>
+            );
+          })}
         </ol>
         <a href="/mi-postulacion/pagos" class="enlace-flecha">Actualizar historial <span aria-hidden="true">↻</span></a>
       </section>
       <section class="portal-card payment-report" aria-labelledby="payment-report-title">
         <p class="antetitulo">Comprobante de pago</p>
-        <h2 id="payment-report-title">Informar un pago</h2>
+        <h2 id="payment-report-title">Enviar un comprobante</h2>
         {unavailable ? <div class="portal-alert portal-alert--info">{unavailable}</div> : (
           <>
-            <p class="payment-help">Este formulario no realiza cobros. Usa los datos de tu comprobante. Todos los campos son obligatorios.</p>
+            <p class="payment-help">Sube el comprobante del pago que realizaste. El equipo de FGREC revisará el comprobante y completará los datos del pago antes de confirmarlo.</p>
             <noscript><p class="portal-alert portal-alert--info">Activa JavaScript para informar tu pago y enviar el comprobante de forma segura.</p></noscript>
             <div id="payment-status" class="payment-feedback" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
             <div id="payment-error" class="payment-feedback payment-reason" role="alert" aria-atomic="true" tabindex="-1"></div>
             <a id="payment-review" href="/mi-postulacion/pagos" class="enlace-flecha" hidden>Consultar el historial antes de continuar</a>
             <form id="payment-form" data-max-bytes={context.maxBytes}>
               <fieldset id="payment-fields" disabled>
-                <legend class="sr-only">Datos del pago y comprobante</legend>
-                <div class="portal-input-group">
-                  <label class="portal-label" for="payment-quote">Cotización</label>
-                  <select class="portal-select" id="payment-quote" name="cotizacionId" required>
-                    {context.cotizaciones.length > 1 && <option value="">Selecciona la cotización</option>}
-                    {context.cotizaciones.map(quote => <option value={quote.id}>{quote.codigo}</option>)}
-                  </select>
-                </div>
-                <div class="portal-input-group">
-                  <label class="portal-label" for="payment-method">Medio de pago utilizado</label>
-                  <select class="portal-select" id="payment-method" name="medioPagoId" required>
-                    <option value="">Selecciona el medio de pago</option>
-                    {availableMethods.map(method => <option value={method.id} data-currency={method.moneda}>{method.nombre} · {method.moneda}</option>)}
-                  </select>
-                </div>
-                <div class="portal-input-group">
-                  <label class="portal-label" for="payment-account">Cuenta que recibió el pago</label>
-                  <select class="portal-select" id="payment-account" name="cuentaReceptoraId" required disabled>
-                    <option value="">Selecciona primero el medio de pago</option>
-                    {context.cuentas.map(account => <option value={account.id} data-currency={account.moneda} hidden disabled>{account.nombre} · {account.banco} · {account.moneda}</option>)}
-                  </select>
-                </div>
-                <div class="payment-form-row">
-                  <div class="portal-input-group">
-                    <label class="portal-label" for="payment-amount">Importe pagado</label>
-                    <input class="portal-input" id="payment-amount" name="amount" type="text" inputmode="decimal" maxlength="14" required aria-describedby="payment-amount-help" placeholder="Ej.: 125,50" />
-                    <p class="payment-help" id="payment-amount-help">Hasta dos decimales, sin separador de miles.</p>
-                  </div>
-                  <div class="portal-input-group">
-                    <label class="portal-label" for="payment-currency">Moneda</label>
-                    <input class="portal-input" id="payment-currency" name="moneda" type="text" readonly required aria-describedby="payment-currency-help" />
-                    <p class="payment-help" id="payment-currency-help">Según el medio elegido.</p>
-                  </div>
-                </div>
-                <div class="portal-input-group">
-                  <label class="portal-label" for="payment-date">Fecha del pago</label>
-                  <input class="portal-input" id="payment-date" name="fechaPago" type="date" max={paymentToday()} required />
-                </div>
-                <div class="portal-input-group">
-                  <label class="portal-label" for="payment-reference">Referencia o número de operación</label>
-                  <input class="portal-input" id="payment-reference" name="referencia" type="text" maxlength="100" required />
-                </div>
+                <legend class="sr-only">Comprobante de pago</legend>
                 <div class="portal-input-group">
                   <label class="portal-label" for="payment-receipt">Comprobante</label>
                   <input class="portal-input payment-file" id="payment-receipt" name="receipt" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required aria-describedby="payment-file-help" />
-                  <p class="payment-help" id="payment-file-help">PDF, JPG o PNG. Máximo {Math.floor(context.maxBytes / 1024 / 1024)} MB. Debe ser legible y corresponder a este pago.</p>
+                  <p class="payment-help" id="payment-file-help">PDF, JPG o PNG. Máximo {Math.floor(context.maxBytes / 1024 / 1024)} MB. Debe ser legible.</p>
                 </div>
-                <button class="portal-btn" type="submit">Enviar pago y comprobante</button>
+                <button class="portal-btn" type="submit">Enviar comprobante</button>
               </fieldset>
             </form>
           </>
@@ -143,22 +104,18 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
   .payment-feedback.payment-reason:not(:empty), .payment-reason { color: var(--portal-rojo); background: var(--portal-rojo-fondo); }
   #payment-review:not([hidden]) { display: block; margin-bottom: 18px; }
   .payment-file { padding: 10px; }
-  .payment-form-row { display: grid; gap: 0 16px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
   .payment-report .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   @media (min-width: 900px) { .payment-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
 </style>
 
 <script>
-  import { parseAmountCents, validatePaymentBody, formatPaymentAmount, formatPaymentDate, type Payment } from '../../lib/payment-pure.ts';
+  import { validatePaymentBody, paymentSummary, type Payment } from '../../lib/payment-pure.ts';
   import { validarArchivoCliente } from '../../lib/portal-pure.ts';
   import { reportPayment, PaymentUploadError } from '../../lib/payment-upload.ts';
 
   const form = document.getElementById('payment-form') as HTMLFormElement | null;
   if (form) {
     const fields = document.getElementById('payment-fields') as HTMLFieldSetElement;
-    const method = document.getElementById('payment-method') as HTMLSelectElement;
-    const account = document.getElementById('payment-account') as HTMLSelectElement;
-    const currency = document.getElementById('payment-currency') as HTMLInputElement;
     const receipt = document.getElementById('payment-receipt') as HTMLInputElement;
     const status = document.getElementById('payment-status')!;
     const error = document.getElementById('payment-error')!;
@@ -166,17 +123,6 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
     let busy = false;
     let uncertain = false;
     fields.disabled = false;
-
-    function syncAccounts() {
-      currency.value = method.selectedOptions[0]?.dataset.currency || '';
-      account.value = '';
-      account.disabled = !currency.value;
-      account.options[0].textContent = currency.value ? 'Selecciona la cuenta receptora' : 'Selecciona primero el medio de pago';
-      for (const option of Array.from(account.options).slice(1)) {
-        option.hidden = option.disabled = option.dataset.currency !== currency.value;
-      }
-    }
-    method.addEventListener('change', syncAccounts);
 
     function showError(message: string) { error.textContent = message; error.focus(); }
     function renderHistory(payments: Payment[]) {
@@ -186,11 +132,12 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
       for (const payment of payments) {
         const item = document.createElement('li'); item.className = 'payment-item';
         const heading = document.createElement('div'); heading.className = 'payment-item-heading';
-        const amount = document.createElement('h3'); amount.textContent = formatPaymentAmount(payment.importeCentavos, payment.moneda);
+        const summary = paymentSummary(payment);
+        const amount = document.createElement('h3'); amount.textContent = summary.title;
         const state = document.createElement('span'); state.className = 'payment-state'; state.dataset.state = payment.estado; state.textContent = payment.estadoTexto;
         heading.append(amount, state);
         const details = document.createElement('dl');
-        for (const [label, value] of [['Fecha del pago', formatPaymentDate(payment.fechaPago)], ['Medio de pago', payment.medioPago], ['Referencia', payment.referencia], ['Cotización', payment.cotizacion]]) {
+        for (const [label, value] of summary.details) {
           const row = document.createElement('div'); const term = document.createElement('dt'); term.textContent = label; const valueElement = document.createElement('dd'); valueElement.textContent = value; row.append(term, valueElement); details.append(row);
         }
         const evidence = document.createElement('p'); evidence.className = 'payment-help'; evidence.textContent = payment.comprobanteRecibido ? 'Comprobante recibido' : 'Sin comprobante registrado';
@@ -208,28 +155,20 @@ const availableMethods = context?.medios.filter(method => context.cuentas.some(a
       if (!file) { showError('Selecciona el comprobante de este pago.'); return; }
       const validation = validarArchivoCliente(file);
       if (!validation.valido || file.size > Number(form.dataset.maxBytes)) { showError(validation.error || 'El comprobante supera el tamaño permitido.'); return; }
-      const data = new FormData(form);
-      const amount = parseAmountCents(String(data.get('amount') || ''));
-      if (amount === null) { showError('Escribe un importe positivo con hasta dos decimales y sin separador de miles.'); return; }
-      const body = {
-        cotizacionId: Number(data.get('cotizacionId')), medioPagoId: Number(data.get('medioPagoId')), cuentaReceptoraId: Number(data.get('cuentaReceptoraId')),
-        importeBrutoCentavos: amount, moneda: currency.value, fechaPago: String(data.get('fechaPago') || ''), referencia: String(data.get('referencia') || ''),
-        nombreArchivo: file.name, tipo: validation.tipoMime, tamano: file.size
-      };
-      const valid = validatePaymentBody(body);
+      const valid = validatePaymentBody({ nombreArchivo: file.name, tipo: validation.tipoMime, tamano: file.size });
       if (!valid.ok) { showError(valid.message); return; }
       busy = true; fields.disabled = true; form.setAttribute('aria-busy', 'true');
       try {
         await reportPayment(valid.body, file, { onProgress: message => { status.textContent = message; } });
-        status.textContent = 'Pago y comprobante recibidos. El pago está pendiente de confirmación por FGREC.';
-        form.reset(); syncAccounts(); status.focus();
+        status.textContent = 'Comprobante recibido. FGREC lo revisará y completará los datos del pago antes de confirmarlo.';
+        form.reset(); status.focus();
         try {
           const refreshed = await fetch('/api/portal/pagos', { cache: 'no-store', signal: AbortSignal.timeout(15000) });
           if (!refreshed.ok) throw new Error('refresh');
           const context = await refreshed.json();
           renderHistory(context.pagos);
-          // Catalogs and eligibility may have changed while uploading: require fresh server rendering.
-          uncertain = true; review.hidden = false; review.textContent = 'Actualizar historial y datos para informar otro pago';
+          // Eligibility may have changed while uploading: require fresh server rendering.
+          uncertain = true; review.hidden = false; review.textContent = 'Actualizar la página para enviar otro comprobante';
         } catch {
           uncertain = true; review.hidden = false;
           status.textContent += ' No pudimos actualizar el historial. Consúltalo antes de informar otro pago.';

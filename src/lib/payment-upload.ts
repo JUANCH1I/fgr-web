@@ -1,3 +1,5 @@
+import { paymentErrorMessage } from './payment-pure.ts';
+
 export class PaymentUploadError extends Error {
   status: number;
   code: string;
@@ -30,7 +32,7 @@ export async function reportPayment(body: Record<string, unknown>, file: File, o
     throw new PaymentUploadError('No se pudo autorizar la carga. No se envió el comprobante. Puedes volver a intentarlo.');
   }
   const auth = await readJson(authorization);
-  if (!authorization.ok) throw new PaymentUploadError(auth.message || 'No fue posible autorizar la carga.', authorization.status, auth.code);
+  if (!authorization.ok) throw new PaymentUploadError(paymentErrorMessage(authorization.status, auth.code) || auth.message || 'No fue posible autorizar la carga.', authorization.status, auth.code);
   if (!auth.token || !auth.url || !auth.tipo || file.size > auth.maxBytes) throw new PaymentUploadError('La autorización de carga no es válida. Actualiza la página antes de continuar.');
   options.onProgress?.('Enviando el comprobante para revisión…');
   let upload: Response;
@@ -45,7 +47,7 @@ export async function reportPayment(body: Record<string, unknown>, file: File, o
   const result = await readJson(upload);
   if (upload.status !== 202 || result.estado !== 'REGISTRADO' || !Number.isSafeInteger(result.pagoId)) {
     const uncertain = upload.ok || upload.status >= 500;
-    throw new PaymentUploadError(uncertain ? 'No pudimos confirmar la recepción. Revisa el historial antes de volver a informar este pago.' : result.message || 'No se recibió el comprobante. Actualiza la página y revisa los datos antes de intentarlo de nuevo.', upload.status, result.code, uncertain, true);
+    throw new PaymentUploadError(uncertain ? 'No pudimos confirmar la recepción. Revisa el historial antes de volver a informar este pago.' : paymentErrorMessage(upload.status, result.code) || result.message || 'No se recibió el comprobante. Actualiza la página antes de intentarlo de nuevo.', upload.status, result.code, uncertain, true);
   }
   return result;
 }
