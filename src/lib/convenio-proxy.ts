@@ -1,4 +1,4 @@
-// Proxy de las dos rutas del convenio que el navegador usa: confirmar la aceptación (POST) y ver o descargar el PDF (GET).
+// Proxy de las rutas del convenio que el navegador usa: pedir el código y confirmar la aceptación (POST) y ver o descargar el PDF (GET).
 // Misma cadena que el resto de /api/portal/*: sesión en cookie HttpOnly, llamada firmada a FGREC (nivel 2) y limpieza de
 // cookie ante 401. La aceptación lleva además la protección CSRF propia; el PDF es una lectura (GET) y no cambia nada.
 
@@ -10,7 +10,7 @@ import {
   borrarCookieSegura,
   headersRespuestaApi
 } from './fgrec-portal.ts';
-import { cabecerasPdf, prepararCuerpoAceptacion } from './convenio-pure.ts';
+import { cabecerasPdf, prepararCuerpoAceptacion, prepararCuerpoCodigo } from './convenio-pure.ts';
 
 type Llamar = typeof llamarFGRECPortal;
 
@@ -29,8 +29,10 @@ function json(status: number, cuerpo: unknown): Response {
   return new Response(JSON.stringify(cuerpo), { status, headers: headersRespuestaApi() });
 }
 
-/** POST: el postulante confirma que leyó y acepta el documento (versión y huella) que tiene delante. */
-export async function manejarAceptacionConvenio(opciones: OpcionesProxyConvenio): Promise<Response> {
+type Preparar = (body: any) => { ok: true; cuerpo: unknown } | { ok: false; message: string; field: string };
+
+/** Cadena común de los dos POST del convenio: CSRF, sesión, cuerpo validado y llamada firmada. Nunca registra el cuerpo (lleva el código). */
+async function reenviarPost(opciones: OpcionesProxyConvenio, rutaRelativa: string, preparar: Preparar): Promise<Response> {
   const { request, cookies } = opciones;
   const llamar = opciones.llamar ?? llamarFGRECPortal;
 
@@ -51,15 +53,15 @@ export async function manejarAceptacionConvenio(opciones: OpcionesProxyConvenio)
     return json(400, { code: 'INVALID_INPUT', message: 'Cuerpo de solicitud requerido.' });
   }
 
-  const preparado = prepararCuerpoAceptacion(body);
+  const preparado = preparar(body);
   if (!preparado.ok) {
     return json(400, { code: 'INVALID_INPUT', field: preparado.field, message: preparado.message });
   }
 
   const respuesta = await llamar({
     metodo: 'POST',
-    rutaRelativa: 'convenio/aceptar',
-    cuerpo: preparado.cuerpo,
+    rutaRelativa,
+    cuerpo: preparado.cuerpo as any,
     sesion: sesionToken,
     contexto: extraerContextoVisitante(request)
   });
@@ -70,6 +72,14 @@ export async function manejarAceptacionConvenio(opciones: OpcionesProxyConvenio)
 
   return json(respuesta.status, respuesta.data || respuesta.error || {});
 }
+
+/** POST: el postulante confirma que leyó y acepta el documento (versión y huella) que tiene delante; con clickwrap, también el código. */
+export const manejarAceptacionConvenio = (opciones: OpcionesProxyConvenio): Promise<Response> =>
+  reenviarPost(opciones, 'convenio/aceptar', prepararCuerpoAceptacion);
+
+/** POST: pide el código que se envía por correo para aceptar un convenio con clickwrap. */
+export const manejarCodigoConvenio = (opciones: OpcionesProxyConvenio): Promise<Response> =>
+  reenviarPost(opciones, 'convenio/codigo', prepararCuerpoCodigo);
 
 /** GET: el PDF del convenio vigente, tal cual lo guarda FGREC. `?descargar=1` lo ofrece como descarga. */
 export async function manejarPdfConvenio(opciones: OpcionesProxyConvenio): Promise<Response> {

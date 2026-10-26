@@ -9,6 +9,11 @@ export const DECLARACION_ACEPTACION = 'Leí y acepto el Convenio de Corresponsab
 export const RUTA_PDF_CONVENIO = '/api/portal/convenio-pdf';
 /** Ruta del sitio a la que se confirma la aceptación. */
 export const RUTA_ACEPTAR_CONVENIO = '/api/portal/convenio-aceptar';
+/** Ruta del sitio que pide el código de aceptación (convenio con clickwrap). */
+export const RUTA_CODIGO_CONVENIO = '/api/portal/convenio-codigo';
+/** Segundos antes de poder pedir otro código (el servidor aplica el mismo mínimo). */
+export const ESPERA_REENVIO_SEGUNDOS = 60;
+export const VIGENCIA_CODIGO_MINUTOS = 5;
 export const RUTA_PAGINA_CONVENIO = '/mi-postulacion/convenio';
 
 export type EstadoConvenio = 'SIN_GENERAR' | 'GENERADO' | 'ACEPTADO' | 'NO_APLICA';
@@ -35,6 +40,13 @@ export interface ResumenConvenio {
   resumenPagos: string;
 }
 
+/** Textos que FGREC manda para el convenio con código: el sitio los muestra tal cual, nunca los escribe. */
+export interface ClickwrapUI {
+  consentimientoElectronico: string;
+  consentimientoContractual: string;
+  avisoElectronico: string;
+}
+
 export interface ConvenioUI {
   estado: EstadoConvenio;
   version: number | null;
@@ -47,6 +59,8 @@ export interface ConvenioUI {
   resumen: ResumenConvenio | null;
   sha256: string | null;
   nombreArchivo: string | null;
+  /** Presente solo si el convenio se acepta con dos consentimientos y un código; `null` es el flujo de una casilla. */
+  clickwrap: ClickwrapUI | null;
 }
 
 const ESTADOS: readonly string[] = ['SIN_GENERAR', 'GENERADO', 'ACEPTADO', 'NO_APLICA'];
@@ -57,7 +71,7 @@ const esHash = (v: unknown): v is string => typeof v === 'string' && /^[0-9a-f]{
 export function leerConvenio(data: any): ConvenioUI {
   const vacio: ConvenioUI = {
     estado: 'SIN_GENERAR', version: null, titulo: 'Convenio de Corresponsabilidad', textoEnBorrador: false, aceptadoEn: null,
-    puedeAceptar: false, declaracion: DECLARACION_ACEPTACION, resumen: null, sha256: null, nombreArchivo: null
+    puedeAceptar: false, declaracion: DECLARACION_ACEPTACION, resumen: null, sha256: null, nombreArchivo: null, clickwrap: null
   };
   if (!data || typeof data !== 'object' || !ESTADOS.includes(data.estado)) return vacio;
   if (data.estado === 'NO_APLICA') return { ...vacio, estado: 'NO_APLICA' };
@@ -68,6 +82,10 @@ export function leerConvenio(data: any): ConvenioUI {
     Number.isSafeInteger(data.version) && esHash(data.pdf?.sha256) && r && typeof r.carrera === 'string' &&
     esDinero(r.total) && esDinero(r.pvp) && esDinero(r.valorMensualPais) && typeof r.beneficio?.porcentaje === 'string';
   if (!completo) return vacio;
+
+  const clickwrap = leerClickwrap(data.clickwrap);
+  // Un convenio pendiente que pide código pero trae textos incompletos no se ofrece: no se inventan los consentimientos.
+  if (data.estado === 'GENERADO' && data.clickwrap != null && clickwrap === null) return vacio;
 
   return {
     estado: data.estado,
@@ -95,8 +113,83 @@ export function leerConvenio(data: any): ConvenioUI {
       resumenPagos: String(r.resumenPagos ?? '')
     },
     sha256: data.pdf.sha256,
-    nombreArchivo: typeof data.pdf.nombreArchivo === 'string' ? data.pdf.nombreArchivo : null
+    nombreArchivo: typeof data.pdf.nombreArchivo === 'string' ? data.pdf.nombreArchivo : null,
+    clickwrap: data.estado === 'GENERADO' ? clickwrap : null
   };
+}
+
+const esTexto = (v: unknown): v is string => typeof v === 'string' && v.trim() !== '';
+
+function leerClickwrap(v: any): ClickwrapUI | null {
+  if (!v || typeof v !== 'object' || v.requiereCodigo !== true) return null;
+  if (!esTexto(v.consentimientoElectronico) || !esTexto(v.consentimientoContractual) || !esTexto(v.avisoElectronico)) return null;
+  return {
+    consentimientoElectronico: v.consentimientoElectronico,
+    consentimientoContractual: v.consentimientoContractual,
+    avisoElectronico: v.avisoElectronico
+  };
+}
+
+export const esCodigo = (v: unknown): v is string => typeof v === 'string' && /^[0-9]{6}$/.test(v);
+
+/** Las dos casillas separadas del clickwrap: el consentimiento de medios electrónicos y la aceptación del convenio. */
+export function validarConsentimientos(c: { medios: boolean; convenio: boolean }): { ok: true } | { ok: false; message: string } {
+  if (!c.medios) return { ok: false, message: 'Para continuar, marca que consientes usar medios electrónicos.' };
+  if (!c.convenio) return { ok: false, message: 'Para continuar, marca que leíste y aceptas el convenio.' };
+  return { ok: true };
+}
+
+export interface CuerpoCodigo {
+  version: number;
+  sha256: string;
+  aceptoMediosElectronicos: true;
+  aceptoConvenio: true;
+}
+
+/** El documento que tiene delante y las dos casillas marcadas (las que el postulante confirmó antes de pedir el código). */
+export const cuerpoClickwrap = (version: number, sha256: string): CuerpoCodigo =>
+  ({ version, sha256, aceptoMediosElectronicos: true, aceptoConvenio: true });
+
+/** Lo que se envía a pedir el código. */
+export function cuerpoSolicitudCodigo(convenio: ConvenioUI): CuerpoCodigo | null {
+  if (!convenio.clickwrap || !convenio.puedeAceptar || convenio.version === null || convenio.sha256 === null) return null;
+  return cuerpoClickwrap(convenio.version, convenio.sha256);
+}
+
+/** Lo que se envía al aceptar con código. Un código que no son 6 dígitos no se envía. */
+export function cuerpoAceptacionConCodigo(convenio: ConvenioUI, codigo: string): (CuerpoCodigo & { codigo: string }) | null {
+  const base = cuerpoSolicitudCodigo(convenio);
+  return base && esCodigo(codigo) ? { ...base, codigo } : null;
+}
+
+/** Valida lo que llega del navegador a la ruta del código y devuelve lo que se reenvía (nada más). */
+export function prepararCuerpoCodigo(body: any):
+  | { ok: true; cuerpo: CuerpoCodigo }
+  | { ok: false; message: string; field: string } {
+  if (body?.aceptoMediosElectronicos !== true) {
+    return { ok: false, field: 'aceptoMediosElectronicos', message: 'Para continuar, marca que consientes usar medios electrónicos.' };
+  }
+  if (body.aceptoConvenio !== true) {
+    return { ok: false, field: 'aceptoConvenio', message: 'Para continuar, marca que leíste y aceptas el convenio.' };
+  }
+  if (!Number.isSafeInteger(body.version) || body.version < 1) {
+    return { ok: false, field: 'version', message: 'Falta la versión del convenio que se acepta.' };
+  }
+  if (!esHash(body.sha256)) {
+    return { ok: false, field: 'sha256', message: 'Falta la huella del documento que se acepta.' };
+  }
+  return { ok: true, cuerpo: { version: body.version, sha256: body.sha256, aceptoMediosElectronicos: true, aceptoConvenio: true } };
+}
+
+/** Segundos que faltan para poder pedir otro código (entero, nunca negativo). */
+export function segundosParaReenvio(pedidoEnMs: number, ahoraMs: number, espera = ESPERA_REENVIO_SEGUNDOS): number {
+  const transcurrido = Math.max(0, ahoraMs - pedidoEnMs);
+  return Math.max(0, Math.ceil(espera - transcurrido / 1000));
+}
+
+export function mensajeCodigoEnviado(enviadoA: unknown): string {
+  const destino = esTexto(enviadoA) ? enviadoA : 'tu correo';
+  return `Te enviamos un código a ${destino}. Vence en ${VIGENCIA_CODIGO_MINUTOS} minutos.`;
 }
 
 /** Las filas del resumen, en el orden en que se leen. Los importes ya vienen formateados por FGREC. */
@@ -136,8 +229,17 @@ export function cuerpoAceptacion(convenio: ConvenioUI): { acepto: true; version:
 
 /** Valida el cuerpo que llega del navegador a la ruta del sitio y devuelve lo que se reenvía (nada más). */
 export function prepararCuerpoAceptacion(body: any):
-  | { ok: true; cuerpo: { acepto: true; version: number; sha256: string } }
+  | { ok: true; cuerpo: { acepto: true; version: number; sha256: string } | (CuerpoCodigo & { codigo: string }) }
   | { ok: false; message: string; field: string } {
+  // Con casillas o código en el cuerpo es el convenio con clickwrap; sin ellos, el cuerpo de una casilla no cambia.
+  if (body && (body.aceptoMediosElectronicos !== undefined || body.aceptoConvenio !== undefined || body.codigo !== undefined)) {
+    const documento = prepararCuerpoCodigo(body);
+    if (!documento.ok) return documento;
+    if (!esCodigo(body.codigo)) {
+      return { ok: false, field: 'codigo', message: 'Ingresa el código de 6 dígitos que te enviamos por correo.' };
+    }
+    return { ok: true, cuerpo: { ...documento.cuerpo, codigo: body.codigo } };
+  }
   if (body?.acepto !== true) {
     return { ok: false, field: 'acepto', message: 'Para continuar, marca que leíste y aceptas el convenio.' };
   }
@@ -157,10 +259,12 @@ export interface ErrorConvenioUI {
   sesionVencida: boolean;
   /** Ya estaba aceptado: recargar muestra la vista de solo lectura. */
   yaAceptado: boolean;
+  /** El código actual ya no sirve: hay que pedir otro. */
+  nuevoCodigo: boolean;
 }
 
-export function interpretarErrorConvenio(status: number, code?: string, message?: string): ErrorConvenioUI {
-  const base = { cambio: false, sesionVencida: false, yaAceptado: false };
+export function interpretarErrorConvenio(status: number, code?: string, message?: string, intentosRestantes?: number): ErrorConvenioUI {
+  const base = { cambio: false, sesionVencida: false, yaAceptado: false, nuevoCodigo: false };
   if (status === 401) {
     return { ...base, sesionVencida: true, mensaje: 'Tu sesión venció. Vuelve a ingresar para aceptar tu convenio.' };
   }
@@ -169,6 +273,28 @@ export function interpretarErrorConvenio(status: number, code?: string, message?
   }
   if (code === 'CONVENIO_UNAVAILABLE') {
     return { ...base, cambio: true, mensaje: 'Por ahora no hay un convenio para aceptar. Si crees que es un error, consulta con tu asesora.' };
+  }
+  if (code === 'CODE_INVALID') {
+    if (intentosRestantes === 0) return { ...base, nuevoCodigo: true, mensaje: 'El código no es correcto y ya no te quedan intentos. Pide un código nuevo.' };
+    const quedan = Number.isSafeInteger(intentosRestantes) && (intentosRestantes as number) > 0
+      ? ` Te quedan ${intentosRestantes} ${intentosRestantes === 1 ? 'intento' : 'intentos'}.`
+      : '';
+    return { ...base, mensaje: `El código no es correcto. Revísalo e inténtalo de nuevo.${quedan}` };
+  }
+  if (code === 'CODE_EXPIRED') return { ...base, nuevoCodigo: true, mensaje: 'El código venció. Pide un código nuevo para continuar.' };
+  if (code === 'CODE_REQUIRED') return { ...base, nuevoCodigo: true, mensaje: 'Primero pide un código nuevo: te lo enviamos por correo.' };
+  if (code === 'CODE_UNAVAILABLE') {
+    return { ...base, nuevoCodigo: true, mensaje: 'No pudimos procesar el código en este momento. No se registró ninguna aceptación; pide un código nuevo en unos minutos.' };
+  }
+  if (code === 'EMAIL_REQUIRED') {
+    return { ...base, mensaje: 'No tenemos un correo cargado para enviarte el código. Pídele a tu asesora que lo cargue.' };
+  }
+  if (code === 'CONVENIO_ACCEPTED') return { ...base, yaAceptado: true, mensaje: 'Este convenio ya fue aceptado.' };
+  if (code === 'CODE_NOT_REQUIRED') {
+    return { ...base, cambio: true, mensaje: 'Este convenio se acepta sin código. Vuelve a abrirlo para ver la versión vigente.' };
+  }
+  if (code === 'RATE_LIMITED') {
+    return { ...base, mensaje: 'Pediste varios códigos seguidos. Espera unos minutos antes de pedir otro código.' };
   }
   if (status === 429) {
     return { ...base, mensaje: 'Hay muchas solicitudes en este momento. Espera unos minutos e inténtalo de nuevo.' };
