@@ -1408,6 +1408,22 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
   </footer>
 
   <script>
+    import { crearReportador } from '../lib/errores-portal.ts';
+
+    // Errores que la página no manejó: van a GlitchTip a través de FGREC (integracion-web.md §4.7).
+    const reportar = crearReportador((reporte) =>
+      fetch('/api/portal/errores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' },
+        body: JSON.stringify(reporte),
+        keepalive: true
+      })
+    );
+    const reportarAqui = (error: unknown) => reportar(error, window.location.pathname);
+    // event.error es null para un script de otro origen ("Script error."), que no trae nada que reportar.
+    window.addEventListener('error', (event) => event.error && reportarAqui(event.error));
+    window.addEventListener('unhandledrejection', (event) => reportarAqui(event.reason));
+
     // Barra lateral desplegable en pantallas angostas: el botón abre y cierra; Escape y el fondo la cierran.
     const btnMenu = document.getElementById('btnMenuPortal');
     const sidebar = document.getElementById('portalSidebar');
