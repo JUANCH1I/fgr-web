@@ -18,6 +18,8 @@ export interface Payment {
 export interface PaymentContext {
   pagos: Payment[];
   puedeRegistrar: boolean;
+  /** True while the applicant still has to accept the convenio before reporting a payment. */
+  requiereConvenio: boolean;
   maxBytes: number;
 }
 
@@ -84,10 +86,12 @@ export function publicPaymentContext(data: PaymentContext): PaymentContext {
   return {
     pagos: data.pagos.map(p => ({ id: p.id, cotizacion: p.cotizacion, estado: p.estado, estadoTexto: p.estadoTexto, importeCentavos: p.importeCentavos ?? null, moneda: p.moneda ?? null, fechaPago: p.fechaPago ?? null, referencia: p.referencia ?? null, medioPago: p.medioPago ?? null, registradoEn: p.registradoEn, comprobanteRecibido: p.comprobanteRecibido, motivo: p.estado === 'RECHAZADO' ? p.motivo : null })),
     puedeRegistrar: data.puedeRegistrar === true,
+    requiereConvenio: data.requiereConvenio === true,
     maxBytes: Math.min(data.maxBytes, LIMITE_MAX_BYTES_ARCHIVO)
   };
 }
 
 export function registrationUnavailable(context: PaymentContext): string | null {
+  if (context.requiereConvenio) return 'Antes de informar tu pago tienes que aceptar tu convenio de corresponsabilidad.';
   return context.puedeRegistrar ? null : `La carga de comprobantes no está disponible en este momento. ${ASK_ADVISOR}`;
 }
