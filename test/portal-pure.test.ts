@@ -10,7 +10,9 @@ import {
   deducirTipoMime,
   mensajeErrorSubida,
   cartaEnviadaEnPanel,
-  resumirDocumentosPanel
+  resumirDocumentosPanel,
+  armarCuerpoSubida,
+  categoriaSubidaValida
 } from '../src/lib/portal-pure.ts';
 
 test('un documento opcional pendiente se presenta como opcional, no como requerido', () => {
@@ -209,4 +211,25 @@ describe('loQueSigue: una sola acción por etapa en el inicio del portal', () =>
     const pausa = loQueSigue({ ...base, situacion: 'EN_PAUSA', proximoPaso: { codigo: 'COMPLETAR_PRECALIFICADOR' } });
     assert.deepEqual([pausa.titulo, pausa.etiqueta], ['Responde las preguntas sobre tus estudios', null]);
   });
+});
+
+test('cuerpo de autorización de subida: la categoría viaja solo cuando está presente', () => {
+  const base = { requisito: 'TITULO', nombreArchivo: 'a.pdf', tipo: 'application/pdf', tamano: 10 };
+  assert.deepEqual(armarCuerpoSubida(base), base);
+  assert.deepEqual(armarCuerpoSubida({ ...base, categoria: undefined }), base);
+  assert.deepEqual(armarCuerpoSubida({ ...base, categoria: '' }), base);
+  assert.deepEqual(
+    armarCuerpoSubida({ ...base, requisito: 'ADICIONAL', categoria: 'CV' }),
+    { ...base, requisito: 'ADICIONAL', categoria: 'CV' }
+  );
+});
+
+test('categoría de subida: ausente es válida; presente debe ser un texto corto', () => {
+  assert.equal(categoriaSubidaValida(undefined), true);
+  assert.equal(categoriaSubidaValida(null), true);
+  assert.equal(categoriaSubidaValida('CV'), true);
+  assert.equal(categoriaSubidaValida(''), false);
+  assert.equal(categoriaSubidaValida(7), false);
+  assert.equal(categoriaSubidaValida({}), false);
+  assert.equal(categoriaSubidaValida('X'.repeat(65)), false);
 });

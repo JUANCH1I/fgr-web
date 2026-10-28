@@ -2,7 +2,13 @@
 // Decide qué dice la tarjeta de estado, cómo se ve cada fila de documento y cómo se resume cada sección.
 // El estado oficial del expediente lo calcula el servidor; aquí solo se traduce a texto y acciones.
 
-import { presentarEstadoDocumento, type RequisitoUI } from './portal-pure.ts';
+import {
+  presentarEstadoDocumento,
+  type AdicionalesUI,
+  type DocumentoAdicionalUI,
+  type EstadoAdicional,
+  type RequisitoUI
+} from './portal-pure.ts';
 import type { EstadoExpediente } from './carta-pure.ts';
 
 // --- Filas de documento ------------------------------------------------------------------------
@@ -66,6 +72,81 @@ export function presentarFilaDocumento(req: RequisitoUI, soloLectura: boolean): 
         textoBoton: permiteSubida ? 'Cargar archivo' : null
       };
   }
+}
+
+// --- Documentos adicionales (opcionales) -------------------------------------------------------
+
+const ESTADOS_ADICIONAL: readonly string[] = ['RECIBIDO', 'VALIDADO', 'OBSERVADO'];
+const MAXIMO_ADICIONALES_POR_DEFECTO = 10;
+
+/** Lee el bloque `adicionales` de la respuesta. Devuelve null si falta o no es un objeto (backend anterior). */
+export function leerAdicionales(crudo: unknown): AdicionalesUI | null {
+  if (!crudo || typeof crudo !== 'object') return null;
+  const c = crudo as Record<string, unknown>;
+  const lista = (v: unknown): Record<string, any>[] => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []);
+  const maximo = Number(c.maximo);
+  return {
+    maximo: Number.isFinite(maximo) && maximo > 0 ? maximo : MAXIMO_ADICIONALES_POR_DEFECTO,
+    categorias: lista(c.categorias)
+      .filter((x) => typeof x.codigo === 'string' && typeof x.nombre === 'string')
+      .map((x) => ({ codigo: x.codigo, nombre: x.nombre })),
+    documentos: lista(c.documentos).map((x) => ({
+      id: x.id,
+      categoria: String(x.categoria ?? ''),
+      categoriaNombre: String(x.categoriaNombre ?? ''),
+      nombreArchivo: String(x.nombreArchivo ?? ''),
+      estado: (ESTADOS_ADICIONAL.includes(x.estado) ? x.estado : 'RECIBIDO') as EstadoAdicional,
+      motivo: x.motivo && typeof x.motivo.texto === 'string' ? x.motivo : null,
+      cargadoEn: x.cargadoEn ?? null
+    }))
+  };
+}
+
+export interface FilaAdicional {
+  id: DocumentoAdicionalUI['id'];
+  categoriaNombre: string;
+  nombreArchivo: string;
+  estado: EstadoAdicional;
+  estadoTexto: string;
+  tono: 'ok' | 'pendiente';
+  /** Motivo de la observación; solo existe cuando el documento está observado y trae motivo. */
+  nota: string | null;
+}
+
+export interface ModeloAdicionales {
+  filas: FilaAdicional[];
+  categorias: AdicionalesUI['categorias'];
+  puedeCargar: boolean;
+  maximoAlcanzado: boolean;
+  avisoMaximo: string | null;
+}
+
+const TEXTO_ESTADO_ADICIONAL: Record<EstadoAdicional, string> = { RECIBIDO: 'Recibido', VALIDADO: 'Validado', OBSERVADO: 'Observado' };
+
+/**
+ * Modelo de la tarjeta «Documentos adicionales». Devuelve null cuando no hay nada que mostrar: el servidor no envía el
+ * bloque, o el expediente está en solo lectura y no hay archivos. La carga se bloquea en solo lectura (igual que las
+ * demás filas) y al llegar al máximo.
+ */
+export function presentarAdicionales(adicionales: AdicionalesUI | null, soloLectura: boolean): ModeloAdicionales | null {
+  if (!adicionales) return null;
+  if (soloLectura && adicionales.documentos.length === 0) return null;
+  const maximoAlcanzado = adicionales.documentos.length >= adicionales.maximo;
+  return {
+    filas: adicionales.documentos.map((d) => ({
+      id: d.id,
+      categoriaNombre: d.categoriaNombre,
+      nombreArchivo: d.nombreArchivo,
+      estado: d.estado,
+      estadoTexto: TEXTO_ESTADO_ADICIONAL[d.estado],
+      tono: d.estado === 'OBSERVADO' ? 'pendiente' : 'ok',
+      nota: d.estado === 'OBSERVADO' && d.motivo?.texto ? cerrarFrase(d.motivo.texto) : null
+    })),
+    categorias: adicionales.categorias,
+    puedeCargar: !soloLectura && !maximoAlcanzado && adicionales.categorias.length > 0,
+    maximoAlcanzado,
+    avisoMaximo: maximoAlcanzado ? `Llegaste al máximo de ${adicionales.maximo} documentos adicionales.` : null
+  };
 }
 
 // --- Conteos y resumen de la sección Documentos ------------------------------------------------

@@ -28,6 +28,30 @@ export interface RequisitoUI {
   cargadoEn?: string | null;
 }
 
+export type EstadoAdicional = 'RECIBIDO' | 'VALIDADO' | 'OBSERVADO';
+
+export interface CategoriaAdicional {
+  codigo: string;
+  nombre: string;
+}
+
+export interface DocumentoAdicionalUI {
+  id: string | number;
+  categoria: string;
+  categoriaNombre: string;
+  nombreArchivo: string;
+  estado: EstadoAdicional;
+  motivo?: MotivoObservacion | null;
+  cargadoEn?: string | null;
+}
+
+/** Bloque «Documentos adicionales» de GET /api/portal/documentos (null: el postulante aún no tiene vía). */
+export interface AdicionalesUI {
+  maximo: number;
+  categorias: CategoriaAdicional[];
+  documentos: DocumentoAdicionalUI[];
+}
+
 export interface PresentacionEstadoDoc {
   etiqueta: string;
   detalle: string | null;
@@ -337,4 +361,22 @@ export function loQueSigue(p: any): LoQueSigue {
       { enlace: verEnviado, etiqueta: 'En evaluación' });
   }
   return paso('Tu asesora te va a contactar con el próximo paso', 'Si quieres adelantar, escríbele.', null, { contacto: true });
+}
+
+/** La categoría es opcional en el proxy (solo la usa ADICIONAL); si viene, debe ser un texto corto. El servidor valida el resto. */
+export function categoriaSubidaValida(categoria: unknown): boolean {
+  if (categoria === undefined || categoria === null) return true;
+  return typeof categoria === 'string' && categoria.length > 0 && categoria.length <= 64;
+}
+
+/** Cuerpo de la autorización de subida; `categoria` viaja solo cuando hay una. */
+export function armarCuerpoSubida(datos: {
+  requisito: string;
+  nombreArchivo: string;
+  tipo: string;
+  tamano: number;
+  categoria?: string | null;
+}): { requisito: string; nombreArchivo: string; tipo: string; tamano: number; categoria?: string } {
+  const { categoria, ...resto } = datos;
+  return categoria ? { ...resto, categoria } : resto;
 }
