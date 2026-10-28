@@ -1172,6 +1172,20 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
     .btn-contact--fila:focus-within { outline: 3px solid var(--portal-cobre); outline-offset: 2px; }
     .btn-contact--fila input[type="file"] { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
 
+    /* Documentos adicionales: lista de lo cargado y formulario (tipo + archivo) */
+    .adicional__archivo { display: block; font-size: 12.5px; font-weight: 400; color: var(--portal-mutado); overflow-wrap: anywhere; }
+    .adicionales-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; margin-top: 16px; }
+    .adicionales-form__campo { display: flex; flex-direction: column; gap: 4px; }
+    .adicionales-form__etiqueta { font-size: 12px; font-weight: 600; color: var(--portal-mutado); }
+    .adicionales-form__select {
+      min-height: 44px; box-sizing: border-box; max-width: 100%; padding: 8px 12px;
+      font-family: inherit; font-size: 13.5px; font-weight: 500; color: var(--portal-azul);
+      background: var(--portal-blanco); border: 1px solid var(--portal-borde); border-radius: 3px;
+    }
+    .adicionales-form__select:focus-visible { outline: 3px solid var(--portal-cobre); outline-offset: 2px; }
+    .btn-contact--fila[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+    @media (max-width: 480px) { .adicionales-form__campo, .adicionales-form__select { width: 100%; } }
+
     .exp-ayuda { margin-top: 14px; }
     .exp-ayuda summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--portal-azul); }
     .exp-ayuda summary::-webkit-details-marker { display: none; }

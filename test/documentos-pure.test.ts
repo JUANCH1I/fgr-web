@@ -4,6 +4,8 @@ import {
   cerrarFrase,
   contarDocumentos,
   formatearFechaCorta,
+  leerAdicionales,
+  presentarAdicionales,
   modelarTarjetaEstado,
   presentarFilaDocumento,
   resumirCarta,
@@ -206,4 +208,94 @@ test('tarjeta REVISADO: muestra el próximo paso solo si no contradice (no pide 
   assert.deepEqual(con.accion, { texto: 'Ver mi siguiente paso', href: '/mi-postulacion' });
   const viejo = modelarTarjetaEstado({ ...base, proximoPaso: { codigo: 'CARGAR_DOCUMENTOS', texto: 'Carga los documentos' } });
   assert.equal(viejo.accion, null);
+});
+
+// --- Documentos adicionales --------------------------------------------------------------------
+
+const CATEGORIAS = [
+  { codigo: 'CV', nombre: 'Currículum vitae' },
+  { codigo: 'CURSOS', nombre: 'Certificados de cursos o capacitaciones' },
+  { codigo: 'CONSTANCIA_LABORAL', nombre: 'Constancia o certificado laboral' },
+  { codigo: 'TRAYECTORIA_LABORAL', nombre: 'Trayectoria laboral' },
+  { codigo: 'OTRO', nombre: 'Otro documento' }
+];
+
+const adicional = (id: number, estado: string, extra: Record<string, unknown> = {}) => ({
+  id,
+  categoria: 'CV',
+  categoriaNombre: 'Currículum vitae',
+  nombreArchivo: `cv-${id}.pdf`,
+  estado,
+  motivo: null,
+  cargadoEn: '2026-10-28T12:00:00Z',
+  ...extra
+});
+
+test('adicionales: un campo ausente, nulo o inválido (backend anterior) no rompe y no muestra la tarjeta', () => {
+  assert.equal(leerAdicionales(undefined), null);
+  assert.equal(leerAdicionales(null), null);
+  assert.equal(leerAdicionales('x'), null);
+  assert.equal(presentarAdicionales(leerAdicionales(undefined), false), null);
+});
+
+test('adicionales: se conserva el orden de categorías y de documentos que manda el servidor', () => {
+  const ad = leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: [adicional(1, 'RECIBIDO'), adicional(2, 'VALIDADO')] });
+  assert.deepEqual(ad?.categorias.map((c) => c.codigo), ['CV', 'CURSOS', 'CONSTANCIA_LABORAL', 'TRAYECTORIA_LABORAL', 'OTRO']);
+  assert.deepEqual(presentarAdicionales(ad, false)?.filas.map((f) => f.nombreArchivo), ['cv-1.pdf', 'cv-2.pdf']);
+});
+
+test('adicionales: cada estado se presenta con su texto y tono; solo el observado trae nota con el motivo', () => {
+  const ad = leerAdicionales({
+    maximo: 10,
+    categorias: CATEGORIAS,
+    documentos: [
+      adicional(1, 'RECIBIDO'),
+      adicional(2, 'VALIDADO'),
+      adicional(3, 'OBSERVADO', { motivo: { codigo: 'ILEGIBLE', texto: 'No se lee la segunda página' } })
+    ]
+  });
+  const filas = presentarAdicionales(ad, false)!.filas;
+  assert.deepEqual(filas.map((f) => [f.estadoTexto, f.tono, f.nota]), [
+    ['Recibido', 'ok', null],
+    ['Validado', 'ok', null],
+    ['Observado', 'pendiente', 'No se lee la segunda página.']
+  ]);
+  assert.equal(filas[0].categoriaNombre, 'Currículum vitae');
+});
+
+test('adicionales: un observado sin motivo no inventa nota', () => {
+  const ad = leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: [adicional(1, 'OBSERVADO')] });
+  assert.equal(presentarAdicionales(ad, false)!.filas[0].nota, null);
+});
+
+test('adicionales: con cupo se puede cargar; al llegar al máximo se oculta el control y se avisa', () => {
+  const docs = (n: number) => Array.from({ length: n }, (_, i) => adicional(i + 1, 'RECIBIDO'));
+  const conCupo = presentarAdicionales(leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: docs(9) }), false)!;
+  assert.equal(conCupo.puedeCargar, true);
+  assert.equal(conCupo.maximoAlcanzado, false);
+  const lleno = presentarAdicionales(leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: docs(10) }), false)!;
+  assert.equal(lleno.puedeCargar, false);
+  assert.equal(lleno.maximoAlcanzado, true);
+  assert.equal(lleno.avisoMaximo, 'Llegaste al máximo de 10 documentos adicionales.');
+});
+
+test('adicionales: en solo lectura no se carga; sin documentos la tarjeta no aparece', () => {
+  const vacio = leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: [] });
+  assert.equal(presentarAdicionales(vacio, true), null);
+  assert.equal(presentarAdicionales(vacio, false)?.puedeCargar, true);
+  const con = presentarAdicionales(leerAdicionales({ maximo: 10, categorias: CATEGORIAS, documentos: [adicional(1, 'RECIBIDO')] }), true)!;
+  assert.equal(con.puedeCargar, false);
+  assert.equal(con.filas.length, 1);
+});
+
+test('adicionales: agregar el bloque no cambia cómo se presenta una fila de requisito', () => {
+  assert.deepEqual(presentarFilaDocumento(req('A', 'PENDIENTE'), false), {
+    estadoTexto: 'Pendiente',
+    icono: 'pendiente',
+    tono: 'pendiente',
+    opcional: false,
+    nota: null,
+    permiteSubida: true,
+    textoBoton: 'Cargar archivo'
+  });
 });

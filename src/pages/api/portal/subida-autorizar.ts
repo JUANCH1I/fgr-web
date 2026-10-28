@@ -10,7 +10,7 @@ import {
   headersRespuestaApi,
   obtenerVariableEntorno
 } from '../../../lib/fgrec-portal.ts';
-import { validarUrlSubida, deducirTipoMime } from '../../../lib/portal-pure.ts';
+import { validarUrlSubida, deducirTipoMime, armarCuerpoSubida, categoriaSubidaValida } from '../../../lib/portal-pure.ts';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const csrf = validarCsrfPortal(request);
@@ -39,8 +39,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
   }
 
-  const { requisito, nombreArchivo, tamano } = body;
-  if (!requisito || !nombreArchivo || typeof tamano !== 'number') {
+  const { requisito, nombreArchivo, tamano, categoria } = body;
+  if (!requisito || !nombreArchivo || typeof tamano !== 'number' || !categoriaSubidaValida(categoria)) {
     return new Response(JSON.stringify({ code: 'INVALID_INPUT', message: 'Datos de archivo incompletos.' }), {
       status: 400,
       headers: headersRespuestaApi()
@@ -69,7 +69,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const respuesta = await llamarFGRECPortal({
     metodo: 'POST',
     rutaRelativa: 'documentos/subida',
-    cuerpo: { requisito, nombreArchivo, tipo: tipoMime, tamano },
+    cuerpo: armarCuerpoSubida({ requisito, nombreArchivo, tipo: tipoMime, tamano, categoria }),
     sesion: sesionToken,
     contexto
   });

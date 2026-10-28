@@ -16,7 +16,9 @@ import type { RequisitoUI } from '../../lib/portal-pure.ts';
 import { leerExpediente, resumirExpediente } from '../../lib/carta-pure.ts';
 import {
   contarDocumentos,
+  leerAdicionales,
   modelarTarjetaEstado,
+  presentarAdicionales,
   presentarFilaDocumento,
   resumirCarta,
   resumirSeccionDocumentos
@@ -137,6 +139,8 @@ const tarjeta = modelarTarjetaEstado({
 const resumenDocumentos = resumirSeccionDocumentos(conteo);
 const resumenCarta = resumirCarta({ carta, soloLectura: resumen.soloLectura });
 const filas = requisitos.map((req) => ({ req, fila: presentarFilaDocumento(req, resumen.soloLectura) }));
+// Documentos adicionales (opcionales): se cargan salvo en solo lectura, igual que las demás filas
+const adicionales = presentarAdicionales(leerAdicionales(docsData.adicionales), resumen.soloLectura);
 const hayCarga = filas.some(({ fila }) => fila.permiteSubida);
 const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.observados ?? 0) + (cartaEnviadaFinal ? 0 : 1);
 ---
@@ -356,6 +360,78 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
                 </details>
               )}
             </section>
+
+            {adicionales && (
+              <section id="adicionales" class="section-card section-card--compact" aria-labelledby="adicionalesTitulo">
+                <h2 id="adicionalesTitulo" class="section-card__title">Documentos adicionales (opcional)</h2>
+                <p class="section-card__resumen">Si querés sumar más información a tu postulación, como tu currículum o certificados de cursos, elegí qué tipo de documento es y cargalo. Podés cargar varios. No son obligatorios para avanzar.</p>
+
+                <div id="listaAdicionales" class={consentimientoPendiente ? 'exp-bloqueado' : ''} inert={consentimientoPendiente}>
+                  {adicionales.filas.length > 0 && (
+                    <ul class="audit-list audit-list--table" style="list-style: none; padding: 0;">
+                      {adicionales.filas.map((fila) => (
+                        <li class="audit-list__row audit-list__row--table" data-adicional={fila.id}>
+                          <div class="audit-list__col-main">
+                            <span class={`audit-indicator ${fila.tono === 'ok' ? 'audit-indicator--ok' : 'audit-indicator--alert'}`} aria-hidden="true">
+                              {fila.tono === 'ok' ? (
+                                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                              ) : '!'}
+                            </span>
+                            <div>
+                              <h3 class="audit-list__nombre">{fila.categoriaNombre}</h3>
+                              <span class="adicional__archivo">{fila.nombreArchivo}</span>
+                            </div>
+                          </div>
+                          <div class="audit-list__col-actions">
+                            <span class={`badge-status ${fila.tono === 'ok' ? 'badge-status--ok' : 'badge-status--pending'}`}>{fila.estadoTexto}</span>
+                          </div>
+                          {fila.nota && (
+                            <div class="audit-list__nota">
+                              <p class="portal-alert portal-alert--info">{fila.nota}</p>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {adicionales.puedeCargar && (
+                    <div class="adicionales-form requisito-item">
+                      <label class="adicionales-form__campo" for="tipoAdicional">
+                        <span class="adicionales-form__etiqueta">Tipo de documento</span>
+                        <select id="tipoAdicional" class="adicionales-form__select">
+                          <option value="" selected disabled>Elegí una opción</option>
+                          {adicionales.categorias.map((c) => <option value={c.codigo}>{c.nombre}</option>)}
+                        </select>
+                      </label>
+                      <label id="btnAdicional" class="btn-contact btn-contact--fila btn-cargar-archivo" role="button" tabindex="-1" aria-disabled="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span>Cargar archivo</span>
+                        <input
+                          type="file"
+                          id="archivoAdicional"
+                          class="input-file-documento"
+                          data-requisito="ADICIONAL"
+                          accept="image/jpeg,image/png,application/pdf"
+                          aria-label="Cargar documento adicional"
+                          disabled
+                        />
+                      </label>
+                      <span class="audit-list__formato">PDF, JPG o PNG &middot; hasta 10 MB</span>
+                      <span class="estado-subida" role="status" aria-live="polite" style="display: none;"></span>
+                    </div>
+                  )}
+
+                  {adicionales.avisoMaximo && <p class="exp-vacio">{adicionales.avisoMaximo}</p>}
+                </div>
+              </section>
+            )}
           </div>
 
           <div id="panelCarta" role="tabpanel" aria-labelledby="tabBtnCarta" hidden>
@@ -396,12 +472,13 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
 </PortalLayout>
 
 <script>
-  import { validarArchivoCliente, mensajeErrorSubida } from '../../lib/portal-pure.ts';
+  import { validarArchivoCliente, mensajeErrorSubida, armarCuerpoSubida } from '../../lib/portal-pure.ts';
 
   const alertaError = document.getElementById('alertaError') as HTMLDivElement | null;
   const alertaExito = document.getElementById('alertaExito') as HTMLDivElement | null;
   const btnAceptarConsentimiento = document.getElementById('btnAceptarConsentimiento') as HTMLButtonElement | null;
   const listaRequisitos = document.getElementById('listaRequisitos') as HTMLDivElement | null;
+  const listaAdicionales = document.getElementById('listaAdicionales') as HTMLDivElement | null;
   const bloqueConsentimiento = document.getElementById('bloqueConsentimiento') as HTMLDivElement | null;
 
   function mostrarError(msg: string) {
@@ -444,9 +521,9 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
       if (res.ok) {
         mostrarExito('Consentimiento registrado con éxito. Ya puedes cargar tus documentos.');
         if (bloqueConsentimiento) bloqueConsentimiento.style.display = 'none';
-        if (listaRequisitos) {
-          listaRequisitos.classList.remove('exp-bloqueado');
-          listaRequisitos.removeAttribute('inert');
+        for (const lista of [listaRequisitos, listaAdicionales]) {
+          lista?.classList.remove('exp-bloqueado');
+          lista?.removeAttribute('inert');
         }
       } else {
         const data = await res.json();
@@ -508,6 +585,8 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
 
       let file = fileList[0];
       const requisito = target.getAttribute('data-requisito');
+      // Los adicionales comparten este flujo; solo suman la categoría elegida en el select.
+      const categoria = requisito === 'ADICIONAL' ? (document.getElementById('tipoAdicional') as HTMLSelectElement | null)?.value : undefined;
       const contenedor = target.closest('.requisito-item');
       const estadoSpan = contenedor?.querySelector('.estado-subida') as HTMLElement | null;
 
@@ -516,6 +595,12 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
         estadoSpan.textContent = texto;
         estadoSpan.style.display = texto ? 'block' : 'none';
         estadoSpan.dataset.cargando = cargando ? 'true' : 'false';
+      }
+
+      if (requisito === 'ADICIONAL' && !categoria) {
+        mostrarError('Elegí el tipo de documento antes de cargar el archivo.');
+        target.value = '';
+        return;
       }
 
       // 1. Validar en cliente
@@ -550,12 +635,13 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
             'Content-Type': 'application/json',
             'X-FGREC-Portal': '1'
           },
-          body: JSON.stringify({
-            requisito,
+          body: JSON.stringify(armarCuerpoSubida({
+            requisito: requisito ?? '',
             nombreArchivo: file.name,
             tipo: validacion.tipoMime || file.type,
-            tamano: file.size
-          })
+            tamano: file.size,
+            categoria
+          }))
         });
 
         if (authRes.status === 401) {
@@ -690,6 +776,17 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
       const foco = destino.querySelector<HTMLElement>('.btn-cargar-archivo, #cartaTexto, #btnAceptarConsentimiento') ?? destino;
       foco.focus({ preventScroll: true });
     });
+  });
+
+  // El botón de adicionales se habilita al elegir el tipo de documento.
+  const tipoAdicional = document.getElementById('tipoAdicional') as HTMLSelectElement | null;
+  const archivoAdicional = document.getElementById('archivoAdicional') as HTMLInputElement | null;
+  const btnAdicional = document.getElementById('btnAdicional');
+  tipoAdicional?.addEventListener('change', () => {
+    const habilitado = Boolean(tipoAdicional.value);
+    if (archivoAdicional) archivoAdicional.disabled = !habilitado;
+    btnAdicional?.setAttribute('aria-disabled', String(!habilitado));
+    btnAdicional?.setAttribute('tabindex', habilitado ? '0' : '-1');
   });
 
   document.querySelectorAll<HTMLLabelElement>('.btn-cargar-archivo').forEach((label) => {
