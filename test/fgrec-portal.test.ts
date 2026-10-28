@@ -111,3 +111,21 @@ test('llamarFGRECPortal sin variables de entorno devuelve 503 sin fallbacks hard
     if (urlPrev) process.env.FGREC_PORTAL_URL = urlPrev;
   }
 });
+
+test('destinoDelEnlace: la vista de Dirección entra sin código; el precalificador va directo; el resto pide el código', async () => {
+  const { destinoDelEnlace } = await import('../src/lib/fgrec-portal.ts');
+  assert.equal(destinoDelEnlace('vista'), '/mi-postulacion');
+  assert.equal(destinoDelEnlace('precalificador'), '/mi-postulacion/precalificador');
+  for (const proposito of ['documentos', 'carta', 'convenio', 'inicio', '', undefined]) {
+    assert.equal(destinoDelEnlace(proposito), '/mi-postulacion/codigo', String(proposito));
+  }
+});
+
+test('borrarSesionYContacto también borra la marca de la vista de Dirección', async () => {
+  const { borrarSesionYContacto, COOKIE_VISTA_NOMBRE } = await import('../src/lib/fgrec-portal.ts');
+  const borradas: string[] = [];
+  borrarSesionYContacto({ delete: (nombre: string) => borradas.push(nombre), set: () => {} });
+  assert.ok(borradas.includes(COOKIE_SESION_NOMBRE));
+  assert.ok(borradas.includes(COOKIE_VISTA_NOMBRE));
+  assert.equal(COOKIE_VISTA_NOMBRE, '__Host-fgrec_vista');
+});

@@ -6,7 +6,8 @@ import {
   obtenerVariableEntorno,
   llamarFGRECPortal,
   extraerContextoVisitante,
-  COOKIE_SESION_NOMBRE
+  COOKIE_SESION_NOMBRE,
+  COOKIE_VISTA_NOMBRE
 } from '../lib/fgrec-portal.ts';
 import { leerDatos, datosFaltantes } from '../lib/datos-pure.ts';
 
@@ -22,6 +23,9 @@ const {
   autenticado = false,
   pendientes = {}
 } = Astro.props;
+
+// Vista de Dirección (integracion-web.md §4.8): el aviso. Las escrituras las rechaza FGREC, no esta marca.
+const vistaDireccion = autenticado && Astro.cookies.has(COOKIE_VISTA_NOMBRE);
 
 const contadores = {
   expediente: pendientes.expediente,
@@ -997,6 +1001,16 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
       margin-bottom: -1px;
       transition: color 0.15s ease, border-color 0.15s ease;
     }
+    .portal-vista-direccion {
+      margin: 0 0 1.25rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--portal-cobre);
+      border-left-width: 4px;
+      border-radius: 8px;
+      color: var(--portal-azul);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
     .exp-solapa:hover {
       color: var(--portal-azul);
     }
@@ -1364,6 +1378,11 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
 
     <div class="portal-shell__contenido">
       <main class="portal-container portal-container--shell">
+        {vistaDireccion && (
+          <p class="portal-vista-direccion" role="status">
+            <strong>Vista de Dirección, solo lectura.</strong> Ves el portal tal como lo ve el postulante; no se puede modificar nada.
+          </p>
+        )}
         <slot />
       </main>
     </div>

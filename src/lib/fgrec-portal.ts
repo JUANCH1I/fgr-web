@@ -6,6 +6,21 @@ import { firmarLlamadaFGREC, sanearValorCabecera } from './firma-fgrec.ts';
 
 export const COOKIE_SESION_NOMBRE = '__Host-fgrec_sesion';
 export const COOKIE_CONTACTO_NOMBRE = '__Host-fgrec_contacto_pendiente';
+/**
+ * Marca de la vista de Dirección (solo lectura, integracion-web.md §4.8). Solo decide el aviso en pantalla:
+ * el bloqueo de las escrituras lo hace FGREC (403 READ_ONLY), no el sitio.
+ */
+export const COOKIE_VISTA_NOMBRE = '__Host-fgrec_vista';
+
+/**
+ * Adónde va el visitante después de canjear un enlace: la vista de Dirección ya es de nivel 2 y entra sin código
+ * (pedirlo le mandaría un correo al postulante); el precalificador funciona con nivel 1; el resto pide el código.
+ */
+export function destinoDelEnlace(proposito?: string | null): string {
+  if (proposito === 'vista') return '/mi-postulacion';
+  if (proposito === 'precalificador') return '/mi-postulacion/precalificador';
+  return '/mi-postulacion/codigo';
+}
 
 /**
  * Calcula maxAge en segundos desde una fecha ISO devuelta por FGREC.
@@ -58,6 +73,7 @@ export function borrarCookieSegura(cookies: { delete: (name: string, opts: any) 
 export function borrarSesionYContacto(cookies: { delete: (name: string, opts: any) => void; set: (name: string, val: string, opts: any) => void }): void {
   borrarCookieSegura(cookies, COOKIE_SESION_NOMBRE);
   borrarCookieSegura(cookies, COOKIE_CONTACTO_NOMBRE);
+  borrarCookieSegura(cookies, COOKIE_VISTA_NOMBRE);
 }
 
 /**
