@@ -8,7 +8,10 @@ import {
   COOKIE_SESION_NOMBRE,
   opcionesCookieSegura,
   maxAgeDesdeIso,
-  obtenerVariableEntorno
+  obtenerVariableEntorno,
+  COOKIE_VISTA_NOMBRE,
+  borrarCookieSegura,
+  destinoDelEnlace
 } from '../../lib/fgrec-portal.ts';
 
 const token = Astro.url.searchParams.get('t')?.trim();
@@ -49,10 +52,18 @@ if (!respuesta.ok || !respuesta.data) {
   // Vigencia de la cookie atada a la expiración del enlace devuelta por FGREC
   const maxAge = maxAgeDesdeIso(expira, 24 * 60 * 60);
   Astro.cookies.set(COOKIE_SESION_NOMBRE, sesion, opcionesCookieSegura(maxAge));
+  const destino = destinoDelEnlace(proposito);
 
-  if (proposito === 'precalificador') {
+  // Vista de Dirección (§4.8): sesión de nivel 2 y solo lectura. Nunca se pide el código: le llegaría a ella.
+  if (proposito === 'vista') {
+    Astro.cookies.set(COOKIE_VISTA_NOMBRE, '1', opcionesCookieSegura(maxAge));
+    return Astro.redirect(destino, 302);
+  }
+  borrarCookieSegura(Astro.cookies, COOKIE_VISTA_NOMBRE);
+
+  if (destino !== '/mi-postulacion/codigo') {
     // Nivel 1 permite usar el precalificador directamente
-    return Astro.redirect('/mi-postulacion/precalificador', 302);
+    return Astro.redirect(destino, 302);
   }
 
   // Si el propósito requiere nivel 2 (documentos o carta), solicitamos el código
@@ -64,7 +75,7 @@ if (!respuesta.ok || !respuesta.data) {
     contexto
   });
 
-  return Astro.redirect('/mi-postulacion/codigo', 302);
+  return Astro.redirect(destino, 302);
 }
 
 const whatsappNumero = obtenerVariableEntorno('FGREC_WHATSAPP_NUMERO').replace(/[^\d+]/g, '');
