@@ -54,7 +54,12 @@ const unavailable = context ? registrationUnavailable(context) : null;
       <section class="portal-card payment-report" aria-labelledby="payment-report-title">
         <p class="antetitulo">Comprobante de pago</p>
         <h2 id="payment-report-title">Enviar un comprobante</h2>
-        {unavailable ? <div class="portal-alert portal-alert--info">{unavailable}</div> : (
+        {unavailable ? (
+          <div class="portal-alert portal-alert--info">
+            {unavailable}
+            {context.requiereConvenio && <> <a href="/mi-postulacion/convenio" class="enlace-flecha">Ver mi convenio</a></>}
+          </div>
+        ) : (
           <>
             <p class="payment-help">Sube el comprobante del pago que realizaste. El equipo de FGREC revisará el comprobante y completará los datos del pago antes de confirmarlo.</p>
             <noscript><p class="portal-alert portal-alert--info">Activa JavaScript para informar tu pago y enviar el comprobante de forma segura.</p></noscript>

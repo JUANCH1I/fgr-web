@@ -25,16 +25,23 @@ test('receipt metadata accepts only supported MIME types and bounded sizes', () 
 });
 
 test('public context exposes only payments, eligibility and size limit', () => {
-  const context: any = { pagos: [{ id: 1, cotizacion: 'Q-1', estado: 'REGISTRADO', estadoTexto: 'Pendiente de revisión', importeCentavos: 12345, moneda: 'USD', fechaPago: '2026-10-10', referencia: 'OP-123', medioPago: 'Transferencia', registradoEn: '2026-10-10', comprobanteRecibido: true, motivo: 'INTERNAL', fee: 999, staff: 'Private' }], cotizaciones: [{ id: 1, codigo: 'Q-1', neto: 99 }], medios: [{ id: 2, nombre: 'Transferencia', moneda: 'USD', comision: 1 }], cuentas: [{ id: 3, nombre: 'Cuenta', banco: 'Banco', moneda: 'USD', numero: 'private' }], puedeRegistrar: true, maxBytes: 999999999, margen: 99 };
+  const context: any = { pagos: [{ id: 1, cotizacion: 'Q-1', estado: 'REGISTRADO', estadoTexto: 'Pendiente de revisión', importeCentavos: 12345, moneda: 'USD', fechaPago: '2026-10-10', referencia: 'OP-123', medioPago: 'Transferencia', registradoEn: '2026-10-10', comprobanteRecibido: true, motivo: 'INTERNAL', fee: 999, staff: 'Private' }], cotizaciones: [{ id: 1, codigo: 'Q-1', neto: 99 }], medios: [{ id: 2, nombre: 'Transferencia', moneda: 'USD', comision: 1 }], cuentas: [{ id: 3, nombre: 'Cuenta', banco: 'Banco', moneda: 'USD', numero: 'private' }], puedeRegistrar: true, requiereConvenio: false, maxBytes: 999999999, margen: 99 };
   const result = publicPaymentContext(context);
   assert.equal(result.pagos[0].motivo, null);
   assert.equal(result.maxBytes, 10485760);
-  assert.deepEqual(Object.keys(result).sort(), ['maxBytes', 'pagos', 'puedeRegistrar']);
+  assert.deepEqual(Object.keys(result).sort(), ['maxBytes', 'pagos', 'puedeRegistrar', 'requiereConvenio']);
   for (const secret of ['INTERNAL', 'Private', 'fee', 'staff', 'neto', 'comision', 'numero', 'margen']) assert.equal(JSON.stringify(result).includes(secret), false, secret);
   context.pagos[0].estado = 'RECHAZADO'; context.pagos[0].motivo = 'No fue posible validar el comprobante.';
   assert.equal(publicPaymentContext(context).pagos[0].motivo, context.pagos[0].motivo);
   assert.equal(registrationUnavailable(result), null);
   assert.match(registrationUnavailable({ ...result, puedeRegistrar: false })!, /no está disponible/);
+});
+
+test('without an accepted convenio the page asks to accept it before reporting a payment', () => {
+  const result = publicPaymentContext({ pagos: [], puedeRegistrar: false, requiereConvenio: true, maxBytes: 10485760 } as any);
+  assert.equal(result.requiereConvenio, true);
+  assert.equal(registrationUnavailable(result), 'Antes de informar tu pago tienes que aceptar tu convenio de corresponsabilidad.');
+  assert.equal(publicPaymentContext({ pagos: [], puedeRegistrar: false, maxBytes: 10485760 } as any).requiereConvenio, false, 'an older backend without the field');
 });
 
 test('formatPaymentDate muestra dd/mm/aaaa sin mover el día', () => {
