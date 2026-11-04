@@ -14,13 +14,24 @@ export const COOKIE_VISTA_NOMBRE = '__Host-fgrec_vista';
 
 /**
  * Adónde va el visitante después de canjear un enlace: la vista de Dirección ya es de nivel 2 y entra sin código
- * (pedirlo le mandaría un correo al postulante); el precalificador funciona con nivel 1; el resto pide el código.
+ * (pedirlo le mandaría un correo al postulante); el precalificador funciona con nivel 1; el resto pide el código, salvo que
+ * FGREC haya conservado la sesión ya verificada del navegador (nivel 2): entonces va directo, como después del código.
  */
-export function destinoDelEnlace(proposito?: string | null): string {
+export function destinoDelEnlace(proposito?: string | null, nivel?: number | null): string {
   if (proposito === 'vista') return '/mi-postulacion';
   if (proposito === 'precalificador') return '/mi-postulacion/precalificador';
-  return '/mi-postulacion/codigo';
+  if (nivel !== 2) return '/mi-postulacion/codigo';
+  if (proposito === 'documentos') return '/mi-postulacion/documentos';
+  if (proposito === 'carta') return '/mi-postulacion/documentos#carta';
+  if (proposito === 'convenio') return '/mi-postulacion/convenio';
+  return '/mi-postulacion';
 }
+
+/**
+ * La cookie de sesión del postulante dura el máximo que admite el navegador (400 días). FGREC decide si la sesión sigue
+ * viva y corre su vencimiento 14 días con cada uso; una cookie atada al primer vencimiento se borraría antes. Un 401 la borra.
+ */
+export const MAX_AGE_COOKIE_SESION = 400 * 24 * 60 * 60;
 
 /**
  * Calcula maxAge en segundos desde una fecha ISO devuelta por FGREC.

@@ -9,6 +9,7 @@ import {
   interpretarErrorConvenio,
   leerConvenio,
   mensajeCodigoEnviado,
+  mensajeCodigoPendiente,
   prepararCuerpoAceptacion,
   prepararCuerpoCodigo,
   segundosParaReenvio,
@@ -287,4 +288,26 @@ test('ruta del sitio del código: misma cadena de proxy que la aceptación', () 
   assert.match(rutaCodigo, /export const prerender = false/);
   assert.match(rutaCodigo, /manejarCodigoConvenio\(\{ request, cookies \}\)/);
   assert.match(rutaCodigo, /export const POST/);
+});
+
+test('leerConvenio: el código ya enviado y vigente se conserva para retomar el paso; si falta o viene raro, null', () => {
+  const pendiente = { enviadoA: 'a***@e***.com', expira: '2026-11-04T21:05:00.000Z' };
+  assert.deepEqual(leerConvenio(respuesta({ clickwrap: CLICKWRAP, codigoPendiente: pendiente })).codigoPendiente, pendiente);
+  assert.equal(leerConvenio(respuesta({ clickwrap: CLICKWRAP, codigoPendiente: null })).codigoPendiente, null);
+  assert.equal(leerConvenio(respuesta({ clickwrap: CLICKWRAP })).codigoPendiente, null);
+  assert.equal(leerConvenio(respuesta({ clickwrap: CLICKWRAP, codigoPendiente: { enviadoA: 5, expira: 'x' } })).codigoPendiente, null);
+  assert.equal(leerConvenio(respuesta({ codigoPendiente: pendiente })).codigoPendiente, null, 'sin clickwrap no hay código');
+});
+
+test('mensajeCodigoPendiente: dice que el código ya se envió y que se escribe abajo, sin pedir otro', () => {
+  const m = mensajeCodigoPendiente('a***@e***.com');
+  assert.match(m, /Ya te enviamos un código a a\*\*\*@e\*\*\*\.com/);
+  assert.match(m, /Escríbelo abajo/);
+  assert.match(mensajeCodigoPendiente(undefined), /Ya te enviamos un código a tu correo/);
+});
+
+test('la pantalla retoma el código ya pedido: abre en el paso del código con las casillas marcadas, sin pedir otro', () => {
+  assert.match(page, /data-codigo-pendiente=\{convenio\.codigoPendiente\?\.enviadoA \?\? undefined\}/);
+  assert.match(page, /if \(clickwrap\.dataset\.codigoPendiente !== undefined\) \{[^}]*medios\.checked = true;[^}]*contrato\.checked = true;[^}]*mostrarPasoCodigo\(mensajeCodigoPendiente\(clickwrap\.dataset\.codigoPendiente\)\);\s*iniciarCuenta\(\);/, 'el reenvío se habilita: si el código venció, puede pedir otro');
+  assert.match(page, /mostrarPasoCodigo\(mensajeCodigoEnviado\(datos\.enviadoA\)\)/, 'pedirlo usa el mismo paso');
 });

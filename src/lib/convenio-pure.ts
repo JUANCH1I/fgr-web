@@ -61,6 +61,8 @@ export interface ConvenioUI {
   nombreArchivo: string | null;
   /** Presente solo si el convenio se acepta con dos consentimientos y un código; `null` es el flujo de una casilla. */
   clickwrap: ClickwrapUI | null;
+  /** Código del convenio ya enviado a esta sesión y todavía vigente: la pantalla abre en el paso de escribirlo. */
+  codigoPendiente: { enviadoA: string; expira: string } | null;
 }
 
 const ESTADOS: readonly string[] = ['SIN_GENERAR', 'GENERADO', 'ACEPTADO', 'NO_APLICA'];
@@ -71,7 +73,7 @@ const esHash = (v: unknown): v is string => typeof v === 'string' && /^[0-9a-f]{
 export function leerConvenio(data: any): ConvenioUI {
   const vacio: ConvenioUI = {
     estado: 'SIN_GENERAR', version: null, titulo: 'Convenio de Corresponsabilidad', textoEnBorrador: false, aceptadoEn: null,
-    puedeAceptar: false, declaracion: DECLARACION_ACEPTACION, resumen: null, sha256: null, nombreArchivo: null, clickwrap: null
+    puedeAceptar: false, declaracion: DECLARACION_ACEPTACION, resumen: null, sha256: null, nombreArchivo: null, clickwrap: null, codigoPendiente: null
   };
   if (!data || typeof data !== 'object' || !ESTADOS.includes(data.estado)) return vacio;
   if (data.estado === 'NO_APLICA') return { ...vacio, estado: 'NO_APLICA' };
@@ -114,7 +116,8 @@ export function leerConvenio(data: any): ConvenioUI {
     },
     sha256: data.pdf.sha256,
     nombreArchivo: typeof data.pdf.nombreArchivo === 'string' ? data.pdf.nombreArchivo : null,
-    clickwrap: data.estado === 'GENERADO' ? clickwrap : null
+    clickwrap: data.estado === 'GENERADO' ? clickwrap : null,
+    codigoPendiente: data.estado === 'GENERADO' && clickwrap !== null ? leerCodigoPendiente(data.codigoPendiente) : null
   };
 }
 
@@ -185,6 +188,16 @@ export function prepararCuerpoCodigo(body: any):
 export function segundosParaReenvio(pedidoEnMs: number, ahoraMs: number, espera = ESPERA_REENVIO_SEGUNDOS): number {
   const transcurrido = Math.max(0, ahoraMs - pedidoEnMs);
   return Math.max(0, Math.ceil(espera - transcurrido / 1000));
+}
+
+function leerCodigoPendiente(p: any): ConvenioUI['codigoPendiente'] {
+  return p && esTexto(p.enviadoA) && esTexto(p.expira) ? { enviadoA: p.enviadoA, expira: p.expira } : null;
+}
+
+/** Al volver a la pantalla con un código ya enviado: se escribe ese, no se pide otro. */
+export function mensajeCodigoPendiente(enviadoA: unknown): string {
+  const destino = esTexto(enviadoA) ? enviadoA : 'tu correo';
+  return `Ya te enviamos un código a ${destino}. Escríbelo abajo; si no lo encuentras o venció, pide otro con «Reenviar código».`;
 }
 
 export function mensajeCodigoEnviado(enviadoA: unknown): string {

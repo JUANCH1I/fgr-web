@@ -8,6 +8,7 @@ import {
   COOKIE_SESION_NOMBRE,
   opcionesCookieSegura,
   maxAgeDesdeIso,
+  MAX_AGE_COOKIE_SESION,
   obtenerVariableEntorno,
   COOKIE_VISTA_NOMBRE,
   borrarCookieSegura,
@@ -22,11 +23,13 @@ if (!token) {
 
 const contexto = extraerContextoVisitante(Astro.request);
 
-// Canjear el token en FGREC
+// Canjear el token en FGREC. Con la sesión del navegador: si ya está verificada para este postulante, FGREC la conserva
+// (volver al correo y tocar el enlace otra vez no deshace el código).
 const respuesta = await llamarFGRECPortal({
   metodo: 'POST',
   rutaRelativa: 'acceso/enlace',
   cuerpo: { token },
+  sesion: Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value,
   contexto
 });
 
@@ -47,12 +50,12 @@ if (!respuesta.ok || !respuesta.data) {
     mensajeError = 'El servicio no está disponible; intenta de nuevo en unos minutos o contáctanos por WhatsApp.';
   }
 } else {
-  const { sesion, proposito, expira } = respuesta.data;
+  const { sesion, proposito, expira, nivel } = respuesta.data;
 
-  // Vigencia de la cookie atada a la expiración del enlace devuelta por FGREC
-  const maxAge = maxAgeDesdeIso(expira, 24 * 60 * 60);
+  // La vista de Dirección vence a los 30 minutos fijos; la sesión del postulante se corre con cada uso en FGREC.
+  const maxAge = proposito === 'vista' ? maxAgeDesdeIso(expira, 24 * 60 * 60) : MAX_AGE_COOKIE_SESION;
   Astro.cookies.set(COOKIE_SESION_NOMBRE, sesion, opcionesCookieSegura(maxAge));
-  const destino = destinoDelEnlace(proposito);
+  const destino = destinoDelEnlace(proposito, nivel);
 
   // Vista de Dirección (§4.8): sesión de nivel 2 y solo lectura. Nunca se pide el código: le llegaría a ella.
   if (proposito === 'vista') {

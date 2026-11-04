@@ -10,7 +10,7 @@ import {
   opcionesCookieSegura,
   borrarCookieSegura,
   borrarSesionYContacto,
-  maxAgeDesdeIso,
+  MAX_AGE_COOKIE_SESION,
   headersRespuestaApi
 } from '../../../lib/fgrec-portal.ts';
 
@@ -67,9 +67,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   if (respuesta.ok && respuesta.data?.sesion) {
-    // Usar la expiración devuelta por FGREC para la cookie de sesión nivel 2
-    const maxAge = maxAgeDesdeIso(respuesta.data.expira, 7 * 24 * 60 * 60);
-    cookies.set(COOKIE_SESION_NOMBRE, respuesta.data.sesion, opcionesCookieSegura(maxAge));
+    cookies.set(COOKIE_SESION_NOMBRE, respuesta.data.sesion, opcionesCookieSegura(MAX_AGE_COOKIE_SESION));
 
     // Borrado seguro de la cookie de contacto con las banderas completas
     borrarCookieSegura(cookies, COOKIE_CONTACTO_NOMBRE);
