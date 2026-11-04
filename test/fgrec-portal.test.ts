@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import {
   extraerIpVisitante,
   validarCsrfPortal,
@@ -118,7 +119,24 @@ test('destinoDelEnlace: la vista de Dirección entra sin código; el precalifica
   assert.equal(destinoDelEnlace('precalificador'), '/mi-postulacion/precalificador');
   for (const proposito of ['documentos', 'carta', 'convenio', 'inicio', '', undefined]) {
     assert.equal(destinoDelEnlace(proposito), '/mi-postulacion/codigo', String(proposito));
+    assert.equal(destinoDelEnlace(proposito, 1), '/mi-postulacion/codigo', `${String(proposito)} nivel 1`);
   }
+});
+
+test('destinoDelEnlace: con la sesión verificada que FGREC conservó (nivel 2) va directo al destino, sin código', async () => {
+  const { destinoDelEnlace } = await import('../src/lib/fgrec-portal.ts');
+  assert.equal(destinoDelEnlace('convenio', 2), '/mi-postulacion/convenio');
+  assert.equal(destinoDelEnlace('documentos', 2), '/mi-postulacion/documentos');
+  assert.equal(destinoDelEnlace('carta', 2), '/mi-postulacion/documentos#carta');
+  assert.equal(destinoDelEnlace('precalificador', 2), '/mi-postulacion/precalificador');
+  assert.equal(destinoDelEnlace('inicio', 2), '/mi-postulacion');
+});
+
+test('entrar manda la sesión del navegador al canjear el enlace y elige el destino con el nivel devuelto', async () => {
+  const pagina = await readFile(new URL('../src/pages/mi-postulacion/entrar.astro', import.meta.url), 'utf8');
+  const canje = pagina.slice(pagina.indexOf("rutaRelativa: 'acceso/enlace'") - 80, pagina.indexOf('let errorEnlace'));
+  assert.match(canje, /sesion: Astro\.cookies\.get\(COOKIE_SESION_NOMBRE\)\?\.value/);
+  assert.match(pagina, /destinoDelEnlace\(proposito, nivel\)/);
 });
 
 test('borrarSesionYContacto también borra la marca de la vista de Dirección', async () => {

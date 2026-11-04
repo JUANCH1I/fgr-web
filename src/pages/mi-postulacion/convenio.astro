@@ -152,7 +152,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
             </form>
           )}
           {pendiente && aceptacion && convenio.clickwrap && (
-            <form id="formClickwrap" class="convenio__aceptar" novalidate data-ruta-codigo={RUTA_CODIGO_CONVENIO} data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256}>
+            <form id="formClickwrap" class="convenio__aceptar" novalidate data-ruta-codigo={RUTA_CODIGO_CONVENIO} data-ruta={RUTA_ACEPTAR_CONVENIO} data-version={String(aceptacion.version)} data-sha256={aceptacion.sha256} data-codigo-pendiente={convenio.codigoPendiente?.enviadoA ?? undefined}>
               <div id="clickwrapAlerta" class="portal-alert portal-alert--error" style="display: none; margin-bottom: 14px;" role="alert"></div>
               <div class="portal-alert portal-alert--info" style="margin-bottom: 14px;" role="note">
                 <span>{convenio.clickwrap.avisoElectronico}</span>
@@ -238,6 +238,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
     esCodigo,
     interpretarErrorConvenio,
     mensajeCodigoEnviado,
+    mensajeCodigoPendiente,
     segundosParaReenvio,
     validarConsentimientos,
     ESPERA_REENVIO_SEGUNDOS,
@@ -387,6 +388,18 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
       return { res, datos };
     };
 
+    // Las casillas quedan fijas: el código se pidió con ellas marcadas.
+    const mostrarPasoCodigo = (mensaje: string) => {
+      medios.disabled = true;
+      contrato.disabled = true;
+      btnEnviar.style.display = 'none';
+      porId<HTMLElement>('ayudaCodigo').hidden = true;
+      enviado.textContent = mensaje;
+      paso.hidden = false;
+      entrada.value = '';
+      entrada.focus();
+    };
+
     const pedirCodigo = async () => {
       const consentimientos = validarConsentimientos({ medios: medios.checked, convenio: contrato.checked });
       if (!consentimientos.ok) { mostrar(consentimientos.message); return; }
@@ -397,15 +410,7 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
       try {
         const { res, datos } = await enviarJson(rutaCodigo, cuerpoClickwrap(version, sha256));
         if (res.ok) {
-          // Las casillas quedan fijas: el código se pidió con ellas marcadas.
-          medios.disabled = true;
-          contrato.disabled = true;
-          btnEnviar.style.display = 'none';
-          porId<HTMLElement>('ayudaCodigo').hidden = true;
-          enviado.textContent = mensajeCodigoEnviado(datos.enviadoA);
-          paso.hidden = false;
-          entrada.value = '';
-          entrada.focus();
+          mostrarPasoCodigo(mensajeCodigoEnviado(datos.enviadoA));
           ocupado = false;
           iniciarCuenta();
         } else {
@@ -428,6 +433,15 @@ const fechaAceptacion = formatearFechaConvenio(convenio.aceptadoEn);
     });
     btnEnviar.addEventListener('click', pedirCodigo);
     btnReenviar.addEventListener('click', pedirCodigo);
+
+    // Volvió a la pantalla (desde el correo o con la página recargada) con un código vigente: se escribe ese, no se pide otro.
+    if (clickwrap.dataset.codigoPendiente !== undefined) {
+      medios.checked = true;
+      contrato.checked = true;
+      mostrarPasoCodigo(mensajeCodigoPendiente(clickwrap.dataset.codigoPendiente));
+      iniciarCuenta(); // «Reenviar» se habilita a los 60 s, como después de pedirlo: si venció, pide otro desde aquí.
+      actualizar();
+    }
 
     clickwrap.addEventListener('submit', async (evento) => {
       evento.preventDefault();
