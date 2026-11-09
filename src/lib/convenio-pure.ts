@@ -21,6 +21,8 @@ export type EstadoConvenio = 'SIN_GENERAR' | 'GENERADO' | 'ACEPTADO' | 'NO_APLIC
 interface Dinero {
   cents: number;
   formatted: string;
+  /** '$U' en un convenio con precio fijo en pesos (Uruguay); sin símbolo, el importe está en USD. */
+  symbol?: string;
 }
 
 export interface ResumenConvenio {
@@ -207,7 +209,7 @@ export function mensajeCodigoEnviado(enviadoA: unknown): string {
 
 /** Las filas del resumen, en el orden en que se leen. Los importes ya vienen formateados por FGREC. */
 export function filasResumen(resumen: ResumenConvenio): Array<{ etiqueta: string; valor: string; destacado?: boolean }> {
-  const usd = (d: Dinero) => `USD ${d.formatted}`;
+  const usd = (d: Dinero) => `${typeof d.symbol === 'string' && d.symbol ? d.symbol : 'USD'} ${d.formatted}`;
   return [
     { etiqueta: 'Persona beneficiaria', valor: resumen.beneficiario },
     { etiqueta: 'País de residencia', valor: resumen.pais },

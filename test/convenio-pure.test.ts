@@ -172,3 +172,14 @@ test('cabecerasPdf: privado, no se guarda, se embebe solo desde el propio sitio 
   assert.equal(cabecerasPdf({ nombreArchivo: 'a.pdf', sha256: HASH, descargar: true })['Content-Disposition'], 'attachment; filename="a.pdf"');
   assert.equal('X-Content-SHA256' in cabecerasPdf({ nombreArchivo: 'a.pdf', sha256: '', descargar: false }), false);
 });
+
+test('filasResumen: un convenio con precio en pesos muestra el símbolo que manda FGREC, nunca USD', () => {
+  const pesos = (cents: number, formatted: string) => ({ cents, formatted, symbol: '$U' });
+  const resumen = leerConvenio(respuestaFGREC({})).resumen!;
+  const filas = filasResumen({ ...resumen, pvp: pesos(1610000, '16.100'), valorMensualPais: pesos(1403000, '14.030'), total: pesos(63975100, '639.751'), resumenPagos: '52 cuotas de $U 12.071 y una última de $U 12.059' });
+  const por = Object.fromEntries(filas.map((f) => [f.etiqueta, f]));
+  assert.equal(por['PVP Internacional UGR'].valor, '$U 16.100 mensuales');
+  assert.equal(por['Valor mensual para Uruguay'].valor, '$U 14.030 mensuales');
+  assert.equal(por['Total del plan'].valor, '$U 639.751');
+  assert.ok(!filas.some((f) => f.valor.includes('USD')));
+});
