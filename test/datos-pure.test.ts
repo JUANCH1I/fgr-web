@@ -4,6 +4,7 @@ import {
   leerDatos,
   datosFaltantes,
   construirCambios,
+  campoEditable,
   prepararCuerpoDatos,
   prepararCuerpoNombre,
   mensajeErrorDatos
@@ -11,7 +12,11 @@ import {
 
 test('leerDatos: los null llegan como texto vacío y documentoEditable solo es true si FGREC lo dice', () => {
   const d = leerDatos({ nombre: 'Ana', apellido: null, email: 'a@x.ec', telefono: null, documento: null, documentoEditable: true });
-  assert.deepEqual(d, { nombre: 'Ana', apellido: '', email: 'a@x.ec', telefono: '', documento: '', documentoEditable: true });
+  assert.deepEqual(d, {
+    nombre: 'Ana', apellido: '', email: 'a@x.ec', telefono: '', documento: '', documentoEditable: true,
+    fechaNacimiento: '', nacionalidad: '', paisResidencia: '', calle: '', numero: '', piso: '', depto: '', codigoPostal: '',
+    paises: [], datosEditables: false
+  });
   assert.equal(leerDatos({}).documentoEditable, false);
   assert.equal(leerDatos(null).nombre, '');
 });
@@ -27,10 +32,16 @@ test('construirCambios: con el documento bloqueado nunca viaja el número', () =
   assert.deepEqual(construirCambios({ documento: '0912345678' }, { documento: '0000' }, false), {});
 });
 
-test('prepararCuerpoDatos: exige el documento, valida lo mínimo y descarta claves ajenas (la fecha de nacimiento ya no viaja)', () => {
-  assert.deepEqual(prepararCuerpoDatos({ documento: ' 0912345678 ', pais: 'EC', fechaNacimiento: '1990-05-01' }), { ok: true, cuerpo: { documento: '0912345678' } });
-  const soloFecha = prepararCuerpoDatos({ fechaNacimiento: '1990-05-01' });
-  assert.equal(soloFecha.ok === false && soloFecha.field, 'datos');
+test('prepararCuerpoDatos: acepta cualquier subconjunto no vacío de campos conocidos, recorta y descarta claves ajenas', () => {
+  assert.deepEqual(prepararCuerpoDatos({ documento: ' 0912345678 ', pais: 'EC', fechaNacimiento: '1990-05-01' }), { ok: true, cuerpo: { documento: '0912345678', fechaNacimiento: '1990-05-01' } });
+  assert.deepEqual(prepararCuerpoDatos({ fechaNacimiento: '1990-05-01' }), { ok: true, cuerpo: { fechaNacimiento: '1990-05-01' } });
+  assert.deepEqual(prepararCuerpoDatos({ calle: ' Av. Amazonas ', piso: '' }), { ok: true, cuerpo: { calle: 'Av. Amazonas' } });
+  const soloAjena = prepararCuerpoDatos({ pais: 'EC' });
+  assert.equal(soloAjena.ok === false && soloAjena.field, 'datos');
+  const noTexto = prepararCuerpoDatos({ calle: 5 });
+  assert.equal(noTexto.ok === false && noTexto.field, 'calle');
+  const calleLarga = prepararCuerpoDatos({ calle: 'x'.repeat(121) });
+  assert.equal(calleLarga.ok === false && calleLarga.field, 'calle');
   const vacio = prepararCuerpoDatos({});
   assert.equal(vacio.ok, false);
   const largo = prepararCuerpoDatos({ documento: 'x'.repeat(41) });
@@ -62,9 +73,32 @@ test('mensajeErrorDatos: el campo y el texto salen del error de FGREC; 409 y 5xx
   assert.deepEqual(mensajeErrorDatos(429, { code: 'TOO_MANY_ATTEMPTS', field: 'documento', message: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' }),
     { campo: 'documento', mensaje: 'Probaste varios números de documento. Vuelve a intentarlo mañana o escríbele a tu asesora.' });
   assert.match(mensajeErrorDatos(503, null).mensaje, /no está disponible/);
+  // New fields: the message goes next to the field; a lock on a filled field too.
+  assert.deepEqual(mensajeErrorDatos(400, { code: 'INVALID_INPUT', field: 'fechaNacimiento', message: 'Fecha no válida.' }), { campo: 'fechaNacimiento', mensaje: 'Fecha no válida.' });
+  assert.deepEqual(mensajeErrorDatos(409, { code: 'DATA_LOCKED', field: 'calle', message: 'Tu expediente ya fue aprobado.' }), { campo: 'calle', mensaje: 'Tu expediente ya fue aprobado.' });
+  assert.equal(mensajeErrorDatos(409, { code: 'DATA_LOCKED' }).campo, null);
+});
+
+test('construirCambios con los datos nuevos: solo lo que cambió; bloqueados, solo los vacíos; los vacíos nunca viajan', () => {
+  const actual = { documento: '1', fechaNacimiento: '1990-05-01', nacionalidad: 'Ecuador', calle: '', codigoPostal: '' };
+  const nuevo = { documento: '1', fechaNacimiento: '1990-05-01', nacionalidad: 'Perú', calle: ' Av. Sol ', codigoPostal: '', piso: '  ' };
+  assert.deepEqual(construirCambios(actual, nuevo, false, true), { nacionalidad: 'Perú', calle: 'Av. Sol' });
+  assert.deepEqual(construirCambios(actual, nuevo, false, false), { calle: 'Av. Sol' });
+  assert.deepEqual(construirCambios(actual, { calle: 'X' }, false, true), { calle: 'X' });
+});
+
+test('campoEditable: con los datos cerrados solo se llena lo vacío', () => {
+  assert.equal(campoEditable({ calle: '' }, 'calle', false), true);
+  assert.equal(campoEditable({ calle: 'X' }, 'calle', false), false);
+  assert.equal(campoEditable({ calle: 'X' }, 'calle', true), true);
 });
 
 test('datosFaltantes names what FGREC still lacks, in plain words, and nothing when all is there', () => {
-  assert.deepEqual(datosFaltantes(leerDatos({ documento: null })), ['tu número de documento']);
-  assert.deepEqual(datosFaltantes(leerDatos({ documento: '0912345678' })), []);
+  assert.deepEqual(datosFaltantes(leerDatos({ documento: null })), [
+    'tu número de documento', 'tu fecha de nacimiento', 'tu nacionalidad', 'tu país de residencia', 'tu calle', 'tu código postal'
+  ]);
+  const completos = { documento: '0912345678', fechaNacimiento: '1990-05-01', nacionalidad: 'Ecuador', paisResidencia: 'Ecuador', calle: 'Av. Sol', codigoPostal: '170150' };
+  assert.deepEqual(datosFaltantes(leerDatos(completos)), []);
+  // Número, piso y depto son opcionales.
+  assert.deepEqual(datosFaltantes(leerDatos({ ...completos, codigoPostal: null, numero: null })), ['tu código postal']);
 });

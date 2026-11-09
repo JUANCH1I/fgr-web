@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-// "Mis datos": el postulante verifica sus datos de contacto, avisa si el nombre está mal y carga su documento. El país no se muestra ni se edita. El sitio no valida el número: lo decide FGREC.
+// "Mis datos": el postulante verifica sus datos de contacto, avisa si el nombre está mal y carga su documento, su fecha de nacimiento, su nacionalidad y su domicilio. El país del mercado no se muestra ni se edita. El sitio no valida los datos: lo decide FGREC; las listas de países salen de su respuesta.
 import PortalLayout from '../../layouts/PortalLayout.astro';
 import {
   COOKIE_SESION_NOMBRE,
@@ -10,7 +10,7 @@ import {
   borrarSesionYContacto,
   obtenerVariableEntorno
 } from '../../lib/fgrec-portal.ts';
-import { leerDatos, datosFaltantes, LARGO_MAX_DOCUMENTO, LARGO_MAX_COMENTARIO } from '../../lib/datos-pure.ts';
+import { leerDatos, datosFaltantes, campoEditable, CAMPOS_DATOS, LARGOS_DATOS, LARGO_MAX_DOCUMENTO, LARGO_MAX_COMENTARIO, type CampoDato } from '../../lib/datos-pure.ts';
 
 const sesionToken = Astro.cookies.get(COOKIE_SESION_NOMBRE)?.value;
 
@@ -44,6 +44,40 @@ const datos = leerDatos(respuesta.data);
 const nombreCompleto = `${datos.nombre} ${datos.apellido}`.trim();
 const sinDato = 'Sin registrar';
 const faltantes = datosFaltantes(datos);
+
+const hoy = new Date().toISOString().slice(0, 10);
+const editable = (campo: CampoDato) => campoEditable(datos, campo, datos.datosEditables);
+const hayEditable = datos.documentoEditable || CAMPOS_DATOS.some(editable);
+const datosCerrados = !datos.datosEditables && CAMPOS_DATOS.some((c) => datos[c]);
+const actualInicial = Object.fromEntries(['documento', ...CAMPOS_DATOS].map((c) => [c, datos[c as 'documento' | CampoDato]]));
+
+interface CampoVista { campo: CampoDato; etiqueta: string; tipo: 'date' | 'select' | 'text'; requerido?: boolean; autocomplete?: string; }
+const secciones: Array<{ id: string; titulo: string; desc: string; campos: CampoVista[]; fila?: CampoVista[] }> = [
+  {
+    id: 'personales',
+    titulo: 'Datos personales',
+    desc: 'Los pedimos para tu alta académica en la universidad.',
+    campos: [
+      { campo: 'fechaNacimiento', etiqueta: 'Fecha de nacimiento', tipo: 'date', requerido: true, autocomplete: 'bday' },
+      { campo: 'nacionalidad', etiqueta: 'Nacionalidad', tipo: 'select', requerido: true }
+    ]
+  },
+  {
+    id: 'domicilio',
+    titulo: 'Domicilio',
+    desc: 'Donde vives actualmente.',
+    campos: [
+      { campo: 'paisResidencia', etiqueta: 'País de residencia', tipo: 'select', requerido: true, autocomplete: 'country-name' },
+      { campo: 'calle', etiqueta: 'Calle', tipo: 'text', requerido: true, autocomplete: 'address-line1' }
+    ],
+    fila: [
+      { campo: 'numero', etiqueta: 'N°', tipo: 'text' },
+      { campo: 'piso', etiqueta: 'Piso', tipo: 'text' },
+      { campo: 'depto', etiqueta: 'Depto', tipo: 'text' },
+      { campo: 'codigoPostal', etiqueta: 'Código postal', tipo: 'text', requerido: true, autocomplete: 'postal-code' }
+    ]
+  }
+];
 ---
 
 <PortalLayout title="Mis datos | Fundación Gran Rosario" autenticado={true} pendientes={{ datos: faltantes.length }}>
@@ -74,64 +108,126 @@ const faltantes = datosFaltantes(datos);
       </header>
 
       <div class="datos-grid">
-        <!-- Columna Principal: Documento (Acción indispensable) -->
+        <!-- Columna Principal: documento y datos que se cargan en un solo formulario -->
         <div class="datos-col--main">
-          <section class="section-card datos-card--primary" aria-labelledby="documento-titulo">
-            <div class="datos-card__header">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><path d="M16 10h2"/><path d="M16 14h2"/></svg>
-              <h2 class="section-card__title" id="documento-titulo">Documento de identidad</h2>
-            </div>
-            <p class="datos-card__desc">Este dato es indispensable para formalizar tu expediente ante la universidad.</p>
+          <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
+          <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
 
-            <div id="datos-estado" class="portal-alert portal-alert--success" role="status" tabindex="-1" hidden></div>
-            <div id="datos-error" class="portal-alert portal-alert--error" role="alert" tabindex="-1" hidden></div>
+          <form
+            id="datos-form"
+            class="datos-form-secciones"
+            novalidate
+            data-actual={JSON.stringify(actualInicial)}
+            data-documento-editable={datos.documentoEditable ? '1' : '0'}
+            data-datos-editables={datos.datosEditables ? '1' : '0'}
+          >
+            <section class="section-card datos-card--primary" aria-labelledby="documento-titulo">
+              <div class="datos-card__header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--portal-cobre)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><path d="M16 10h2"/><path d="M16 14h2"/></svg>
+                <h2 class="section-card__title" id="documento-titulo">Documento de identidad</h2>
+              </div>
+              <p class="datos-card__desc">Este dato es indispensable para formalizar tu expediente ante la universidad.</p>
 
-            <form
-              id="datos-form"
-              class="datos-form-grid"
-              novalidate
-              data-documento={datos.documento}
-              data-editable={datos.documentoEditable ? '1' : '0'}
-            >
-              {datos.documentoEditable ? (
-                <div class="portal-input-group">
-                  <label for="datos-documento" class="portal-label">
-                    <span>Número de documento de identidad</span>
-                    <span class="portal-label__tag">Requerido</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="datos-documento"
-                    name="documento"
-                    class="portal-input"
-                    maxlength={LARGO_MAX_DOCUMENTO}
-                    autocomplete="off"
-                    placeholder="Ej. Cédula, DNI o Pasaporte"
-                    value={datos.documento}
-                    aria-describedby="datos-documento-error"
-                  />
-                  <p id="datos-documento-error" class="datos__error" hidden></p>
-                </div>
-              ) : (
-                <div class="portal-input-group">
-                  <p class="portal-label">Número de documento de identidad</p>
-                  <div class="datos__valor-bloqueado">
-                    <span class="datos__valor-texto">{datos.documento || sinDato}</span>
-                    <span class="portal-badge portal-badge--neutral">Validado</span>
+              <div class="datos-form-grid">
+                {datos.documentoEditable ? (
+                  <div class="portal-input-group">
+                    <label for="datos-documento" class="portal-label">
+                      <span>Número de documento de identidad</span>
+                      <span class="portal-label__tag">Requerido</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="datos-documento"
+                      name="documento"
+                      class="portal-input"
+                      maxlength={LARGO_MAX_DOCUMENTO}
+                      autocomplete="off"
+                      placeholder="Ej. Cédula, DNI o Pasaporte"
+                      value={datos.documento}
+                      aria-describedby="datos-documento-error"
+                    />
+                    <p id="datos-documento-error" class="datos__error" hidden></p>
                   </div>
-                  <p class="datos__nota">Tu expediente ya fue aprobado: para cambiar el número de documento, escríbele a tu asesora.</p>
-                </div>
-              )}
+                ) : (
+                  <div class="portal-input-group">
+                    <p class="portal-label">Número de documento de identidad</p>
+                    <div class="datos__valor-bloqueado">
+                      <span class="datos__valor-texto">{datos.documento || sinDato}</span>
+                      <span class="portal-badge portal-badge--neutral">Validado</span>
+                    </div>
+                    <p class="datos__nota">Tu expediente ya fue aprobado: para cambiar el número de documento, escríbele a tu asesora.</p>
+                  </div>
+                )}
+              </div>
+            </section>
 
-              {datos.documentoEditable && (
-                <div class="datos-form__footer">
-                  <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">
-                    Guardar mis datos
-                  </button>
+            {secciones.map((sec) => {
+              const campoVista = (c: CampoVista) => (
+                <div class="portal-input-group">
+                  {editable(c.campo) ? (
+                    <>
+                      <label for={`datos-${c.campo}`} class="portal-label">
+                        <span>{c.etiqueta}</span>
+                        {c.requerido && <span class="portal-label__tag">Requerido</span>}
+                      </label>
+                      {c.tipo === 'select' ? (
+                        <select id={`datos-${c.campo}`} name={c.campo} class="portal-select" aria-describedby={`datos-${c.campo}-error`}>
+                          <option value="">Selecciona una opción</option>
+                          {datos.paises.map((p) => <option value={p} selected={p === datos[c.campo]}>{p}</option>)}
+                        </select>
+                      ) : (
+                        <input
+                          type={c.tipo}
+                          id={`datos-${c.campo}`}
+                          name={c.campo}
+                          class="portal-input"
+                          value={datos[c.campo]}
+                          maxlength={c.tipo === 'text' ? LARGOS_DATOS[c.campo as keyof typeof LARGOS_DATOS] : undefined}
+                          min={c.tipo === 'date' ? '1900-01-01' : undefined}
+                          max={c.tipo === 'date' ? hoy : undefined}
+                          autocomplete={c.autocomplete ?? 'off'}
+                          aria-describedby={`datos-${c.campo}-error`}
+                        />
+                      )}
+                      <p id={`datos-${c.campo}-error`} class="datos__error" hidden></p>
+                    </>
+                  ) : (
+                    <>
+                      <p class="portal-label">{c.etiqueta}</p>
+                      <div class="datos__valor-bloqueado">
+                        <span class="datos__valor-texto">{datos[c.campo]}</span>
+                        <span class="portal-badge portal-badge--neutral">Validado</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
-            </form>
-          </section>
+              );
+              return (
+                <section class="section-card datos-card--primary" aria-labelledby={`${sec.id}-titulo`}>
+                  <div class="datos-card__header">
+                    <h2 class="section-card__title" id={`${sec.id}-titulo`}>{sec.titulo}</h2>
+                  </div>
+                  <p class="datos-card__desc">{sec.desc}</p>
+                  <div class="datos-form-grid">
+                    {sec.campos.map(campoVista)}
+                    {sec.fila && <div class="datos-fila">{sec.fila.map(campoVista)}</div>}
+                  </div>
+                </section>
+              );
+            })}
+
+            {datosCerrados && (
+              <p class="datos__nota">Tu expediente ya fue aprobado: los datos validados no se pueden cambiar. Para corregirlos, escríbele a tu asesora.</p>
+            )}
+
+            {hayEditable && (
+              <div class="datos-form__footer">
+                <button type="submit" id="datos-guardar" class="portal-btn portal-btn--primary">
+                  Guardar mis datos
+                </button>
+              </div>
+            )}
+          </form>
         </div>
 
         <!-- Columna Secundaria: Ficha de contacto institucional y aviso de nombre -->
@@ -259,10 +355,12 @@ const faltantes = datosFaltantes(datos);
     flex-direction: column;
     gap: 18px;
   }
+  .datos-form-grid .portal-input-group { margin-bottom: 0; }
+  .datos-form-secciones { display: flex; flex-direction: column; gap: 24px; }
+  .datos-fila { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 18px; }
+  .datos-col--main > .portal-alert { margin-bottom: 16px; }
   .datos-form__footer {
-    margin-top: 8px;
-    padding-top: 16px;
-    border-top: 1px solid var(--portal-borde);
+    padding-top: 4px;
   }
 
   .datos__valor-bloqueado {
@@ -327,7 +425,7 @@ const faltantes = datosFaltantes(datos);
 </style>
 
 <script>
-  import { construirCambios, mensajeErrorDatos, type ErrorDatos } from '../../lib/datos-pure.ts';
+  import { construirCambios, mensajeErrorDatos, CAMPOS_DATOS, type ErrorDatos } from '../../lib/datos-pure.ts';
 
   const REDIRECCION_LOGIN = '/mi-postulacion/ingresar';
   const CABECERAS = { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' };
@@ -395,27 +493,35 @@ const faltantes = datosFaltantes(datos);
     }
   });
 
-  // --- Documento ---
+  // --- Datos del postulante (documento, fecha de nacimiento, nacionalidad y domicilio) ---
   const form = el<HTMLFormElement>('datos-form');
-  const inputDocumento = el<HTMLInputElement>('datos-documento');
   const guardar = el<HTMLButtonElement>('datos-guardar');
   const estado = el('datos-estado');
   const error = el('datos-error');
-  const errorDocumento = el('datos-documento-error');
 
-  const editable = form?.dataset.editable === '1';
-  let actual = { documento: form?.dataset.documento ?? '' };
+  const documentoEditable = form?.dataset.documentoEditable === '1';
+  const datosEditables = form?.dataset.datosEditables === '1';
+  let actual: Record<string, string> = JSON.parse(form?.dataset.actual ?? '{}');
+
+  const campoInput = (campo: string) => el<HTMLInputElement | HTMLSelectElement>(`datos-${campo}`);
+  const campoError = (campo: string) => el(`datos-${campo}-error`);
 
   function limpiarErrores() {
-    ocultar(estado, error, errorDocumento);
-    inputDocumento?.removeAttribute('aria-invalid');
+    ocultar(estado, error);
+    for (const campo of ['documento', ...CAMPOS_DATOS]) {
+      ocultar(campoError(campo));
+      campoInput(campo)?.removeAttribute('aria-invalid');
+    }
   }
 
   function mostrarError(e: ErrorDatos) {
-    if (e.campo === 'documento') {
-      inputDocumento?.setAttribute('aria-invalid', 'true');
-      if (errorDocumento) { errorDocumento.textContent = e.mensaje; errorDocumento.hidden = false; }
-      inputDocumento?.focus();
+    const input = e.campo && e.campo !== 'comentario' ? campoInput(e.campo) : null;
+    const caja = e.campo ? campoError(e.campo) : null;
+    if (input && caja) {
+      input.setAttribute('aria-invalid', 'true');
+      caja.textContent = e.mensaje;
+      caja.hidden = false;
+      input.focus();
     } else {
       mostrar(error, e.mensaje);
     }
@@ -424,7 +530,10 @@ const faltantes = datosFaltantes(datos);
   form?.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     limpiarErrores();
-    const cambios = construirCambios(actual, { documento: inputDocumento?.value }, editable);
+    // Un campo que no se dibujó (bloqueado) no tiene input: queda sin valor y no viaja.
+    const nuevo: Record<string, string | undefined> = {};
+    for (const campo of ['documento', ...CAMPOS_DATOS]) nuevo[campo] = campoInput(campo)?.value;
+    const cambios = construirCambios(actual, nuevo, documentoEditable, datosEditables);
     if (!Object.keys(cambios).length) {
       mostrar(estado, 'No hay cambios para guardar.');
       return;
@@ -434,8 +543,13 @@ const faltantes = datosFaltantes(datos);
     if (guardar) guardar.disabled = false;
     if (!r) return;
     if (r.status === 200) {
-      actual = { documento: r.data?.documento ?? '' };
-      if (inputDocumento) inputDocumento.value = actual.documento;
+      for (const [campo, enviado] of Object.entries(cambios)) {
+        // FGREC puede normalizar lo guardado; si no devuelve el campo, vale lo que se envió.
+        const guardado = typeof r.data?.[campo] === 'string' ? r.data[campo] : (enviado as string);
+        actual[campo] = guardado;
+        const input = campoInput(campo);
+        if (input) input.value = guardado;
+      }
       mostrar(estado, 'Guardamos tus datos.');
     } else {
       mostrarError(r.status === 0 ? { campo: null, mensaje: ERROR_RED } : mensajeErrorDatos(r.status, r.data));
