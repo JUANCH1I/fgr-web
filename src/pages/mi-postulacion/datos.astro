@@ -41,6 +41,19 @@ const whatsappHref = whatsappNumero
   : null;
 
 const datos = leerDatos(respuesta.data);
+
+// Los datos personales viajan a la universidad bajo la autorización de documentos: si falta aceptar la versión vigente, se pide aquí.
+let consentimiento: { codigo: string; version: string; texto: string } | null = null;
+if (respuesta.ok) {
+  const respCons = await llamarFGRECPortal({
+    metodo: 'GET',
+    rutaRelativa: 'consentimientos',
+    sesion: sesionToken,
+    contexto: extraerContextoVisitante(Astro.request)
+  });
+  const texto = respCons.ok ? respCons.data?.textos?.find((t: any) => t.codigo === 'DOCUMENTOS_TRANSFERENCIA') : null;
+  if (texto && !texto.aceptado) consentimiento = { codigo: texto.codigo, version: texto.version, texto: texto.texto };
+}
 const nombreCompleto = `${datos.nombre} ${datos.apellido}`.trim();
 const sinDato = 'Sin registrar';
 const faltantes = datosFaltantes(datos);
@@ -218,6 +231,22 @@ const secciones: Array<{ id: string; titulo: string; desc: string; campos: Campo
 
             {datosCerrados && (
               <p class="datos__nota">Tu expediente ya fue aprobado: los datos validados no se pueden cambiar. Para corregirlos, escríbele a tu asesora.</p>
+            )}
+
+            {consentimiento && CAMPOS_DATOS.some(editable) && (
+              <section id="datos-consentimiento" class="section-card exp-consentimiento-card" aria-labelledby="datos-consentimiento-titulo"
+                data-codigo={consentimiento.codigo} data-version={consentimiento.version}>
+                <h2 id="datos-consentimiento-titulo" class="section-card__title">Autorización de uso y transferencia de datos</h2>
+                <p class="datos-card__desc">Para guardar tus datos personales necesitamos que aceptes la autorización vigente: los enviamos a la universidad para tu alta académica.</p>
+                <div class="exp-consentimiento__texto" tabindex="0" role="region" aria-label="Texto legal de la autorización">
+                  {consentimiento.texto}
+                </div>
+                <label class="portal-label" for="datos-consentimiento-acepto">
+                  <input type="checkbox" id="datos-consentimiento-acepto" aria-describedby="datos-consentimiento-error" />
+                  <span>Leí y acepto la autorización de uso y transferencia de mis datos y documentos.</span>
+                </label>
+                <p id="datos-consentimiento-error" class="datos__error" hidden></p>
+              </section>
             )}
 
             {hayEditable && (
@@ -425,7 +454,7 @@ const secciones: Array<{ id: string; titulo: string; desc: string; campos: Campo
 </style>
 
 <script>
-  import { construirCambios, mensajeErrorDatos, CAMPOS_DATOS, type ErrorDatos } from '../../lib/datos-pure.ts';
+  import { construirCambios, mensajeErrorDatos, tocaDatosPersonales, CAMPOS_DATOS, type ErrorDatos } from '../../lib/datos-pure.ts';
 
   const REDIRECCION_LOGIN = '/mi-postulacion/ingresar';
   const CABECERAS = { 'Content-Type': 'application/json', 'X-FGREC-Portal': '1' };
@@ -537,6 +566,29 @@ const secciones: Array<{ id: string; titulo: string; desc: string; campos: Campo
     if (!Object.keys(cambios).length) {
       mostrar(estado, 'No hay cambios para guardar.');
       return;
+    }
+    const bloqueConsentimiento = el('datos-consentimiento');
+    if (bloqueConsentimiento && tocaDatosPersonales(cambios)) {
+      const acepto = el<HTMLInputElement>('datos-consentimiento-acepto');
+      const errorConsentimiento = el('datos-consentimiento-error');
+      ocultar(errorConsentimiento);
+      if (!acepto?.checked) {
+        if (errorConsentimiento) {
+          errorConsentimiento.textContent = 'Para guardar tus datos personales, marca que aceptas la autorización.';
+          errorConsentimiento.hidden = false;
+        }
+        acepto?.focus();
+        return;
+      }
+      if (guardar) guardar.disabled = true;
+      const c = await enviar('/api/portal/consentimiento', { codigo: bloqueConsentimiento.dataset.codigo, version: bloqueConsentimiento.dataset.version });
+      if (!c) return;
+      if (c.status !== 200 && c.status !== 201) {
+        if (guardar) guardar.disabled = false;
+        mostrar(error, c.status === 0 ? ERROR_RED : (c.data?.message || 'No pudimos registrar tu aceptación. Inténtalo de nuevo.'));
+        return;
+      }
+      bloqueConsentimiento.remove();
     }
     if (guardar) guardar.disabled = true;
     const r = await enviar('/api/portal/datos', cambios);

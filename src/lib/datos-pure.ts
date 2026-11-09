@@ -90,6 +90,11 @@ export function construirCambios(
   return cambios;
 }
 
+/** Los datos personales viajan a la universidad bajo la autorización de documentos; el número de documento solo no la pide. */
+export function tocaDatosPersonales(cambios: Partial<Record<CampoTexto, string>>): boolean {
+  return CAMPOS_DATOS.some((campo) => cambios[campo] !== undefined);
+}
+
 export type CuerpoPreparado<T> = { ok: true; cuerpo: T } | { ok: false; field: string; message: string };
 
 /** Valida lo mínimo antes de molestar a FGREC; el detalle (formato del número, de la fecha, la lista de países) lo decide FGREC. */

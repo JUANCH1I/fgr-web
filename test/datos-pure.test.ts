@@ -7,7 +7,8 @@ import {
   campoEditable,
   prepararCuerpoDatos,
   prepararCuerpoNombre,
-  mensajeErrorDatos
+  mensajeErrorDatos,
+  tocaDatosPersonales
 } from '../src/lib/datos-pure.ts';
 
 test('leerDatos: los null llegan como texto vacío y documentoEditable solo es true si FGREC lo dice', () => {
@@ -101,4 +102,11 @@ test('datosFaltantes names what FGREC still lacks, in plain words, and nothing w
   assert.deepEqual(datosFaltantes(leerDatos(completos)), []);
   // Número, piso y depto son opcionales.
   assert.deepEqual(datosFaltantes(leerDatos({ ...completos, codigoPostal: null, numero: null })), ['tu código postal']);
+});
+
+test('tocaDatosPersonales: the consent is needed when a personal datum travels, not for the document number alone', () => {
+  assert.equal(tocaDatosPersonales({ documento: '0912345678' }), false);
+  assert.equal(tocaDatosPersonales({}), false);
+  assert.equal(tocaDatosPersonales({ calle: 'Av. Sol' }), true);
+  assert.equal(tocaDatosPersonales({ documento: '0912345678', fechaNacimiento: '1990-05-01' }), true);
 });
