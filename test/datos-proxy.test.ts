@@ -36,14 +36,14 @@ test('guardar: rechaza sin CSRF, sin sesión, con JSON inválido y con cuerpo va
   assert.equal((await manejarGuardadoDatos({ request: peticion('datos', '{no'), cookies: cookiesFalsas('s'), llamar })).status, 400);
   const vacio = await manejarGuardadoDatos({ request: peticion('datos', {}), cookies: cookiesFalsas('s'), llamar });
   assert.equal(vacio.status, 400);
-  const soloFecha = await manejarGuardadoDatos({ request: peticion('datos', { fechaNacimiento: '1990-05-01' }), cookies: cookiesFalsas('s'), llamar });
+  const soloFecha = await manejarGuardadoDatos({ request: peticion('datos', { pais: 'EC' }), cookies: cookiesFalsas('s'), llamar });
   assert.equal(soloFecha.status, 400);
   assert.equal((await soloFecha.json()).field, 'datos');
 
   assert.equal(llamadas, 0);
 });
 
-test('guardar: reenvía solo el documento, con la sesión y el contexto del visitante; devuelve el cuerpo de FGREC', async () => {
+test('guardar: reenvía solo los campos conocidos, con la sesión y el contexto del visitante; devuelve el cuerpo de FGREC', async () => {
   let recibido: any;
   const llamar = (async (o: any) => { recibido = o; return { ok: true, status: 200, data: DATOS }; }) as any;
   const res = await manejarGuardadoDatos({ request: peticion('datos', { documento: ' 0912345678 ', fechaNacimiento: '1990-05-01', pais: 'EC' }), cookies: cookiesFalsas('tok-1'), llamar });
@@ -51,7 +51,7 @@ test('guardar: reenvía solo el documento, con la sesión y el contexto del visi
   assert.deepEqual(await res.json(), DATOS);
   assert.equal(recibido.metodo, 'POST');
   assert.equal(recibido.rutaRelativa, 'datos');
-  assert.deepEqual(recibido.cuerpo, { documento: '0912345678' });
+  assert.deepEqual(recibido.cuerpo, { documento: '0912345678', fechaNacimiento: '1990-05-01' });
   assert.equal(recibido.sesion, 'tok-1');
   assert.deepEqual(recibido.contexto, { ip: '1.2.3.4', ua: 'UA/1' });
 });
