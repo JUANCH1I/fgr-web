@@ -1,0 +1,159 @@
+---
+// Printed QR codes point here: keep this exact path (/certificados/<codigo>) across redesigns or domain moves.
+export const prerender = false;
+
+import sitio from '../../datos/sitio.json';
+import { resolverImagen } from '../../lib/imagen';
+import { obtenerVariableEntorno } from '../../lib/fgrec-portal';
+import { leerCertificados, verificarCertificado } from '../../lib/certificados';
+
+const resultado = verificarCertificado(
+  Astro.params.codigo ?? '',
+  leerCertificados(obtenerVariableEntorno('CERTIFICADOS_JSON'))
+);
+
+// Names must never reach search engines.
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+if (resultado.tipo === 'inexistente') Astro.response.status = 404;
+
+const correo = sitio.contacto.correo;
+const logoURL = resolverImagen(sitio.logo, 600);
+const titulo = {
+  vigente: 'Certificado válido',
+  anulado: 'Certificado anulado',
+  inexistente: 'No encontramos este certificado'
+}[resultado.tipo];
+
+const filas = resultado.tipo === 'vigente'
+  ? [
+      ['Nombre', resultado.certificado.nombre],
+      ['Curso', resultado.certificado.curso],
+      ['Fecha', resultado.certificado.fecha_curso],
+      ['Duración', /^\d+$/.test(resultado.certificado.horas) ? `${resultado.certificado.horas} horas` : resultado.certificado.horas],
+      ['Evaluación', resultado.certificado.evaluacion],
+      ['Realizado para', resultado.certificado.realizado_para],
+      ['Dictado por', resultado.certificado.dictado_por],
+      ['Emitido por', resultado.certificado.emitido_por],
+      ['N.º de certificado', resultado.certificado.numero]
+    ]
+  : resultado.tipo === 'anulado'
+    ? [['Nombre', resultado.nombre], ['N.º de certificado', resultado.numero]]
+    : [];
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <title>{titulo} | {sitio.nombreCorto}</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=Montserrat:wght@500;600&display=swap" />
+  <style>
+    :root {
+      --azul: #00182E;
+      --cobre: #805634;
+      --marfil: #F8F4EC;
+      --linea: #e4dccb;
+      --rojo: #8a1c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-block-size: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--marfil);
+      color: var(--azul);
+      font-family: Montserrat, system-ui, sans-serif;
+      font-size-adjust: from-font;
+      line-height: 1.5;
+    }
+    main, footer { inline-size: min(100% - 2rem, 34rem); margin-inline: auto; }
+    /* The official logo is light-on-dark, so it sits on a brand-blue band. */
+    header { padding-block: 1.25rem; background: var(--azul); text-align: center; }
+    header img { inline-size: 11rem; block-size: auto; }
+    main { flex: 1; padding-block: 2rem; }
+    .estado {
+      margin: 0 0 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cobre);
+    }
+    h1 {
+      margin: 0 0 1.25rem;
+      font-family: "EB Garamond", Georgia, serif;
+      font-size-adjust: from-font;
+      font-weight: 600;
+      font-size: clamp(1.9rem, 1.5rem + 2vw, 2.5rem);
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+    .anulado h1 { color: var(--rojo); }
+    dl {
+      margin: 0;
+      padding: 0.25rem 1.25rem;
+      background: #fff;
+      border: 1px solid var(--linea);
+      border-block-start: 4px solid var(--cobre);
+      border-radius: 0.5rem;
+    }
+    .anulado dl { border-block-start-color: var(--rojo); }
+    dl div { padding-block: 0.75rem; border-block-end: 1px solid var(--linea); }
+    dl div:last-child { border-block-end: 0; }
+    dt {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cobre);
+    }
+    dd {
+      margin: 0.15rem 0 0;
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: 1.2rem;
+      overflow-wrap: anywhere;
+    }
+    p { text-wrap: pretty; }
+    a { color: var(--cobre); }
+    footer {
+      padding-block: 1.25rem 2rem;
+      border-block-start: 1px solid var(--linea);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src={logoURL} alt={sitio.nombre} width="204" height="60" />
+  </header>
+  <main class={resultado.tipo}>
+    {resultado.tipo !== 'inexistente' && <p class="estado">Estado: {resultado.tipo}</p>}
+    <h1>{titulo}</h1>
+    {filas.length > 0 && (
+      <dl>
+        {filas.map(([etiqueta, valor]) => (
+          <div><dt>{etiqueta}</dt><dd>{valor}</dd></div>
+        ))}
+      </dl>
+    )}
+    {resultado.tipo === 'anulado' && (
+      <p>Este certificado fue anulado y ya no tiene validez. Para consultas, escríbanos a <a href={`mailto:${correo}`}>{correo}</a>.</p>
+    )}
+    {resultado.tipo === 'inexistente' && (
+      <p>Revise que el código coincida con el impreso en el diploma. Si el problema continúa, escríbanos a <a href={`mailto:${correo}`}>{correo}</a>.</p>
+    )}
+  </main>
+  <footer>
+    Emitido por Fundación Gran Rosario Ecuador · <a href="https://www.fgrec.org/">www.fgrec.org</a>
+  </footer>
+</body>
+</html>
