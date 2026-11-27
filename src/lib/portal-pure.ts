@@ -249,11 +249,11 @@ export function mensajeErrorSubida(status: number, code?: string, serverMessage?
   } else if (status === 415 || code === 'UNSUPPORTED_TYPE') {
     detalle = 'Formato no soportado. Asegúrate de subir un archivo PDF, JPG o PNG.';
   } else if (status === 422 || code === 'INVALID_FILE' || code === 'ACTIVE_CONTENT') {
-    detalle = serverMessage || 'El contenido del archivo no es válido (los PDFs con scripts o contenido activo no están permitidos).';
+    detalle = serverMessage || 'Este PDF no se puede recibir porque trae elementos que no se admiten. Sube una foto o una captura del documento (JPG o PNG), o ábrelo e imprímelo como PDF nuevo.';
   } else if (serverMessage) {
     detalle = serverMessage;
   }
-  return `${detalle} Debes volver a seleccionar el archivo para solicitar una nueva autorización de carga (cada autorización es de un solo uso).`;
+  return `${detalle} Para intentarlo de nuevo, debes volver a seleccionar el archivo.`;
 }
 
 /**

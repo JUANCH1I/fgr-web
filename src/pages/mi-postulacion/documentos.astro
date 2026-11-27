@@ -597,6 +597,12 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
         estadoSpan.dataset.cargando = cargando ? 'true' : 'false';
       }
 
+      // The reason stays next to the button the applicant is looking at; the top banner scrolled away from it.
+      function fallo(motivo: string) {
+        setEstado(motivo, false);
+        target.value = '';
+      }
+
       if (requisito === 'ADICIONAL' && !categoria) {
         mostrarError('Elegí el tipo de documento antes de cargar el archivo.');
         target.value = '';
@@ -612,15 +618,11 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
           if (convertido) {
             file = convertido;
           } else {
-            mostrarError('Tu teléfono tomó la foto en formato HEIC y no fue posible convertirla automáticamente. Por favor toma una foto en formato JPG o selecciona otro archivo.');
-            setEstado('', false);
-            target.value = '';
+            fallo('Tu teléfono tomó la foto en formato HEIC y no fue posible convertirla automáticamente. Por favor toma una foto en formato JPG o selecciona otro archivo.');
             return;
           }
         } else {
-          mostrarError(validacion.error || 'Archivo no válido.');
-          setEstado('', false);
-          target.value = '';
+          fallo(validacion.error || 'Archivo no válido.');
           return;
         }
       }
@@ -651,9 +653,7 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
 
         const authData = await authRes.json();
         if (!authRes.ok || !authData.token || !authData.url) {
-          mostrarError(authData.message || 'No fue posible autorizar la subida del documento.');
-          setEstado('Error de autorización', false);
-          target.value = '';
+          fallo(authData.message || 'No fue posible autorizar la subida del documento.');
           return;
         }
 
@@ -681,15 +681,10 @@ const pendientesExpediente = Number(conteo.pendientes ?? 0) + Number(conteo.obse
           try {
             errData = await uploadRes.json();
           } catch {}
-          const errorMsg = mensajeErrorSubida(uploadRes.status, errData.code, errData.message);
-          mostrarError(errorMsg);
-          setEstado('Rechazado', false);
-          target.value = '';
+          fallo(mensajeErrorSubida(uploadRes.status, errData.code, errData.message));
         }
       } catch (err: any) {
-        mostrarError('Error de red durante la carga del archivo. Vuelve a seleccionar el archivo para intentar de nuevo.');
-        setEstado('Error de subida', false);
-        target.value = '';
+        fallo('Error de red durante la carga del archivo. Vuelve a seleccionar el archivo para intentar de nuevo.');
       }
     });
   });
